@@ -485,3 +485,58 @@
 - YouTube Studio 자막 다운로드: https://support.google.com/youtube/answer/2734705
 - YouTube 자막 파일 형식: https://support.google.com/youtube/answer/2734698
 - YouTube 자막 추가 및 타임스탬프 설명: https://support.google.com/youtube/answer/2734796
+
+
+## 15. VB-20 — 일반 시청자 자막 자동 취득 공식 경로 재검증 (2026-11-11)
+
+### 사용자 관점 및 목표
+- 사용자 지적을 반영해 대상 사용자를 다시 고정했다: 영상책 사용자는 영상 제작자/편집자가 아니라 일반 유튜브 시청자다.
+- 제작자에게 연락하거나 YouTube Studio에서 자막을 내려받거나 SRT/VTT를 가져오도록 요구하는 흐름은 일반 시청자용 해결책이 아니며, 제품 핵심 기능으로 제안하지 않는다.
+- 핵심 목표는 영상책 안에서 YouTube 영상을 찾고 선택한 뒤, 일반 시청자에게 보이는 자막/대본을 자동 확보하고, 한국어 표기 교정 후 영상책 내부에 표시하며 재생 시점과 동기화하는 것이다.
+
+### 공식 자료 재검증 (2026-11-11)
+1. **YouTube 대본 UI**
+   - YouTube Help는 자막이 있는 영상에서 영상 설명의 'Show transcript'를 통해 전체 대본을 보고, 문장을 눌러 해당 시점으로 이동할 수 있다고 설명한다.
+   - 이 문서는 YouTube 사용자 UI 사용법이며, 제3자 앱에 대본 본문을 제공하는 API라고 설명하지 않는다.
+   - 출처: https://support.google.com/youtube/answer/15930243
+
+2. **YouTube Captions API**
+   - `captions.list`는 자막 트랙 목록만 반환하고 실제 자막 본문은 포함하지 않는다. OAuth scope가 필요하며 quota cost는 50 units다.
+   - `captions.download`는 실제 자막 파일을 반환하지만 OAuth가 필요하고, 요청 사용자가 해당 영상을 편집할 권한이 있어야 한다. quota cost는 200 units다.
+   - 따라서 일반 시청자 권한으로 임의 공개 영상의 본문을 가져오는 공식 API가 아니다.
+   - 출처: https://developers.google.com/youtube/data/reference/rest/v3/captions/list ; https://developers.google.com/youtube/data/reference/rest/v3/captions/download ; https://developers.google.com/youtube/data/guides/implementation/captions
+
+3. **IFrame Player API와 브라우저 경계**
+   - 공식 IFrame Player API는 YouTube 영상을 삽입하고 재생/일시정지/탐색/현재 재생 시간 등의 플레이어 제어를 제공한다. 검토한 공식 문서에서 자막 텍스트/대본 본문을 읽어오는 메서드는 확인되지 않았다.
+   - 브라우저 동일 출처 정책상 다른 출처의 iframe DOM은 부모 페이지에서 직접 읽을 수 없다.
+   - 출처: https://developers.google.com/youtube/iframe_api_reference ; https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe
+
+4. **정책 경계**
+   - YouTube Developer Policies는 문서화되지 않은 API 사용을 금지하고, YouTube/Google 애플리케이션 스크래핑 또는 스크랩된 YouTube 데이터/콘텐츠 취득을 금지한다.
+   - 출처: https://developers.google.com/youtube/terms/developer-policies
+   - 따라서 InnerTube 등 내부 요청 복제, YouTube 페이지 DOM 자동 수집, 프록시를 통한 수집·우회는 구현 후보에서 제외한다.
+
+5. **앱 내부 검색의 별도 문제**
+   - 공개 영상 검색용 `search.list`는 공식 API이나, 기본 할당량은 하루 100회이며 추가 페이지 호출도 쿼터를 소비한다.
+   - 공개 데이터 요청에도 API key가 필요하고, API 정책은 자격 증명을 오픈소스 프로젝트에 삽입하지 못하도록 한다. API 이용 약관 §3.2의 법적 계약 연령 조건도 있다.
+   - 출처: https://developers.google.com/youtube/data/reference/rest/v3/search/list ; https://developers.google.com/youtube/data/guides/authentication ; https://developers.google.com/youtube/terms/api-services-terms-of-service ; https://developers.google.com/youtube/terms/developer-policies
+   - 현재 사용자에게 API 프로젝트/약관 수락/키/OAuth 설정을 안내하지 않는다.
+
+### 판정
+- **확인됨:** YouTube는 자막이 있는 영상의 대본을 일반 사용자에게 YouTube 화면 안에서 보여준다.
+- **확인됨:** 공식 Captions API는 일반 시청자의 임의 공개 영상 자막 본문 자동 취득 경로가 아니다.
+- **확인됨:** 공식 IFrame API는 재생 제어·현재 시간 확인 기능을 제공한다.
+- **확인됨:** 정책은 undocumented API와 YouTube 앱 스크래핑/스크랩 데이터 취득을 금지한다.
+- **미확인:** 일반 시청자가 볼 수 있는 대본을 영상책의 정적 GitHub Pages 앱이 공식적이고 지속적으로 자동 취득할 수 있는 경로.
+- **미해결:** 영상책 내부 검색 → 자막 자동 취득 → 한국어 교정 → 내부 표시/시간 동기화의 전체 흐름.
+- **중요:** 이번 조사는 모든 가능한 기술 경로가 불가능하다는 증명이 아니다. 현재 공식 문서와 제약 검토에서 채택 가능한 경로를 찾지 못했다는 결론이다.
+
+### 코드·테스트·비용
+- 코드 변경: 없음.
+- API 계정/키/OAuth/외부 서비스/결제: 없음, 비용 0원.
+- 실제 API 호출, CORS/브라우저 테스트, Android 실기기 테스트, GitHub Pages 배포 테스트: 미실행.
+- 앱 내부 검색/자동 자막/교정/시간 동기화 end-to-end: 미실행.
+- 제작자 제공 SRT/VTT 정적 경로: 역사적 참고/권리 허가 테스트용으로만 문서화하며 일반 시청자 해결책으로 안내하지 않는다.
+
+### 다음 작업
+- 일반 시청자에게 공개된 대본을 제3자 앱에서 읽어오는 **공식적으로 문서화된 방법**이 새로 확인되는 경우에만 작은 검증을 진행한다. 그렇지 않으면 자막 취득을 해결한 것처럼 기능을 추가하지 않는다.
