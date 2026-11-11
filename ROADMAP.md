@@ -189,3 +189,17 @@
 - [ ] Android 및 GitHub Pages 실기기/배포 테스트
 
 이번 회차는 공식 문서 조사와 프로젝트 문서 갱신만 수행했다. 코드·API 계정·키·OAuth·외부 서비스·결제 변경은 없고 비용은 0원이다. 실제 브라우저/CORS/Android/Pages 테스트는 미실행이다. 제작자/권리자 파일을 일반 시청자에게 요구하지 않는다.
+
+
+## VB-22 기록 — 2026-11-11
+- [x] Web Speech API가 YouTube 자막 API가 아닌 STT라는 점 확인
+- [x] 기본 Chrome SpeechRecognition이 서버 기반일 수 있고 오프라인이 아님을 확인
+- [x] Chrome Android에서 SpeechRecognition on-device `processLocally` 지원이 확인되지 않음을 확인
+- [x] Chrome Android에서 `getDisplayMedia` 및 systemAudio 지원이 확인되지 않음을 확인
+- [x] YouTube IFrame API captions 모듈의 공개 옵션(fontSize, reload) 확인
+- [x] captions 모듈이 transcript 본문/cue 반환 기능을 문서화하지 않음을 확인
+- [ ] 일반 시청자용 공식 자동 자막 본문 취득 경로 발견
+- [ ] 앱 내부 검색 → 자동 자막 → 한국어 교정 → 표시/시간 동기화 E2E
+- [ ] Android 실기기 및 Pages 테스트
+
+이번 회차는 공식 문서 조사 및 문서 반영만 수행했다. 코드 변경·API 호출·외부 서비스·계정·결제는 없고 비용은 0원이다. Android 실기기와 실제 YouTube 영상에서의 API 실험은 미실행이다.
