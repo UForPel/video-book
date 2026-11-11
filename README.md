@@ -38,6 +38,10 @@
 - 브라우저 내 음성 인식·AI 처리는 기기 성능과 메모리 한계를 Android에서 검증해야 합니다.
 - API 키, 비밀번호, 개인 정보는 공개 저장소에 올리지 않습니다.
 
+## AI 작업 관리
+
+- [AGENT_WORK_RULES.md](AGENT_WORK_RULES.md): AI 작업 행동강령, 최신 정보·근거 재검증, 성공/실패 기록 절차
+
 ## 문서 안내
 
 - [PROJECT_CONTEXT.md](PROJECT_CONTEXT.md): 확정된 요구사항과 제약
