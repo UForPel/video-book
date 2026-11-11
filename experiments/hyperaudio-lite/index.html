@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>영상책 · Hyperaudio Lite 독립 실험</title>
+  <link rel="stylesheet" href="./vendor/hyperaudio-lite-player.css">
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f6f8; color: #20242a; }
+    main { width: min(100%, 760px); margin: 0 auto; padding: 16px; }
+    h1 { font-size: 1.25rem; margin: 4px 0 8px; }
+    .notice { padding: 12px; border-radius: 10px; background: #fff4d6; font-size: .9rem; line-height: 1.5; }
+    .player-wrap { position: relative; width: 100%; aspect-ratio: 16 / 9; margin: 14px 0; background: #111; }
+    .player-wrap iframe { width: 100%; height: 100%; border: 0; }
+    .transcript { height: 300px; overflow-y: auto; border: 1px solid #ccd1d8; border-radius: 10px; padding: 14px; background: white; line-height: 2.1; }
+    .transcript p { margin: 0 0 1em; }
+    .transcript [data-m] { cursor: pointer; border-radius: 3px; }
+    .transcript .active > .active { background: #dceafe; color: #123b70; text-decoration: underline; }
+    .transcript .read { color: #333; }
+    .transcript .unread { color: #666; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+    button { border: 0; border-radius: 8px; padding: 10px 14px; background: #2459a6; color: white; font-size:  .95rem; }
+    #status { font-size: .9rem; color: #48515d; }
+    footer { margin-top: 18px; font-size: .8rem; color: #69717c; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Hyperaudio Lite 독립 실험</h1>
+  <p class="notice">이 페이지는 자막 자동 취득 실험이 아닙니다. 미리 작성한 테스트 문장과 YouTube 영상을 연결해 문장 클릭 이동·현재 단어 강조·자동 스크롤을 확인합니다. 기존 영상책 화면은 변경하지 않습니다.</p>
+  <div class="player-wrap">
+    <iframe id="hyperplayer" data-player-type="youtube"
+      src="https://www.youtube.com/embed/PbKzEAgl-Fg?enablejsapi=1"
+      title="Hyperaudio Lite test video" allow="autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen></iframe>
+  </div>
+  <div class="actions">
+    <button type="button" id="jump-start">처음부터</button>
+    <button type="button" id="jump-middle">중간 문장으로 이동</button>
+  </div>
+  <p id="status" role="status">플레이어 API를 불러오는 중입니다. 영상이 준비되면 문장을 눌러보세요.</p>
+  <section id="hypertranscript" class="transcript hyperaudio-transcript" aria-label="테스트용 시간표시 문장">
+    <article><section>
+      <p><span data-m="1000" data-d="700" tabindex="0">영상책은 </span><span data-m="1800" data-d="800" tabindex="0">영상과 </span><span data-m="2700" data-d="900" tabindex="0">문장을 </span><span data-m="3700" data-d="1000" tabindex="0">연결합니다. </span></p>
+      <p><span data-m="6500" data-d="800" tabindex="0">문장을 </span><span data-m="7400" data-d="700" tabindex="0">누르면 </span><span data-m="8200" data-d="900" tabindex="0">해당 시점으로 </span><span data-m="9200" data-d="1000" tabindex="0">이동합니다. </span></p>
+      <p><span data-m="13500" data-d="700" tabindex="0">재생하면 </span><span data-m="14300" data-d="900" tabindex="0">현재 단어가 </span><span data-m="15300" data-d="1100" tabindex="0">강조됩니다. </span></p>
+      <p><span data-m="20500" data-d="800" tabindex="0">이 문장은 </span><span data-m="21400" data-d="900" tabindex="0">자동 스크롤 </span><span data-m="22400" data-d="1000" tabindex="0">확인용입니다. </span></p>
+      <p><span data-m="27500" data-d="800" tabindex="0">여기까지가 </span><span data-m="28400" data-d="1000" tabindex="0">첫 번째 </span><span data-m="29500" data-d="1000" tabindex="0">테스트 구간입니다. </span></p>
+    </section></article>
+  </section>
+  <footer>
+    Hyperaudio Lite 2.6.4 · MIT License · 원본: https://github.com/hyperaudio/hyperaudio-lite
+    <br>테스트용 문장은 실제 영상 대본이 아니며 기능 검증을 위해 임의로 작성했습니다.
+  </footer>
+</main>
+<script src="./vendor/hyperaudio-lite.js"></script>
+<script>
+  let transcriptPlayer;
+  const status = document.getElementById("status");
+  try {
+    transcriptPlayer = new HyperaudioLite({
+      transcript: "hypertranscript",
+      player: "hyperplayer",
+      autoScroll: true,
+      playOnClick: true
+    });
+    status.textContent = "초기화 완료. 영상 재생 후 현재 단어 강조를 확인하고, 문장을 눌러 시점 이동을 시험하세요.";
+  } catch (error) {
+    status.textContent = "초기화 오류: " + error.message;
+  }
+  document.getElementById("jump-start").addEventListener("click", () => {
+    if (transcriptPlayer) {
+      transcriptPlayer.myPlayer.setTime(1);
+      transcriptPlayer.myPlayer.play();
+      transcriptPlayer.updateTranscriptVisualState(1, true);
+    }
+  });
+  document.getElementById("jump-middle").addEventListener("click", () => {
+    if (transcriptPlayer) {
+      transcriptPlayer.myPlayer.setTime(13.5);
+      transcriptPlayer.myPlayer.play();
+      transcriptPlayer.updateTranscriptVisualState(13.5, true);
+    }
+  });
+</script>
+</body>
+</html>
