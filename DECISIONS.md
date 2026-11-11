@@ -114,3 +114,21 @@
 - 확인: 확인한 Web Speech API 문서는 마이크 또는 사용자가 선택한 오디오/비디오 파일을 입력으로 설명한다. YouTube iframe 내부에서 재생 중인 교차 출처 오디오를 자동으로 전달받는 기능은 확인되지 않았다.
 - 결정: 마이크/파일 기반 음성 인식은 YouTube iframe 오디오 자동 전사와 같은 기능으로 취급하지 않는다. 로컬 미디어 STT는 별도 후보로 유지한다.
 - 출처: https://learn.microsoft.com/en-us/microsoft-edge/web-platform/speech-recognition-api
+
+
+## 결정 019 — GitHub Actions는 실시간 자막 백엔드가 아님
+- 상태: GitHub 공식 문서 확인
+- 확인:
+  - GitHub Pages는 HTML/CSS/JavaScript 등 정적 파일을 게시하는 호스팅 서비스이며 서버 측 언어 실행을 지원하지 않는다.
+  - GitHub Actions workflow는 저장소 이벤트, 외부 dispatch, 수동 실행 또는 예약에 의해 시작되는 작업이다.
+  - 각 job은 runner 실행 환경에서 수행되며, workflow는 상시 HTTP 요청을 수신하는 웹 서버가 아니다.
+  - Actions REST API를 통해 workflow를 실행할 수 있지만, 이것은 방문자 요청에 실시간 응답하는 일반적인 백엔드 API와 다르다.
+- 결정: Actions를 실시간 YouTube 자막 요청 서버로 사용하지 않는다. 빌드, 검사, 배포 및 관리 자동화 용도로만 사용한다.
+- 보안: 공개 GitHub Pages JavaScript에 PAT 또는 비밀 토큰을 넣지 않는다.
+- 제품 목표는 변경하지 않는다. 현재 YouTube 재생 화면에서 자막을 자동 확보하고 시간대별로 동기화하는 것이 계속 핵심 목표다.
+- 출처:
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+  - https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows
+  - https://docs.github.com/en/actions/get-started/understand-github-actions
+  - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
+  - https://docs.github.com/en/rest/actions/workflow-runs
