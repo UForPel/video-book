@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5f0">
+  <meta name="description" content="유튜브 영상과 시간대별 글을 함께 읽는 영상책">
+  <title>영상책</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="영상책 홈"><span class="brand-mark">책</span><span>영상책</span></a>
+      <span class="prototype-label">첫 번째 실험</span>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">VIDEO BOOK</p>
+      <h1>영상을 읽는 새로운 방법</h1>
+      <p class="intro-copy">먼저 유튜브 영상 재생과 원하는 시점으로 이동하는 기능부터 확인합니다.</p>
+    </section>
+
+    <section class="load-panel" aria-labelledby="load-title">
+      <label id="load-title" for="video-url">유튜브 영상 주소 또는 영상 ID</label>
+      <div class="load-row">
+        <input id="video-url" type="url" inputmode="url" placeholder="https://youtu.be/..." autocomplete="off">
+        <button id="load-video" type="button">불러오기</button>
+      </div>
+      <p id="status" class="status" role="status">영상 주소를 입력하고 불러오기를 눌러주세요.</p>
+    </section>
+
+    <section class="viewer" aria-label="영상 플레이어">
+      <div id="player-placeholder" class="player-placeholder">
+        <span class="play-symbol">▶</span>
+        <span>영상이 여기에 표시됩니다</span>
+      </div>
+      <div id="player"></div>
+    </section>
+
+    <section class="transcript-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">SYNCED TEXT</p>
+          <h2>시간대별 글</h2>
+        </div>
+        <span class="coming-soon">자막 연결 준비 중</span>
+      </div>
+      <p class="helper">아래 버튼은 영상 시점 이동을 시험하기 위한 예시입니다. 실제 자막은 아직 연결되지 않았습니다.</p>
+      <div class="sample-lines">
+        <button class="time-line" type="button" data-seconds="0"><span class="timestamp">00:00</span><span>영상의 처음으로 이동하기</span><span class="line-arrow">↗</span></button>
+        <button class="time-line" type="button" data-seconds="30"><span class="timestamp">00:30</span><span>30초 지점으로 이동하기</span><span class="line-arrow">↗</span></button>
+        <button class="time-line" type="button" data-seconds="60"><span class="timestamp">01:00</span><span>1분 지점으로 이동하기</span><span class="line-arrow">↗</span></button>
+      </div>
+    </section>
+
+    <footer>개인용 프로젝트 · 기능 검증 단계</footer>
+  </main>
+  <script src="./app.js"></script>
+</body>
+</html>
