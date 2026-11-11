@@ -1,31 +1,45 @@
 # 영상책 벤치마킹 후보 — 재검증 기록
 
 조사일: 2026-11-11  
-목적: 이전에 검토한 오픈소스 프로젝트 중 공식 저장소와 README에서 기능·구조를 다시 확인할 수 있는 항목만 기록한다.
+목적: 이전에 검토한 오픈소스 프로젝트 중 공식 저장소와 README/코드에서 확인 가능한 내용만 기록한다.
 
 ## 판정 기준
 
-- **확인됨**: 공식 GitHub 저장소/README에서 프로젝트 목적, 주요 기능, 기술적 전제 또는 라이선스를 확인함.
+- **확인됨**: 공식 GitHub 저장소/README/실제 코드에서 기능, 구조, 라이선스 또는 기술 전제를 확인함.
 - **벤치마킹 가능**: 코드/화면 구조를 참고할 가치가 있음. 영상책에 그대로 복사하거나 의존성을 추가한다는 뜻은 아님.
 - **채택 보류**: 영상책의 핵심 제약(정적 GitHub Pages, Android, 무료/쿼터 최소화, 자동 자막)과 맞지 않거나 정책·안정성·라이선스 검증이 더 필요함.
 - 별도 실기기 테스트나 운영 안정성 검증을 하지 않은 사항은 성공했다고 간주하지 않는다.
 
 ## 1. Hyperaudio Lite
 
-- 저장소: https://github.com/hyperaudio/hyperaudio-lite
-- 공식 데모: https://hyperaudio.github.io/hyperaudio-lite/youtube.html
-- 확인된 내용:
-  - 가벼운 인터랙티브 transcript viewer.
-  - Vanilla JavaScript, 프레임워크/의존성 없이 동작하며 빌드 단계가 필요 없다고 README에 명시.
-  - MIT 라이선스.
-  - YouTube iframe을 플레이어로 연결하는 예제가 있음.
-  - 타임스탬프가 포함된 transcript를 클릭해 해당 시점으로 이동하고 재생 중 텍스트를 따라가는 기능을 제공.
-  - 입력 transcript는 SRT 등에서 변환하거나 별도 Editor/Converter로 준비해야 함.
-- 영상책 벤치마킹: **적극 권장** — 타임라인 자막 UI, 문장/단어 클릭 seek, 자동 스크롤, 플레이어 어댑터 구조.
-- 한계:
-  - YouTube 영상에서 자막을 자동으로 가져오는 기능은 README에서 확인되지 않음.
-  - 자막 확보 문제를 해결해 주는 도구가 아니라, 확보된 시간표시 transcript를 재생과 동기화하는 도구.
-- 판정: **UI/동기화 참고 후보로 확인됨. 자동 자막 취득 도구로는 부적합.**
+- 공식 저장소: https://github.com/hyperaudio/hyperaudio-lite
+- README: https://github.com/hyperaudio/hyperaudio-lite/blob/main/README.md
+- YouTube 데모: https://hyperaudio.github.io/hyperaudio-lite/youtube.html
+- 실제 YouTube 데모 소스: https://github.com/hyperaudio/hyperaudio-lite/blob/main/demos/youtube.html
+- 확인한 버전: package.json에 2.6.4 표기
+- 라이선스: 저장소 LICENSE 파일 및 package.json에 MIT 명시
+- 확인된 구조/기능:
+  - Vanilla JavaScript 기반의 인터랙티브 transcript viewer.
+  - README는 약 10KB minified, 외부 라이브러리 의존성 없음, 프레임워크 없음, 빌드 단계 없이 사용할 수 있다고 설명.
+  - transcript는 HTML 요소로 표현하고 각 단어에 `data-m`(시작 시각, 밀리초), `data-d`(단어 길이, 밀리초)를 둔다.
+  - 클릭 가능한 단어에서 해당 시점으로 이동하고 재생할 수 있으며, 재생/seek에 맞춰 현재 단어 강조와 자동 스크롤을 수행한다.
+  - YouTube iframe 지원이 실제 코드에 있음. iframe은 `id`, `data-player-type="youtube"`, `enablejsapi=1` 설정을 사용하며 라이브러리의 YouTube 어댑터가 YouTube IFrame API를 로드하고 `YT.Player` 인스턴스를 생성한다.
+  - 최신 README는 options 객체 방식의 초기화와 destroy()/pauseAutoscroll()/resumeAutoscroll() 등을 설명한다.
+  - SRT는 편집기/변환기에서 transcript로 변환할 수 있는 입력 형식으로 언급된다. 라이브러리의 핵심 transcript DOM 형식은 SRT 파일 자체가 아니라 단어별 타임스탬프 HTML이다.
+- 영상책 벤치마킹:
+  - 자막 문장/단어 클릭 시 seek
+  - 재생 위치에 맞춘 활성 단어 강조
+  - 자막 자동 스크롤
+  - 미디어 플레이어 어댑터를 분리하는 구조
+- **중요한 통합 충돌 위험(영상책 현재 코드와 비교):**
+  - 현재 영상책 `app.js`는 `new YT.Player("player", ...)`로 플레이어 인스턴스를 직접 생성하고, 같은 인스턴스에서 `loadVideoById`, `seekTo`, `getCurrentTime` 등을 호출한다.
+  - Hyperaudio Lite의 기본 YouTube 어댑터도 지정된 iframe에 대해 별도의 `new YT.Player(...)`를 생성한다.
+  - 따라서 현재 플레이어에 Hyperaudio Lite 기본 YouTube 어댑터를 그대로 덧붙이면 같은 영상 플레이어를 두 객체가 관리하거나 API 콜백/이벤트가 중복되는 충돌 가능성이 있다. 바로 통합하지 않는다.
+  - 가능한 다음 실험은 (A) 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube 플레이어를 단독 소유하게 해 검증하거나, (B) 현재 영상책 플레이어와 연결하는 사용자 정의 adapter를 검토하는 것이다. 어느 쪽이 적절한지는 최소 실험 후 결정한다.
+- 자동 자막 취득:
+  - README, YouTube 데모, 확인한 핵심 코드에서 임의의 공개 YouTube 영상 자막을 자동으로 내려받는 기능은 확인하지 못했다.
+  - 데모 transcript는 HTML에 미리 들어 있는 시간표시 텍스트이며, 플레이어에서 자동 추출한 자막이 아니다.
+- 판정: **시간 동기화 UI 벤치마킹으로 적합. 자동 자막 취득 기능은 제공하지 않음. 영상책 기존 플레이어에 즉시 통합하지 말고 독립 실험을 먼저 수행.**
 
 ## 2. Hyperaudio Lite Editor
 
@@ -111,7 +125,7 @@
 
 | 프로젝트 | 확인된 강점 | 자동 자막 취득 | GitHub Pages 단독 적합성 | 영상책 활용 |
 |---|---|---|---|---|
-| Hyperaudio Lite | 타임드 transcript와 YouTube iframe 동기화 | 확인 안 됨 | 프런트엔드 모듈로 검토 가능 | 동기화 UI 참고 |
+| Hyperaudio Lite | 단어 단위 timed transcript와 YouTube iframe 동기화 | 확인 안 됨 | 정적 프런트엔드 라이브러리로 검토 가능 | 독립 실험 후 동기화 UI 일부 참고 |
 | Hyperaudio Lite Editor | 로컬 STT/자막 교정/내보내기 | 로컬 미디어 대상 기능, YouTube iframe 자동 추출은 미확인 | 일부 브라우저 기능은 가능성 있으나 실험 필요 | 교정 UI/로컬 STT 참고 |
 | Invidious | 대체 프런트엔드/API | 이번 조사에서 확인 안 됨 | 부적합(서버/인스턴스) | 구조만 참고 |
 | Piped | 대체 프런트엔드/API | 이번 조사에서 확인 안 됨 | 부적합(백엔드/인스턴스) | 구조만 참고 |
@@ -120,19 +134,26 @@
 
 ## 영상책에 대한 결론
 
-1. **Hyperaudio Lite를 우선 벤치마킹**한다. 이미 영상책이 구현한 YouTube IFrame 플레이어와 결합할 수 있는 시간 동기화 transcript UI가 목적에 가장 가깝다.
-2. **Hyperaudio Lite Editor는 별도 실험**으로 둔다. Android 기기에서 한국어 Whisper/Parakeet 모델이 실제로 실행되는지, 메모리/성능이 감당 가능한지 확인하기 전에는 통합하지 않는다.
-3. Invidious, Piped, ViewTube, Materialious는 제품 전체를 복제하거나 서버를 연결하지 않는다. 필요한 UI/구조만 참고한다.
-4. 이번 재검증으로도 **임의의 공개 YouTube 영상에서 자막을 자동으로 얻는, 무료·무제한·서버 없는 확실한 방법은 확인되지 않았다.**
-5. 어떤 비공식 서비스도 자동 자막 취득 경로로 확정하지 않는다. 공식 문서, 운영 구조, 라이선스, 정책, 장애 대응을 확인하고 별도 실험을 통과한 뒤에만 채택한다.
+1. **Hyperaudio Lite를 시간 동기화 UI의 1순위 벤치마킹 대상으로 유지**한다.
+2. **바로 현재 앱에 붙이지 않는다.** 현재 앱과 Hyperaudio Lite 모두 YouTube IFrame API 플레이어를 생성/관리하므로 이중 플레이어 관리 충돌 위험을 먼저 해결해야 한다.
+3. 다음 최소 실험은 별도 테스트 페이지에서 Hyperaudio Lite 단독 YouTube iframe + 미리 준비된 소량의 timed transcript로 클릭 seek/활성 단어/자동 스크롤을 확인하는 것이다. 이 실험은 자막 자동 취득 테스트가 아니다.
+4. Hyperaudio Lite Editor는 별도 실험으로 둔다. Android 기기에서 한국어 Whisper/Parakeet 모델의 실행, 메모리/성능, 라이선스를 확인하기 전에는 통합하지 않는다.
+5. Invidious, Piped, ViewTube, Materialious는 제품 전체를 복제하거나 서버를 연결하지 않는다. 필요한 UI/구조만 참고한다.
+6. 임의의 공개 YouTube 영상에서 자막을 자동으로 얻는 무료·무제한·서버 없는 확실한 방법은 여전히 확인되지 않았다.
+7. 비공식 서비스도 자동 자막 취득 경로로 확정하지 않는다. 공식 문서, 운영 구조, 라이선스, 정책, 장애 대응을 확인하고 별도 실험을 통과한 뒤에만 채택한다.
 
 ## 확인한 공식 출처
 
 - https://github.com/hyperaudio/hyperaudio-lite
+- https://github.com/hyperaudio/hyperaudio-lite/blob/main/README.md
+- https://github.com/hyperaudio/hyperaudio-lite/blob/main/demos/youtube.html
+- https://github.com/hyperaudio/hyperaudio-lite/blob/main/js/hyperaudio-lite.js
+- https://github.com/hyperaudio/hyperaudio-lite/blob/main/package.json
+- https://github.com/hyperaudio/hyperaudio-lite/blob/main/LICENSE
 - https://github.com/hyperaudio/hyperaudio-lite-editor
 - https://github.com/iv-org/invidious
 - https://github.com/TeamPiped/Piped
 - https://github.com/ViewTube/viewtube
 - https://github.com/Materialious/Materialious
 
-이 문서는 저장소 README/공식 문서에서 확인한 기능 설명을 정리한 것이며, 각 프로젝트의 모든 버전·배포 인스턴스·실사용 가용성을 실기기에서 검증했다는 뜻은 아니다.
+이 문서는 저장소 README/공식 문서와 일부 실제 소스 파일을 확인한 결과이며, Android 실기기에서 Hyperaudio Lite를 테스트했다는 뜻은 아니다.
