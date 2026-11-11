@@ -67,10 +67,19 @@ window.onYouTubeIframeAPIReady = function () {
 };
 
 function parseTimestamp(value) {
-  const match = value.trim().match(/^(?:(\d+):)?(\d{1,2}):(\d{2})[,.](\d{1,3})$/);
-  if (!match) return null;
-  return Number(match[1] || 0) * 3600 + Number(match[2]) * 60 + Number(match[3]) +
-    Number((match[4] + "00").slice(0, 3)) / 1000;
+  // SRT: 00:00:01,250 / VTT: 00:01.250 or 00:00:01.250
+  const time = value.trim().split(/\\s+/)[0].replace(",", ".");
+  const parts = time.split(":");
+  if (parts.length !== 2 && parts.length !== 3) return null;
+  const secondsPart = parts.pop();
+  const secondsMatch = secondsPart.match(/^(\\d{1,2})(?:\\.(\\d{1,3}))?$/);
+  if (!secondsMatch) return null;
+  const minutesPart = parts.pop();
+  if (!/^\\d{1,2}$/.test(minutesPart)) return null;
+  const hoursPart = parts.length ? parts.pop() : "0";
+  if (!/^\\d+$/.test(hoursPart)) return null;
+  const fraction = secondsMatch[2] ? Number((secondsMatch[2] + "00").slice(0, 3)) / 1000 : 0;
+  return Number(hoursPart) * 3600 + Number(minutesPart) * 60 + Number(secondsMatch[1]) + fraction;
 }
 
 function parseSubtitle(text) {
@@ -148,9 +157,22 @@ subtitleFile.addEventListener("change", async () => {
     return;
   }
   try {
-    const result = parseSubtitle(await file.text());
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    let decoded = "";
+    try {
+      decoded = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    } catch (_) {
+      // Korean subtitle files are sometimes saved as EUC-KR/CP949.
+      try {
+        decoded = new TextDecoder("euc-kr").decode(bytes);
+      } catch (_) {
+        decoded = new TextDecoder("utf-8").decode(bytes);
+      }
+    }
+    const result = parseSubtitle(decoded);
     if (!result.length) {
-      statusEl.textContent = "자막을 읽지 못했습니다. SRT/VTT 형식과 시간 표기를 확인해주세요.";
+      statusEl.textContent = "자막 형식을 인식하지 못했습니다. SRT/VTT 파일인지, 시간 표기가 올바른지 확인해주세요.";
       return;
     }
     cues = result;
