@@ -235,3 +235,37 @@
 3. 무료 웹 UI, 무료 API, 무료 무제한 API는 서로 다른 조건이다. API credit, 계정 제한, 분당 rate limit, 서버 운영 한도를 각각 확인해야 한다.
 4. 이번 후보들은 자막 형식/타임스탬프 데이터 구조의 참고 자료로는 유용하지만, 현재의 ‘GitHub Pages 단독 + 별도 서버 없음 + 무료/쿼터 최소화’ 핵심 조건을 만족하는 채택 후보는 아니다.
 5. 다음 단계는 사용자가 별도 서버를 허용할지 여부를 결정하는 것이다. 승인 전에는 제3자 API 키를 앱 코드에 넣거나 연동 코드를 추가하지 않는다.
+
+
+## 10. 일반 웹페이지에서 YouTube 자막을 직접 읽을 수 있는지 — 2026-11-11
+
+### 확인된 브라우저 보안 경계
+- 영상책은 GitHub Pages 출처에서 실행되고 YouTube 영상은 다른 출처의 iframe에서 재생된다.
+- MDN의 동일 출처 정책 문서는 교차 출처 iframe의 내부 문서/DOM에 대한 스크립트 접근이 제한되며, 교차 출처 간 통신은 명시적으로 허용된 `postMessage` 등의 통로를 사용해야 한다고 설명한다.
+- 따라서 영상책의 일반 페이지 JavaScript가 YouTube iframe 내부 자막 DOM을 직접 읽는 방식을 기본 기능으로 가정할 수 없다.
+- 출처:
+  - https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
+  - https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe
+  - https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/contentWindow
+
+### Android Chrome 확장 프로그램 경로
+- Chromium Extensions 담당자는 2026-10-08 공개 Chromium Extensions 포럼 답변에서 Chrome 모바일에 확장 프로그램 지원 계획이 없다고 답했다.
+- Chrome 도움말 커뮤니티도 Android용 Chrome은 데스크톱 확장 프로그램을 지원하지 않는다고 안내한다.
+- 영상책 사용 환경이 Android Chrome이므로, 데스크톱 Chrome/Edge 확장 프로그램 기반 프로젝트를 설치해 해결하는 경로는 현재 사용자 환경에 맞지 않는다.
+- 출처:
+  - https://groups.google.com/a/chromium.org/g/chromium-extensions/c/tCUm3kceybk
+  - https://support.google.com/chrome/thread/469081090/extensions?hl=en
+
+### 브라우저 음성 인식과 YouTube iframe 오디오
+- 확인한 Web Speech API 관련 Edge 문서는 음성 인식 입력으로 마이크 또는 사용자가 선택한 오디오/비디오 파일을 설명한다.
+- 이 문서는 교차 출처 YouTube iframe에서 재생 중인 오디오 스트림을 웹페이지가 직접 입력으로 받을 수 있다고 설명하지 않는다.
+- 따라서 마이크 기반 음성 인식이나 파일 기반 로컬 STT를 현재 YouTube iframe 오디오의 자동 전사 기능으로 간주하지 않는다.
+- 사용자 제공 미디어 파일을 처리하는 로컬 STT 가능성은 별도 후속 후보로 남긴다.
+- 출처: https://learn.microsoft.com/en-us/microsoft-edge/web-platform/speech-recognition-api
+
+### 영상책 판정
+1. 일반 GitHub Pages JavaScript가 YouTube iframe 내부의 자막 DOM/텍스트를 직접 읽는 경로는 동일 출처 정책상 사용할 수 있다고 가정하지 않는다.
+2. Android Chrome에서 데스크톱 확장 프로그램을 설치하는 경로는 현재 지원되지 않으므로 제외한다.
+3. Web Speech API/로컬 STT는 마이크 또는 사용자가 제공한 파일 입력과 YouTube iframe의 오디오를 구분해서 평가한다.
+4. 이는 자동 자막 전체가 불가능하다는 결론이 아니다. 서비스 자체 서버가 자막을 제공하는 경로, 허용된 공식 인터페이스, 사용자 제공 자막/미디어 등은 각각 따로 검증한다.
+5. 다음 조사는 자막 웹사이트가 브라우저에서 직접 데이터를 받는지, 서비스 서버가 중계하는지, 영상책에서 안전하게 호출 가능한 공개 인터페이스가 있는지 확인하는 데 집중한다.
