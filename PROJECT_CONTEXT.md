@@ -95,3 +95,16 @@
 ## 9. 변경 기록
 
 - 2026-11-11: 개인용 모바일 우선 웹앱, GitHub Pages, 무료/저사용량 의존성 최소화, 핵심 기능 우선순위를 정리함.
+
+
+## 10. 자동 자막 목표와 공식 API 조사 결과 (2026-11-11)
+
+- 최종 사용자 흐름은 기기에서 SRT/VTT 파일을 직접 선택하는 방식이 아니라, 유튜브 영상을 불러오면 가능한 경우 자막을 자동으로 확보해 영상과 동기화하는 방식이다.
+- 로컬 SRT/VTT 선택 기능은 내부 시험용 보조 기능이며 최종 목표가 아니다.
+- YouTube 공식 Captions API는 OAuth 인증을 요구한다. `captions.list` 응답에는 자막 본문이 포함되지 않으며, `captions.download`는 사용자가 해당 동영상을 수정할 권한이 있어야 한다.
+- 따라서 공식 API만으로 임의의 공개 영상에 대한 자동 자막 취득을 구현할 수 없다.
+- 공식 참고 문서:
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+  - https://developers.google.com/youtube/v3/guides/implementation/captions
+- 다음 개발 과제는 일반 공개 영상의 자막을 자동 확보할 수 있는 정책 준수 경로를 검증하는 것이다. 비용, 요청 제한, 서버 필요 여부, Android 호환성, 개인정보 및 서비스 안정성을 확인하기 전에는 외부 서비스를 채택하지 않는다.
