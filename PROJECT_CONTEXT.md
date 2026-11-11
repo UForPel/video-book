@@ -196,3 +196,19 @@
 - 따라서 마이크로 스피커 소리를 다시 듣는 실험은 사용자가 소리를 외부로 재생하고 마이크 권한을 주어야 하며, 에코 제거/주변 소음/인식 정확도/연속 동작/서버 전송 여부와 비용을 보장할 수 없다. 핵심 경로로 채택하지 않는다.
 - YouTube IFrame API는 `captions` 모듈의 `fontSize`와 `reload` 옵션을 문서화한다. 자막 문장/큐/전체 대본 본문을 반환하는 옵션은 목록에 없다.
 - 상세 근거: [RESEARCH_BENCHMARKS.md §26](./RESEARCH_BENCHMARKS.md#26-브라우저-stt와-youtube-iframe-captions-모듈-검증-2026-11-11), [PROJECT_STATUS.md VB-22](./PROJECT_STATUS.md#16-vb-22--브라우저-stt-및-iframe-captions-모듈-검증-2026-11-11).
+
+
+## 18. 공개 자막 추출 생태계 조사 기준 및 결과 (2026-11-11)
+- 10개를 넘는 서로 다른 검색 질의로 GitHub 저장소/소스 코드, npm 패키지, 기술 문서, Reddit 사용자 사례, YouTube 공식 정책을 비교했다.
+- 실제 소스 확인 후보:
+  - `jdepoix/youtube-transcript-api`: Python 요청 기반. 영상 페이지에서 caption track을 찾아 timedtext 본문을 가져오는 서버/CLI 성격.
+  - `neurelectra-oss/youtube-captions`: Node.js axios 기반. InnerTube client profile과 timedtext 파싱, 프록시 agent 옵션을 사용.
+  - `devhims/youtube-caption-extractor`: TypeScript fetch 기반. InnerTube client profile을 시도하고 caption track을 정규화. 샘플은 Next.js와 Cloudflare Container API 포함.
+  - `kepano/defuddle`: 현재 페이지 DOM의 transcript를 먼저 확인하고, 별도 InnerTube/timedtext 경로도 가진다. 모바일 Safari CORS 문제 이슈가 확인됨.
+  - `rapha30/yt-youtube-transcript`: Go CLI/라이브러리. Android/iOS InnerTube와 watch-page scrape fallback을 명시하고 자체 문서에서 비공식 endpoint의 취약성을 밝힘.
+  - `yt-dlp`: Python CLI로 수동/자동 자막 파일을 저장하는 옵션 제공. 정적 브라우저 앱이 아님.
+- Reddit 사용자 사례:
+  - Obsidian Web Clipper 사례는 사용자가 YouTube transcript panel을 직접 열어야 하며, 페이지에 존재하는 DOM만 읽을 수 있다고 작성자가 답변.
+  - 다른 Obsidian plugin 사례는 외부 Nootube 도구를 사용하고 자막이 없으면 Whisper로 전환한다고 작성자가 설명. 무료/무서버 독립 구현 근거가 아니다.
+- 현재까지 적합성 판정: 공개 소스에 자막 추출 구현은 다수 존재하지만, 확인한 대표 사례는 문서화되지 않은 내부 API/스크래핑에 의존하거나 서버/CLI/외부 서비스가 필요하다. 브라우저 DOM 방식은 YouTube 원본 페이지 안에서 실행되는 구조이며 영상책 페이지에서 임베드 iframe을 읽는 방법이 아니다.
+- 상세 비교와 출처: [RESEARCH_BENCHMARKS.md §27](./RESEARCH_BENCHMARKS.md#27-공개-자막-추출-프로젝트-및-커뮤니티-사례-비교-2026-11-11).
