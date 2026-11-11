@@ -212,3 +212,12 @@
   - 다른 Obsidian plugin 사례는 외부 Nootube 도구를 사용하고 자막이 없으면 Whisper로 전환한다고 작성자가 설명. 무료/무서버 독립 구현 근거가 아니다.
 - 현재까지 적합성 판정: 공개 소스에 자막 추출 구현은 다수 존재하지만, 확인한 대표 사례는 문서화되지 않은 내부 API/스크래핑에 의존하거나 서버/CLI/외부 서비스가 필요하다. 브라우저 DOM 방식은 YouTube 원본 페이지 안에서 실행되는 구조이며 영상책 페이지에서 임베드 iframe을 읽는 방법이 아니다.
 - 상세 비교와 출처: [RESEARCH_BENCHMARKS.md §27](./RESEARCH_BENCHMARKS.md#27-공개-자막-추출-프로젝트-및-커뮤니티-사례-비교-2026-11-11).
+
+
+## 19. 스크래핑 유형별 조사 결과 (2026-11-11)
+- 화면 DOM 읽기, 페이지 네트워크 응답 가로채기, 비공식 endpoint 직접 호출, 서버/헤드리스 브라우저를 분리해 평가해야 한다.
+- 화면 DOM 사례: YouTube Copy Transcript, SubtideX, PromptTube. YouTube transcript panel을 열고 렌더링된 segment와 timestamp를 읽는다.
+- 페이지 응답 가로채기 사례: youtube-transcript-downloader는 content script에서 YouTube 페이지의 fetch 응답을 관찰해 transcript data를 캐시하고, DOM을 fallback으로 사용한다. 네트워크 요청은 YouTube 내부 API와 연결되므로 순수 DOM 방식과 구분한다.
+- 2026년 Obsidian Clipper 이슈에서 YouTube DOM selector 변경과 timedtext 0-byte/지연 사례가 함께 보고됐다.
+- Android에서 Chrome은 확장 미지원, Firefox Android는 확장 지원하나 모든 확장 호환을 보장하지 않는다.
+- 상세 내용: [RESEARCH_BENCHMARKS.md §28](./RESEARCH_BENCHMARKS.md#28-스크래핑-유형별-기술-정책-모바일-적합성-조사-2026-11-11).
