@@ -942,3 +942,106 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 - 브라우저 DOM 접근 사례는 원본 YouTube 페이지 안에서 사용자가 이미 연 transcript panel을 읽는 구조다. 영상책 별도 도메인에서 iframe 내부 DOM을 읽을 수 있다는 뜻은 아니다.
 - 현재 조사 범위에서는 0원·정적 GitHub Pages·Android 일반 시청자·정책 준수 조건을 모두 만족하는 자동 추출 코드를 채택하지 않는다.
 - 다음 우선순위는 원본 YouTube 페이지의 viewer-visible transcript DOM을 정책에 맞게 앱과 연계할 수 있는 공식/지원 경로가 있는지, Android에서 사용자 부담 없이 가능한지 확인하는 것이다. STT는 이 탐색보다 앞서지 않는다.
+
+
+## 28. 스크래핑 유형별 기술·정책·모바일 적합성 조사 — 2026-11-11
+
+### 조사 질문과 분류
+질문: YouTube 자막 스크래핑은 왜 문제가 되는가? 기술적으로 어떤 유형이 있고 영상책의 핵심 기능에 가장 가까운 것은 무엇인가?
+검색 질의 20개 이상으로 GitHub 프로젝트/이슈, 공식 정책/약관, Chrome/Mozilla 공식 문서, Reddit/커뮤니티 사례를 확인했다.
+- A. Viewer-visible DOM scraping: 화면에 렌더링된 transcript panel의 DOM을 읽음.
+- B. Network interception: YouTube 페이지가 자체적으로 보내는 transcript 응답을 관찰/가로채 캐시.
+- C. Undocumented endpoint: InnerTube/timedtext 등 비공개/문서화되지 않은 요청을 직접 구성.
+- D. Server/headless scraping: 별도 서버에서 페이지를 브라우저 렌더링하고 DOM/응답을 추출.
+
+### A. Viewer-visible DOM scraping
+#### YouTube Copy Transcript
+- https://github.com/reconcrete/youtube-copy-transcript
+- README의 실제 흐름: YouTube의 Show transcript UI를 클릭 → 패널을 기다림 → 구형 `ytd-transcript-segment-renderer` 또는 신형 `transcript-segment-view-model`을 읽음 → fallback은 패널 내 timestamp 패턴을 사용.
+- 단일 selector에 의존하지 않고 여러 DOM reader를 순서대로 시도한다.
+- 프로젝트는 실제 2026 DOM 3가지 fixture로 테스트한다.
+- 참고할 설계: UI 열기 상태, SPA 내비게이션 감지, 구형/신형 selector 분기, fallback reader, fixture 테스트.
+- 한계: README가 안내하는 Chrome/Chromium 확장이다. Android Chrome 지원을 의미하지 않는다.
+
+#### SubtideX
+- https://github.com/yniijia/SubtideX
+- README에 transcript-first flow 명시: 패널 열기 → `.segment-text` / `#segments-container` 등 selector로 caption row 읽기 → 가상 스크롤을 내려 나머지 segment 로드 → CSV.
+- 오류 사례: transcript 없음, timeout, 빈/부분 CSV, extension message 수신 실패.
+- README는 token-protected caption endpoint의 경우 panel DOM path에 의존한다고 설명한다.
+- 참고할 설계: 진행상태 표시, 누락 segment 탐지, virtualized list 처리, timestamp/duration 데이터 구조.
+- 한계: Manifest V3 Chrome extension이며 데스크톱 브라우저 대상.
+
+#### PromptTube
+- https://github.com/brnrd/PromptTube
+- Firefox content script가 UI 버튼을 추가하고, transcript panel을 열어 DOM을 읽는다. 실패하면 내부 caption track endpoint를 fetch한다.
+- README는 DOM/UI 구조 변경과 지역화된 label에 따른 자동 열기 실패를 명시한다.
+- DOM + 비공식 network fallback 혼합형이다. 순수 DOM 방식으로 분류하지 않는다.
+
+### B. Page network interception
+#### youtube-transcript-downloader
+- https://github.com/ColinEberhardt/youtube-transcript-downloader
+- README: content script가 YouTube 페이지의 `window.fetch`를 가로채 `/get_transcript` 또는 `/get_panel` 응답을 캐시한다. 추출 시 캐시 → continuation fetch → 이미 렌더링된 DOM 순서로 시도한다.
+- 외부 서버 없이 로컬 브라우저에서 파일을 생성한다고 프로젝트가 설명한다.
+- 기술적으로 transcript 데이터가 페이지에서 로드되는 시점에 확보할 수 있다는 장점이 있다.
+- 단점: 내부 API 응답/비공식 데이터 경로에 의존한다. YouTube가 요청 구조를 바꾸면 깨질 수 있고 정책상 scraping/undocumented access 위험을 검토해야 한다.
+
+### C. Undocumented endpoint direct fetch
+#### youtube-transcript-api
+- https://github.com/jdepoix/youtube-transcript-api
+- README는 클라우드 IP 차단과 429/IP block 문제를 명시한다.
+- issue 목록에는 2026년 PoTokenRequired, proxy, 429 재시도 관련 이슈가 있다.
+- 직접 endpoint 호출은 페이지 DOM을 읽는 A 방식과 전혀 다르며, 브라우저 CORS/차단/토큰/네트워크 정책의 영향을 받는다.
+- 프록시 회전·차단 회피 절차는 조사상 문제 유형으로만 기록하고 영상책에서 구현하지 않는다.
+
+### D. Server/headless browser
+- YouTube SPA를 실제 브라우저 엔진으로 렌더링해 DOM을 읽을 수 있지만, 별도 실행 환경/서버가 필요하다.
+- 정적 GitHub Pages 브라우저 코드만으로 운영할 수 없고, cloud IP 차단, 배포 비용, 동시 요청, 개인정보/로그 관리, 유지보수 부담이 생긴다.
+- 현재 0원·서버 없는 조건에는 부적합.
+
+### 실제 고장 사례
+1. Obsidian Clipper issue #946 (2026-08-28): https://github.com/obsidianmd/obsidian-clipper/issues/946
+   - YouTube transcript DOM selector가 `yt-core-attributed-string`에서 `ytAttributedStringHost`로 바뀌어 기존 reader가 텍스트 0개를 얻는 사례.
+   - 동시에 timedtext 요청은 0-byte HTTP 200을 약 8초 뒤 반환해 network fallback도 실패한 사례.
+   - 하나의 추출 방식만 믿으면 UI/API 변경에 취약하며, fallback도 함께 깨질 수 있다.
+2. Defuddle issue #310 (2026-06-11): https://github.com/kepano/defuddle/issues/310
+   - 모바일 Safari에서 cross-origin timedtext fetch가 CORS preflight로 실패한 사례.
+   - transcript DOM을 열어 두는 경로가 상대적으로 유효한 fallback으로 보고됐지만, iOS 비동기 처리/패널 열기에도 별도 문제가 있었다.
+3. youtube-transcript-api issue list: https://github.com/jdepoix/youtube-transcript-api/issues
+   - IP block, 429, PoTokenRequired, proxy 관련 이슈가 확인됨.
+4. Reddit 사례: https://www.reddit.com/r/webdev/comments/1qx15i5/youtube_gotcha_problem/
+   - 개발자가 raw fetch에서 빈 HTML/봇 감지 문제를 보고했고, 댓글은 브라우저 흐름/동적 로딩/비공식 라이브러리를 논의했다. 댓글 조언은 공식 문서가 아니며 정책 준수 근거로 취급하지 않는다.
+
+### 약관·정책
+- YouTube Terms of Service: https://www.youtube.com/t/terms
+  - 서비스에 자동화된 수단(robots.txt에 따른 공개 검색엔진 또는 YouTube의 사전 서면 허가 등 명시된 예외 외)으로 접근하는 것을 제한하는 문구가 있다.
+- YouTube API Services Developer Policies: https://developers.google.com/youtube/terms/developer-policies
+  - API Client 문맥에서 YouTube/Google Applications scraping 및 scraped content/data 취득 금지 조항이 있다.
+  - 별도 조항은 undocumented API 사용/역공학을 금지한다.
+- 두 문서의 적용 범위를 섞지 않는다. API Developer Policies는 API Client 문맥의 규칙이며, Terms of Service는 일반 서비스 이용 약관이다.
+- 화면 DOM scraping이 법적으로 항상 금지된다고 판단하지도, 사용자가 패널을 수동으로 열면 허용된다고 판단하지도 않는다. 이번 자료만으로 개별 구현의 법률 결론을 내릴 수 없다.
+- 자막 텍스트는 영상 콘텐츠의 일부일 수 있다. 공개 저장소에 자막 전문을 복제/배포하는 기능은 권리 확인 없이 제공하지 않는다.
+
+### 브라우저·Android 적합성
+- Chrome content scripts는 지정된 URL 패턴에 일치하는 페이지에 주입되며 페이지 DOM을 읽을 수 있다. 이것은 확장 권한으로 실행되는 코드이며 일반 GitHub Pages 웹페이지의 권한이 아니다.
+- 동일 출처 정책상 video-book.github.io에서 youtube.com iframe 내부 DOM을 직접 읽을 수 없다.
+- Chrome for Android는 확장을 지원하지 않는다(2026년 10월 Chrome Extensions 담당자의 Chromium 커뮤니티 답변도 모바일 지원 계획이 없다고 함).
+- Firefox for Android는 확장을 지원하지만 Mozilla 공식 도움말은 일부 add-on이 Android와 호환되지 않을 수 있다고 명시한다.
+- 따라서 데스크톱 확장 구현을 사용자 Android Chrome에서 실행할 수 있다고 가정하지 않는다.
+- 별도 확장으로 YouTube 탭 DOM을 읽고 Video Book 탭으로 결과를 전달하는 방식은 개념상 검토 가능하지만, Firefox Android 지원·배포·권한·데이터 전달·약관을 실제 검증하지 않았다. 사용자가 수동으로 transcript를 복사/붙여넣기 하는 방식은 제안하지 않는다.
+
+### 영상책에 대한 판단
+| 유형 | 자막 확보 기술성 | 안정성/정책 위험 | Android/정적 Pages 적합성 | 현재 판단 |
+|---|---|---|---|---|
+| A. 표시된 DOM 읽기 | 높음(패널에 자막이 보일 때) | DOM 변경·가상 스크롤·약관상 자동화 접근 검토 필요 | 확장 환경 필요, Chrome Android 불가 | 최우선 기술 후보지만 배포 전 정책·기기 검증 |
+| B. 요청/응답 가로채기 | transcript data가 로드될 때 가능 | 내부 API 구조·정책 위험·변경 취약성 | 확장 환경 필요 | 기술 참고, 기본 경로 채택 보류 |
+| C. 비공식 endpoint 직접 요청 | 일부 영상에서 가능 | CORS·차단·PoToken·429·약관/정책 위험 | 브라우저 단독은 제약 큼 | 통합하지 않음 |
+| D. 서버/헤드리스 | 렌더링/추출 가능 | 운영비·IP 차단·개인정보·정책 검토 | 정적/무서버 조건 불일치 | 부적합 |
+
+### 조사량과 검증 한계
+- 서로 다른 검색 관점 20개 이상: 완료.
+- GitHub 프로젝트 6개 이상 및 실제 README/구현 흐름/이슈 비교: 완료.
+- YouTube Terms, Developer Policies, Chrome, Mozilla 문서 확인: 완료.
+- Reddit 및 개발자 커뮤니티 사례: 확인.
+- Android 실기기·확장 설치·앱 간 전달 E2E: 미실행.
+- 법률 자문/YouTube의 서면 허가 확인: 미실행.
+- 비용: 0원. 코드/계정/API/서버/프록시/결제 변경 없음.
