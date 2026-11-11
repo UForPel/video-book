@@ -332,3 +332,15 @@
   - 제작자가 명시적으로 제공/허가한 SRT/VTT 파일의 정적 등록 경로만 제한적으로 유지한다.
 - 제품의 범용 자동 자막 목표를 포기한 것은 아니다. 현재 0원·무서버·Android·정책 준수 조건을 동시에 충족하는 경로를 찾지 못해 미해결로 유지한다.
 - 상세 근거: RESEARCH_BENCHMARKS.md §21, PROJECT_STATUS.md §10.
+
+## Decision 034 — YouTube 공식 대본 페이지 링크를 보조 경로로 제공 (2026-11-11)
+- 상태: 구현, 실기기 검증 대기
+- 근거: YouTube Help는 자막이 있는 영상에서 공식 '대본 보기' 기능과 문장별 시점 이동을 안내한다. Developer Policies는 undocumented API와 YouTube 앱 스크래핑을 금지한다.
+- 결정:
+  - 유효한 YouTube video ID가 입력되면 표준 YouTube 시청 페이지 링크를 노출한다.
+  - 사용자는 YouTube 공식 UI에서 대본이 제공되는지 확인하고 읽을 수 있다.
+  - 영상책이 YouTube 페이지의 대본 DOM을 읽거나 대본을 자동 복제한다고 주장하지 않는다.
+  - 내부 패널은 제작자가 제공/허가한 SRT/VTT 등록 파일만 자동 로드한다.
+  - 비공식 API, 스크래핑, 프록시, 접근 제한 우회는 구현하지 않는다.
+- 이 fallback은 사용자에게 공식 대본으로 가는 경로를 제공하지만, 영상책 내부 자동 자막 취득 목표를 완료한 것은 아니다.
+- 참고: https://support.google.com/youtube/answer/15930243, https://developers.google.com/youtube/terms/developer-policies
