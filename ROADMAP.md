@@ -60,3 +60,5 @@
 - 2026-11-11: TranscriptLayer API의 timestamped segments/무료 100 credits/분당 120회 제한/Bearer key/18세 이상 계정 조건을 확인. 사용 후보에서 제외하고 참고 자료로만 기록.
 
 - 2026-11-11: TranscriptFetch 무키 체험은 네트워크당 하루 10회 및 자동 스크립트/봇 수집 금지 약관을 확인해 자동 공급원에서 제외.
+
+- 2026-11-11: VB-08 공식 Captions API 권한/quota, IFrame captions 범위, 제작자 제공 SRT/VTT의 동일 출처/CORS 경로 조사. 다음 작업 VB-09 단일 영상 자동 연결 검증.
