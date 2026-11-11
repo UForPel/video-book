@@ -215,6 +215,8 @@ function renderTranscript() {
 subtitleFile.addEventListener("change", async () => {
   const file = subtitleFile.files && subtitleFile.files[0];
   if (!file) return;
+  // A manually selected file takes precedence over an in-flight registered-caption fetch.
+  captionLoadToken += 1;
   if (!/\.(srt|vtt)$/i.test(file.name)) {
     statusEl.textContent = "SRT 또는 VTT 파일만 불러올 수 있습니다.";
     subtitleFile.value = "";
