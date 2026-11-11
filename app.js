@@ -83,6 +83,10 @@ function getCaptionRegistry() {
           throw new Error("invalid caption registry");
         }
         return data;
+      })
+      .catch(error => {
+        captionRegistryPromise = null;
+        throw error;
       });
   }
   return captionRegistryPromise;
@@ -102,6 +106,7 @@ async function loadRegisteredSubtitle(videoId) {
     const path = registry[videoId];
     if (!path) {
       transcriptHint.textContent = "이 영상에 등록된 자막이 없습니다. 제작자 제공/허가 SRT·VTT 파일을 선택할 수 있습니다.";
+      statusEl.textContent = "등록된 자막이 없습니다. 자막 파일을 직접 선택할 수 있습니다.";
       return;
     }
 
@@ -126,6 +131,7 @@ async function loadRegisteredSubtitle(videoId) {
   } catch (_) {
     if (token !== captionLoadToken) return;
     transcriptHint.textContent = "등록된 자막을 자동으로 불러오지 못했습니다. SRT/VTT 파일을 직접 선택할 수 있습니다.";
+    statusEl.textContent = "등록 자막을 읽지 못했습니다. 자막 파일을 직접 선택해주세요.";
   }
 }
 
