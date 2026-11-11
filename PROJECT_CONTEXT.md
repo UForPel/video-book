@@ -166,3 +166,13 @@
 - 이번 조사에서 현재 제약을 모두 충족하는 앱 내부 검색+임의 공개 영상 자동 자막 추출 경로는 확인되지 않았다. 불가능하다고 모든 경우를 단정하지 않는다.
 - 검색과 추출은 독립된 선결 과제다. 자동 추출 경로가 확보되기 전에는 교정 기능을 핵심 목표 달성으로 간주하지 않는다.
 - 상세 조사: [RESEARCH_BENCHMARKS.md §23](./RESEARCH_BENCHMARKS.md#23-youtube-공식-검색-api자막-본문-접근의-분리-검증--2026-11-11), [PROJECT_STATUS.md §13](./PROJECT_STATUS.md#13-vb-18--youtube-공식-검색-api와-자막-본문-접근-재검증-2026-11-11).
+
+
+## 15. 제작자 제공 자막 파일의 제한적 공식 경로 (2026-11-11)
+- YouTube Studio는 권한 있는 제작자/편집자가 영상별 자막 트랙 파일을 다운로드할 수 있는 UI를 제공한다: YouTube Studio → Subtitles → 영상 선택 → 언어별 Edit → Options → Download subtitles.
+- YouTube 공식 도움말은 SRT와 WebVTT를 지원하며 SRT는 UTF-8 plain text를 요구한다.
+- 영상책 `app.js`는 `captions.json`의 video ID를 `captions/<file>.srt/.vtt`와 매핑하면 파일을 자동 fetch/parse하고 플레이어 시간과 동기화하는 구조를 이미 갖고 있다.
+- 현재 `captions.json`에는 실제 등록 항목이 없으므로 실제 파일 기반 E2E는 아직 검증되지 않았다.
+- GitHub 저장소에 자막을 올리면 공개 접근 가능해진다. YouTube Studio에서 다운로드 가능하다는 사실만으로 재배포 권한이 생기지 않으므로 실제 권리자의 명시적 공개 허가가 있는 파일만 등록한다.
+- 이 경로는 제작자 제공 파일에 한정된 보조 수단이다. 임의 공개 영상의 자동 추출이나 영상책 내부 검색을 구현한 것이 아니다.
+- 참고: [PROJECT_STATUS.md §14](./PROJECT_STATUS.md#14-vb-19--제작자-제공-자막-파일의-공식-확보정적-연결-경로-확인-2026-11-11), [RESEARCH_BENCHMARKS.md §24](./RESEARCH_BENCHMARKS.md#24-youtube-studio-제작자-자막-파일과-영상책-정적-등록-경로--2026-11-11).
