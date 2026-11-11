@@ -315,3 +315,20 @@
 - 공식 API 제한: captions.list는 트랙 메타데이터만 반환하고 OAuth 및 50 quota units가 필요하다. captions.download는 영상 편집 권한과 OAuth가 필요하고 200 quota units가 든다.
 - 결과: 현재 무료 0원·무서버·Android·임의 공개 영상 자동 취득을 모두 만족하는 정책 준수 경로는 확인되지 않았다. 제품 목표 자체를 변경한 것은 아니며, 목표 달성 경로가 미해결 상태임을 명확히 한다.
 - 참고: [AGENT_WORK_RULES.md](./AGENT_WORK_RULES.md), [VB-14 조사 기록](./PROJECT_STATUS.md#9-vb-14--공개-자막-추출-프로젝트-조사-및-정책-적합성-판정-2026-11-11)
+
+## Decision 033 — 독립 자막 API는 핵심 의존성으로 채택하지 않음 (2026-11-11)
+- 상태: 확정 (현재 제약 기준)
+- 배경: TranscriptFox, Transcript.land, GetYouTubeTranscript의 최신 공개 API 문서·이용약관·개인정보 안내를 비교했다.
+- 근거:
+  1. TranscriptFox는 API key 없이 쓸 수 있으나 익명 하루 1건, 첫 10분 제한 및 서비스 전체 한도가 있다. 공개 API의 원본 YouTube 캡션 취득 권한과 브라우저 CORS 지원은 문서에서 확인되지 않았다.
+  2. Transcript.land는 API key와 월 15분 무료 한도를 요구하며 외부 서버/ASR 처리에 의존한다. 일부 원문은 웹 조회에서 HTTP 402로 열리지 않아 추가 확인이 필요하다.
+  3. GetYouTubeTranscript는 일회성 무료 100 credits 및 API key가 필요하며 공개 README가 자체 서비스의 YouTube scraping infrastructure를 명시한다.
+  4. YouTube API Services Terms 3.2는 법적 구속력이 있는 계약 체결 연령 미달자의 API 약관 수락/사용을 금지한다. 사용자 연령을 고려해 API 계정/OAuth 가입을 진행하지 않는다.
+  5. YouTube 공식 API의 captions.download는 해당 영상 편집 권한과 OAuth가 필요하므로 임의 공개 영상의 시청자용 자막 API가 아니다.
+- 결정:
+  - 세 외부 서비스를 영상책의 핵심 자동 자막 공급원으로 통합하지 않는다.
+  - 무료 한도, 외부 서버, CORS, 권리 취득 방식, 개인정보 처리 중 하나라도 확인되지 않은 서비스는 채택하지 않는다.
+  - 비공식 스크래핑 또는 undocumented API 접근을 구현하지 않는다.
+  - 제작자가 명시적으로 제공/허가한 SRT/VTT 파일의 정적 등록 경로만 제한적으로 유지한다.
+- 제품의 범용 자동 자막 목표를 포기한 것은 아니다. 현재 0원·무서버·Android·정책 준수 조건을 동시에 충족하는 경로를 찾지 못해 미해결로 유지한다.
+- 상세 근거: RESEARCH_BENCHMARKS.md §21, PROJECT_STATUS.md §10.
