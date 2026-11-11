@@ -83,3 +83,13 @@
 - 요구사항: 임의 공개 YouTube 영상 자동 자막, 무제한 무료, 별도 서버 없음, GitHub Pages 정적 앱, Android 사용.
 - 결론: 조사한 후보 중 이 조건을 모두 안정적·정책 검증 상태로 만족하는 방식은 확인되지 않았다.
 - 결정: 다음 구현 전에 어떤 제약을 완화할 수 있는지 사용자와 결정한다. 승인 전에는 자동 자막 취득 코드를 추가하지 않는다.
+
+
+## 결정 015 — 호스팅형 자막 사이트와 API의 차이
+- 상태: 공개 개발자 문서/페이지 확인
+- 확인: YouTubeScribe 문서(현재 홈페이지는 VideoQuill로 리디렉션)는 transcript API, timestamped segments, Bearer key, credit 차감, rate limit을 문서화한다. API 키를 클라이언트 코드에 노출하지 말라고 명시한다.
+- YT2Text는 별도 VPS 백엔드와 API key 인증, 비동기 job 처리 구조를 설명한다. 무료 플랜도 월별 영상 처리 한도가 있다.
+- 스마트폰 브라우저에서 웹사이트가 작동하는 것과, GitHub Pages 앱이 해당 사이트의 자막 결과를 안전하게 직접 호출할 수 있는 것은 별개다.
+- 결정: 두 서비스 모두 timestamped transcript 데이터 형식의 참고 후보로만 둔다. API 키를 공개 저장소/클라이언트 코드에 넣지 않는다. 현재 정적 Pages + 서버 없음 + 무료/쿼터 최소화 조건에서는 핵심 의존성으로 채택하지 않는다.
+- 주의: YouTubeScribe/VideoQuill 브랜드와 가격/무료 조건의 최신 일관성이 확인되지 않았으므로 무제한 무료 API로 간주하지 않는다. YT2Text 문서 내 무료 한도/API 키 플랜 설명도 가입 전 재확인한다.
+- 참고: https://youtubescribe.com/docs ; https://youtubescribe.com/api-access ; https://videoquill.com/ ; https://docs.yt2text.cc/guide/getting-started/ ; https://docs.yt2text.cc/reference/faq/
