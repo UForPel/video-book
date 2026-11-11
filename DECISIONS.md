@@ -197,3 +197,28 @@
   - https://player.support.brightcove.com/user-interface/adding-captions-videos-programmatically.html
   - https://mstudio.support.brightcove.com/media/managing-text-tracks.html
   - https://developers.google.com/youtube/iframe_api_reference
+
+
+## 결정 024 — 영상책의 비용은 무료만 허용
+- 상태: 사용자 명시 결정 및 공식 요금/제한 문서 대조
+- 사용자 요구: 무료만 사용. 저렴한 유료 서비스도 허용하지 않는다.
+- 제외:
+  - 유료 API, 서버, AI 서비스
+  - 무료 체험 종료 후 결제가 필요한 서비스
+  - 결제 수단 등록 또는 유료 플랜 전환이 핵심 기능의 조건인 서비스
+  - 무료 사용량 소진 시 유료 전환을 요구하는 외부 서비스의 핵심 의존성
+- 유지:
+  - GitHub Free 공개 저장소와 GitHub Pages 정적 호스팅
+  - 브라우저 내 처리
+  - 기존 SRT/VTT 파서와 자막 시간 동기화 UI
+- 확인:
+  - GitHub Pages는 GitHub Free 공개 저장소에서 제공되는 정적 호스팅이며 서버 측 언어 실행을 지원하지 않는다. 사용량 제한/soft limit은 존재한다.
+  - Cloudflare Workers Free에는 일일 100,000 요청 및 요청별 CPU 시간 등 제한이 있다. 현재 조사 범위에서 이 무료 서버리스 플랜이 일반 YouTube 영상의 자막 전문을 공식적으로 공급할 수 있다는 근거는 확인되지 않았으므로 채택하지 않는다.
+  - YouTube captions.list는 OAuth를 요구하고 실제 자막 본문을 반환하지 않는다. captions.download는 OAuth 및 해당 영상 수정 권한이 필요하다. 일반 공개 영상의 무료 범용 자막 API가 아니다.
+- 결정: 서버리스 무료 플랜이 존재한다는 이유만으로 채택하지 않는다. 무료이고, 사용 조건에 부합하며, 실제 자막 데이터를 합법적·안정적으로 제공한다는 세 조건이 모두 확인되어야 후보로 인정한다.
+- 출처:
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
+  - https://developers.cloudflare.com/workers/platform/limits/
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
