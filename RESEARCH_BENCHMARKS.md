@@ -504,3 +504,69 @@
 - 브라우저 CORS 및 POST 테스트: 미실행
 - GitHub Pages 배포 테스트: 미실행
 - 적합 후보 발견: 실패 (현재 조사 범위 내)
+
+## 21. 독립 호스팅 자막 API 및 권리·무료 조건 재검토 — 2026-11-11
+
+### 조사 목표
+YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공자의 API가 무료 0원·GitHub Pages·Android 조건에 맞는지 확인했다. 서비스 제공자의 API 문서, 이용약관, 개인정보 문서와 YouTube 공식 정책을 대조했으며, 문서에 없는 CORS·권리·연령 조건은 추정하지 않았다.
+
+### 후보 A. TranscriptFox 공개 API
+- API: https://www.transcriptfox.com/docs/api
+- 이용약관: https://www.transcriptfox.com/terms
+- 개인정보: https://www.transcriptfox.com/privacy
+- API 문서는 계정/API key 없이 JSON POST를 할 수 있다고 명시한다. YouTube/Vimeo/TED 새 링크 조회를 지원하고, 읽을 수 있는 캡션이 없으면 오류를 반환한다. API는 이미 게시된 캡션 또는 사이트에 저장된 transcript만 읽으며 오디오 다운로드나 음성인식을 시작하지 않는다고 설명한다.
+- 무료 한도: 익명 연결당 하루 1건, 로그인 계정당 하루 10건, 무료 결과는 첫 10분까지만 제공한다. 웹사이트/API/MCP가 같은 한도를 공유하고 서비스 전체 처리 제한도 있다. 무료 무제한 공급원이 아니다.
+- 이용약관은 공개 API의 가벼운 자동 사용을 공개 한도 내에서 허용하지만 크롤링·대량 수집·제한 우회를 금지한다. 사용자는 읽을 권리가 있는 공개 미디어만 제출해야 하며 transcript는 원본 소유자의 권리에 속한다고 명시한다.
+- 개인정보 문서는 API가 원본 캡션 또는 저장 transcript를 읽고 ASR을 시작하지 않는다고 별도로 설명한다. 링크 기반 웹사이트의 ASR 처리와 API 경로는 구분된다. API 결과는 공유 캐시에 들어가며 기술 로그에 IP 주소가 포함될 수 있고, 사용량 기록은 해시 연결 정보와 함께 보관된다.
+- 판정: 조사 후보/채택 보류. API key가 없다는 장점은 있으나 일일·길이·서비스 전체 한도가 핵심 조건에 맞지 않는다. 제공자가 YouTube 캡션을 어떤 권한·방식으로 취득하는지, 영상책에서 사용할 데이터 이용 범위가 무엇인지 문서만으로 확인되지 않았다. 브라우저 CORS/OPTIONS 지원도 미확인이다. 영상 URL/IP가 외부 서비스로 전송되는 개인정보 영향도 있다. YouTube 정책 적합성을 독립적으로 확인하기 전에는 통합하지 않는다.
+
+### 후보 B. Transcript.land
+- API 빠른 시작: https://transcript.land/docs/quickstart
+- 개발자 안내: https://transcript.land/for/developers
+- 이용약관: https://transcript.land/terms
+- 개인정보: https://transcript.land/privacy
+- 문서는 REST API에 Bearer API key가 필요하다고 안내한다. 무료 제공량은 월 15분이며, 캡션이 없으면 비동기 ASR 작업으로 넘어갈 수 있다고 설명한다.
+- 이용약관은 제출자가 미디어를 전사할 권리가 있어야 하고 호스팅 플랫폼의 약관을 위반하는 콘텐츠 제출도 금지한다. 개인정보 문서는 영상 URL·업로드 파일·결과 transcript 및 사용량 정보를 처리하고 서버 캐시와 외부 음성인식 공급자를 사용한다고 설명한다.
+- 판정: 부적합. API key와 월별 무료 사용량 제한, 외부 서버/ASR 의존성이 있다. 브라우저 CORS, 연령 조건, YouTube 원본 캡션 취득 권한/정책 근거는 이번 조사에서 확인되지 않았다. 무료 한도가 핵심 기능을 중단시키므로 채택하지 않는다.
+- 제한: 공식 페이지 일부는 웹 조회 도구에서 HTTP 402로 열리지 않아 검색으로 확인된 공식 문서 요약에 한정한다. 상세 조항을 직접 열람한 것으로 간주하지 않는다.
+
+### 후보 C. GetYouTubeTranscript
+- API 문서: https://getyoutubetranscript.com/docs
+- 공개 문서 저장소: https://github.com/tubeagentkit/youtube-transcript-api
+- 문서는 YouTube 자막 API와 타임스탬프 옵션을 제공한다고 설명한다. 무료 제공량은 100 credits 일회성이며 API key가 필요하다. 키 발급은 대시보드 또는 이메일 일회용 코드 확인 절차를 사용하고 초과 사용은 유료 플랜/추가 구매 구조다.
+- 공개 README는 서비스가 자체 호스팅한 스크래핑 인프라로 YouTube 데이터를 가져온다고 명시한다.
+- 판정: 제외. 일회성 무료 크레딧은 지속적 무료 조건을 만족하지 않는다. 제공자가 설명하는 수집 방식은 YouTube 공식 Developer Policies의 스크래핑 금지 조항과 충돌할 수 있으므로 사용하지 않는다. 연령 적합성도 확인되지 않아 가입하지 않는다.
+
+### YouTube 공식 경로와 연령 조건
+- YouTube Studio 도움말은 제작자가 Studio에서 영상별 자막을 추가하거나 자막 파일을 업로드할 수 있음을 설명한다: https://support.google.com/youtube/answer/2734796
+- Data API의 captions.list는 OAuth 인증이 필요하며 트랙 정보만 반환한다. captions.download는 실제 파일을 내려받지만 해당 영상 편집 권한과 OAuth가 필요하다:
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+- YouTube API Services Terms 3.2는 법적 구속력이 있는 계약을 체결할 연령에 도달하지 않은 사람은 약관을 수락하거나 API 서비스를 이용해서는 안 된다고 명시한다: https://developers.google.com/youtube/terms/api-services-terms-of-service/
+- 사용자의 연령을 고려해 API 가입, OAuth 동의, 약관 수락은 진행하지 않는다.
+- YouTube Developer Policies는 undocumented API 사용과 YouTube 애플리케이션 스크래핑 및 스크랩된 데이터 획득을 금지한다: https://developers.google.com/youtube/terms/developer-policies
+
+### 종합 판정
+| 후보 | 무료 조건 | 실행/인증 | 권리·정책 | 영상책 판정 |
+|---|---|---|---|---|
+| TranscriptFox | 익명 1건/일, 첫 10분 | 서버 API, API key 없음, POST | 사용자 권리 확인 요구; 원본 취득 권한과 CORS 미확인 | 보류 |
+| Transcript.land | 월 15분 무료 | 서버 API, API key 필요 | 제출자 권리 및 플랫폼 약관 준수 요구; 취득 방식 미확인 | 제외 |
+| GetYouTubeTranscript | 100 credits 일회성 | 서버 API, API key·이메일 확인 | 공개 README가 scraping infrastructure 명시 | 제외 |
+| YouTube Captions API | quota 사용 | OAuth, 법적 계약 연령 조건 | 영상 편집 권한 필요, 공식 문서화 | 현재 사용자의 직접 경로로 채택 안 함 |
+
+- 이번 조사에서 0원 지속 사용, 무서버 GitHub Pages, Android, YouTube 정책 준수, 명확한 데이터 취득 권한을 모두 만족하는 독립 자막 공급원은 확인하지 못했다.
+- 제작자가 명시적으로 제공/허가한 SRT/VTT 파일을 영상 ID에 연결하는 기존 정적 등록 방식은 제한적 경로로 유지 가능하다. 임의 공개 영상 전체를 자동 취득하는 해결책은 아니다.
+- 실제 API POST, 브라우저 CORS/OPTIONS, 대상 영상 결과, Android, GitHub Pages 테스트는 실행하지 않았다. 후보 API를 앱에 통합하지 않았다.
+
+### 확인 상태
+- 서비스 API/약관/개인정보 공식 문서 조회: 부분 성공 (Transcript.land 일부 페이지는 HTTP 402로 원문 열람 실패)
+- TranscriptFox API와 웹사이트 처리 경로 구분: 확인됨
+- TranscriptFox의 YouTube 캡션 취득 권한 및 CORS: 미확인
+- Transcript.land 무료 분량/API key 요구: 공식 문서 검색 결과로 부분 확인; 원문 전체 열람 미실행
+- GetYouTubeTranscript의 일회성 크레딧/API key/스크래핑 인프라: 공식 API 문서 및 README 확인
+- YouTube API 연령 조항: 공식 약관 확인
+- 실제 API POST/CORS/실영상/Android/Pages: 미실행
+- 앱 코드 변경·계정 생성·결제: 없음, 비용 0원
+
+### 다음 작업
+외부 자막 API를 핵심 의존성으로 추가하지 않는다. 제작자가 명시적으로 공개·허가한 SRT/VTT 파일을 기존 정적 등록 방식으로 연결하는 흐름만 설계 후보로 유지한다.
