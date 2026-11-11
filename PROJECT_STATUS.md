@@ -104,3 +104,12 @@
 - 판정: GitHub 내부 우선 원칙은 유지하되, Actions를 실시간 자막 추출 서버로 사용하지 않는다. Actions는 빌드/테스트/배포 및 관리 자동화 용도로 사용한다.
 - 자동 자막 목표는 변경하지 않는다. 다음은 GitHub 안에서 가능한 대안 중 브라우저에서 안전하게 동작하는 공개 기능/데이터 경로가 있는지 한 가지씩 검증한다.
 - 출처: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages ; https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows ; https://docs.github.com/en/actions/get-started/understand-github-actions ; https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows ; https://docs.github.com/en/rest/actions/workflow-runs
+
+
+## 10. 공개 자막 API 후보의 사용 조건 확인 — 2026-11-11
+- TranscriptLayer 공개 문서는 YouTube 공개 영상의 기존 자막 트랙을 JSON/segments/SRT/VTT로 반환하는 API를 설명한다. 성공한 선택 트랙 1개당 1 credit, 무료 계정은 가입 시 100 credits, 무료 분당 120 API 요청 제한을 안내한다.
+- API는 Bearer API key 인증을 요구하며 키를 공개 코드에 넣거나 공유하지 말라고 명시한다. API 문서에서 브라우저 CORS 허용 여부는 확인되지 않았다.
+- Acceptable Use Policy는 접근 통제 우회, 쿠키/로그인정보 제공, 제한 회피를 금지하고, 적법하게 처리할 권리/허가가 있는 콘텐츠만 요청하도록 한다.
+- Privacy Policy는 계정을 성인(18세 이상)으로 제한한다고 명시한다. 따라서 이 프로젝트의 현재 사용자 환경에서 계정 생성/서비스 사용 후보로 채택하지 않는다.
+- 판정: 기술 구조/응답 데이터 형식의 참고 자료로만 기록. 연동 및 가입 진행하지 않음.
+- 출처: https://transcriptlayer.com/docs/ ; https://transcriptlayer.com/signup/ ; https://transcriptlayer.com/acceptable-use/ ; https://transcriptlayer.com/privacy/
