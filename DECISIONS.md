@@ -79,3 +79,14 @@
 
 - 2026-11-11: 초기 기술 방향과 검증 필요 항목 기록.
 - 2026-11-11: YouTube 공식 Captions API의 OAuth 및 영상 수정 권한 제약을 확인하고 자동 자막 취득을 별도 핵심 과제로 명시.
+
+
+## 결정 009 — 벤치마킹 자료는 재검증 후 저장소에 기록
+
+- 상태: 작업 방식 확정
+- 결정: 이전에 조사한 오픈소스 사이트/프로젝트는 공식 GitHub 저장소와 README/문서에서 확인 가능한 내용만 조사 문서에 기록한다.
+- 확인된 내용과 미확인/미검증 사항을 분리한다. README에 적힌 기능을 실제 작동 보장이나 사용자 경험 검증으로 과장하지 않는다.
+- 저장 문서: [RESEARCH_BENCHMARKS.md](./RESEARCH_BENCHMARKS.md)
+- 현재 우선 참고: Hyperaudio Lite의 YouTube iframe 연동 transcript 동기화 UI.
+- 별도 실험: Hyperaudio Lite Editor의 로컬 STT 및 자막 교정 UI. Android 성능·한국어 품질·라이선스를 별도 확인하기 전에는 통합하지 않는다.
+- Invidious, Piped, ViewTube, Materialious는 UI/구조 참고만 하며 서버/공개 인스턴스를 핵심 의존성으로 채택하지 않는다.
