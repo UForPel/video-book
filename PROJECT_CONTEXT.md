@@ -108,3 +108,13 @@
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
   - https://developers.google.com/youtube/v3/guides/implementation/captions
 - 다음 개발 과제는 일반 공개 영상의 자막을 자동 확보할 수 있는 정책 준수 경로를 검증하는 것이다. 비용, 요청 제한, 서버 필요 여부, Android 호환성, 개인정보 및 서비스 안정성을 확인하기 전에는 외부 서비스를 채택하지 않는다.
+
+
+## 11. AI 작업 행동강령 — 2026-11-11
+
+- 저장소의 [AGENT_WORK_RULES.md](AGENT_WORK_RULES.md)를 모든 영상책 관련 작업 전에 조회하고 따른다.
+- 매 작업 전 최신 커밋과 기준 문서, 현재 목표/제약/직전 작업 결과를 확인한다.
+- 가격·쿼터·API·약관·지원 여부 등 변동 정보는 작업 당일 1차 출처와 독립된 보조 출처로 재확인한다. 출처 충돌은 숨기지 않고 미확인/자료 충돌로 기록한다.
+- 작업 전 목표·범위·검증 방법을 사용자에게 설명하고, 작업 후 성공·실패·미실행 테스트·변경 파일·커밋·다음 작업을 GitHub에 기록한다.
+- 테스트 합성 성공, 실제 Android 테스트, 브라우저 네트워크 테스트, GitHub Pages 배포 확인을 서로 구분한다.
+- 요구사항과 다른 기능을 임의로 만들지 않는다. 기존의 무료 0원, Android, GitHub Pages 우선, YouTube 자막 자동 취득 목표를 사용자 승인 없이 변경하지 않는다.
