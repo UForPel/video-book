@@ -1,4 +1,4 @@
 {
   "_comment": "Add only video IDs whose SRT/VTT file is provided by the creator or explicitly authorized for use.",
-  "_example_format": "VIDEO_ID": "captions/VIDEO_ID.vtt"
+  "_example": "Replace this example entry with a real 11-character YouTube video ID mapped to a file under captions/; this value is documentation only."
 }
