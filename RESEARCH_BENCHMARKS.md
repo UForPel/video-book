@@ -427,3 +427,35 @@
 - MDN Fetch 문서에 따르면 동일 출처 요청은 브라우저에서 기본적으로 처리할 수 있고, 교차 출처 응답은 서버의 CORS 허용 헤더가 필요하다. 따라서 자막 파일을 Pages와 같은 출처에 두는 방식은 별도 외부 API나 CORS 설정을 요구하지 않는다.
 - 출처: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch ; https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
 - 제한: 등록 목록은 현재 비어 있다. 허가된 샘플 파일이 없으므로 실제 fetch 성공, 실제 cue 표시, Android 재생 동기화는 아직 테스트되지 않았다. 코드 반영 사실을 실기기 검증 완료로 표현하지 않는다.
+
+
+## 19. 공개 자막 추출 프로젝트 및 TranscriptFox 재검토 — 2026-11-11
+
+### 공개 구현 유형 조사
+- 공개 비교 목록은 스크립트/로컬 실행 라이브러리(Python `youtube-transcript-api`, JavaScript `YouTube.js`), 명령행 도구(`yt-dlp`의 자막 저장 기능), 서버/클라우드 API, 자막이 없는 영상용 로컬 STT를 별개 유형으로 분류한다.
+- 해당 목록은 후보 탐색용 큐레이션 자료다. 목록에 올라 있다는 이유만으로 라이선스, 최신 유지보수, YouTube 정책 적합성, Android 브라우저 직접 실행 가능성을 보증하지 않는다.
+- `youtube-transcript-api`는 Python 라이브러리로 소개되며 API key/headless browser 없이 수동/자동 자막을 가져온다고 설명된다. 외부 프로젝트 소개 자료는 YouTube 내부 구현에 의존할 수 있고 YouTube 변경 시 깨질 수 있다고 경고한다. 이 방식이 GitHub Pages의 브라우저 JS에서 직접 동작하는지, 현재 약관에 부합하는지는 아직 검증되지 않았다. 구현 코드를 복사하거나 내부 요청을 적용하지 않는다.
+- `YouTube.js`는 YouTube 내부 InnerTube API용 JavaScript 클라이언트로 소개된다. 내부 인터페이스 의존성, 정책, 브라우저 CORS, Android 실행 가능성을 별도로 확인해야 하므로 현 단계에서 채택하지 않는다.
+- `yt-dlp`는 CLI에서 자막 파일을 저장하는 도구로 소개된다. CLI/서버 또는 로컬 런타임 의존성이므로 GitHub Pages만으로 방문자 브라우저에서 실행되는 해결책으로 취급하지 않는다.
+
+### TranscriptFox 공개 문서 확인
+- API 문서: https://www.transcriptfox.com/docs/api
+- Privacy: https://www.transcriptfox.com/privacy
+- API 문서는 JSON POST `/api/v1/transcripts`, API key 불필요, 익명 하루 1건/로그인 하루 10건, 무료 응답 첫 10분, 서비스 전체 처리 한도 및 공정 사용 제한을 설명한다.
+- API 문서는 API가 기존 캡션 또는 저장된 transcript를 읽으며 음성 인식을 시작하지 않는다고 설명한다.
+- Privacy 문서는 링크에 자막이 없을 경우 서버가 오디오를 내려받아 Groq/Deepgram 등 음성인식 서비스로 보낸다고 설명한다.
+- 판정: API와 웹사이트의 처리 경로가 다를 수 있지만 문서만으로 API의 모든 경로를 확정할 수 없다. 이 차이는 자료 충돌/추가 확인 사항으로 남긴다. 무료 무제한 경로가 아니므로 핵심 의존성으로 채택하지 않는다.
+- 개인정보 문서는 IP를 포함할 수 있는 기술 로그와 해시된 사용량 기록을 설명한다. 외부 서비스로 링크를 전송하는 개인정보 영향도 별도 검토가 필요하다.
+- API 문서에는 POST 요청 예시가 있지만 브라우저 CORS/OPTIONS preflight 허용 여부는 이번 조회에서 확인되지 않았다. 영상책 브라우저에서 POST 요청, 대상 영상 자막 응답, Android 실행은 미실행이다.
+
+### 이번 조사 결론
+- 유명 사이트의 결과 화면만 모방하기보다, 공개된 라이브러리/CLI/호스팅 API/로컬 STT의 실행 위치와 의존성을 분리해 비교한다.
+- 후보의 공개 코드가 있어도 그것이 정적 웹앱에서 직접 동작하거나 정책상 사용 가능하다는 뜻은 아니다.
+- TranscriptFox는 조사 후보로만 남기며, 영상책 코드에 연결하지 않는다.
+- 다음 확인은 개별 공개 저장소의 최신 README, 라이선스, 릴리스/이슈, 의존 실행 환경을 확인하고, 무료 0원·Android·GitHub Pages·정책 조건을 기준으로 걸러내는 것이다.
+
+### 출처 및 조회일
+- Awesome YouTube Transcripts (후보 분류 목록, 2026-11-11 조회): https://github.com/tubeagentkit/awesome-youtube-transcripts
+- youtube-transcript-api 프로젝트 소개(보조 자료, 2026-11-11 조회): https://topopensource.ai/projects/jdepoix-youtube-transcript-api
+- TranscriptFox API (서비스 제공자 문서, 2026-11-11 조회): https://www.transcriptfox.com/docs/api
+- TranscriptFox Privacy (서비스 제공자 문서, 2026-11-11 조회): https://www.transcriptfox.com/privacy
