@@ -46,3 +46,5 @@
 - 2026-11-11: IFrame Player API 문서에서 자막 텍스트 반환 메서드를 확인하지 못함. 플레이어 내 캡션 표시 제어와 자막 전문 취득을 구분.
 - 2026-11-11: Transcript Studio for YouTube와 yttext의 README/라이선스/아키텍처/배포 문서를 확인. 확장 권한 방식과 FastAPI 서버 방식의 제약을 기록.
 - 2026-11-11: 별도 참고 페이지를 사용자 테스트 대상으로 안내하지 않기로 재확인.
+
+- 2026-11-11: YouTubeScribe(현재 VideoQuill로 리디렉션)와 YT2Text의 공개 API 문서/가격/인증 구조 확인. timestamped transcript API는 있으나 API 키 보호를 위해 서버가 필요하고 무료/credit 한도가 있어 현재 정적 Pages 기준에 채택하지 않음.
