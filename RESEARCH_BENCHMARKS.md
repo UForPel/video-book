@@ -570,3 +570,32 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 
 ### 다음 작업
 외부 자막 API를 핵심 의존성으로 추가하지 않는다. 제작자가 명시적으로 공개·허가한 SRT/VTT 파일을 기존 정적 등록 방식으로 연결하는 흐름만 설계 후보로 유지한다.
+
+## 22. YouTube 공식 대본 UI를 통한 정책 준수 fallback — 2026-11-11
+
+### 확인된 공식 기능
+- YouTube Help 'View video transcripts' (조회일 2026-11-11): https://support.google.com/youtube/answer/15930243
+- 공식 도움말은 자막이 있는 영상에서 영상 설명의 'Show transcript'를 선택해 전체 대본을 보고, 대본 문장을 눌러 해당 시점으로 이동할 수 있다고 명시한다.
+- 이는 사용자가 YouTube가 제공하는 UI를 직접 사용하는 기능이며, 영상책이 대본 본문을 수집하거나 별도 패널로 가져오는 API를 의미하지 않는다.
+
+### 정책 경계
+- YouTube API Developer Policies (조회일 2026-11-11): https://developers.google.com/youtube/terms/developer-policies
+- 문서화되지 않은 API 사용, YouTube/Google 애플리케이션 스크래핑 및 스크랩된 YouTube 데이터 취득은 금지된다.
+- 따라서 브라우저 자동화로 YouTube 페이지의 대본 DOM을 읽거나, 비공개 내부 요청을 복제하거나, 프록시를 통해 수집하는 방법은 채택하지 않는다.
+- '합법' 여부는 국가별 법률·저작권·계약 조건에 따라 달라질 수 있어 본 프로젝트가 법률 자문이나 보증을 제공하지 않는다. YouTube 공식 문서와 콘텐츠 권리 허가가 명확한 경로만 채택한다.
+
+### 영상책의 적용
+- 유효한 video ID에서 표준 YouTube 시청 페이지로 연결하는 링크를 추가했다.
+- YouTube에서 제공하는 대본이 있으면 사용자는 공식 UI에서 읽고 문장별 이동을 이용할 수 있다.
+- 영상책 내부 패널의 자동 로드와는 별도이며, 내부 패널에는 제작자가 제공/허가한 SRT/VTT 파일만 자동 연결한다.
+- 새 링크는 영상 ID가 유효할 때만 표시되며, 새 탭에서 YouTube 공식 페이지를 연다.
+
+### 검증 상태
+- 공식 도움말 기능 설명: 확인됨
+- 공식 Developer Policies의 undocumented API/스크래핑 금지: 확인됨
+- index.html/app.js/style.css 변경: GitHub 업데이트 성공
+- 브라우저 DOM 및 링크 동작: 미실행
+- Android 실기기: 미실행
+- GitHub Pages 배포: 미실행
+- 내부 패널 자동 자막 취득: 미해결
+- 비용 및 외부 계정: 0원, 생성 없음
