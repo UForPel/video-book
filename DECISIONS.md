@@ -132,3 +132,20 @@
   - https://docs.github.com/en/actions/get-started/understand-github-actions
   - https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows
   - https://docs.github.com/en/rest/actions/workflow-runs
+
+
+## 결정 020 — TranscriptLayer는 사용 후보에서 제외
+- 상태: 공개 문서 확인
+- 확인:
+  - TranscriptLayer는 공개 YouTube 영상의 기존 자막 트랙을 timestamped segments 및 JSON/SRT/VTT로 제공하는 API를 문서화한다.
+  - 무료 가입 크레딧은 100이며, 성공한 선택 트랙 1개당 1 credit. 무료 계정의 요청 속도 제한은 분당 120회다.
+  - API는 Bearer API key를 요구하고, 키를 공개하거나 공유하지 말라고 명시한다. 정적 GitHub Pages 코드에 키를 넣을 수 없다.
+  - 공개 API 문서에서 CORS 허용 정책은 확인되지 않았다.
+  - Acceptable Use Policy는 접근 통제/지역 제한/플랫폼 보안 우회, 쿠키/로그인정보 제공, 한도 회피를 금지한다.
+  - Privacy Policy는 계정을 성인(18세 이상)으로 제한한다.
+- 결정: 사용자의 연령 조건에 맞지 않으므로 계정 생성/서비스 사용/연동을 진행하지 않는다. 기술 구조와 timestamped transcript schema 참고용으로만 보관한다.
+- 출처:
+  - https://transcriptlayer.com/docs/
+  - https://transcriptlayer.com/signup/
+  - https://transcriptlayer.com/acceptable-use/
+  - https://transcriptlayer.com/privacy/
