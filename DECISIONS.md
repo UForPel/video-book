@@ -428,3 +428,17 @@
 - 영상책 구체 규칙: 목표 사용자는 일반 유튜브 시청자다. 제작자 연락, YouTube Studio 접근, 제작자 자막 파일 확보를 요구하지 않는다.
 - 행동강령: AGENT_WORK_RULES.md §10.
 - 작업 기록: PROJECT_STATUS.md VB-21.
+
+
+## Decision 040 — 브라우저 STT 및 IFrame captions 옵션을 자동 자막 취득 해결책으로 채택하지 않음 (2026-11-11)
+- 상태: 조사 기반 비채택 결정.
+- 근거:
+  - Web Speech API는 STT이며 YouTube transcript API가 아니다. 기본 Chrome 음성 인식은 서버 기반일 수 있고 Android Chrome on-device 처리 지원은 확인되지 않았다.
+  - Android Chrome의 화면/시스템 오디오 캡처 지원은 확인되지 않았다.
+  - YouTube IFrame API captions 모듈의 공식 옵션은 fontSize와 reload뿐이며, transcript 본문/cue를 반환하지 않는다.
+- 결정:
+  1. 마이크로 휴대폰 스피커 소리를 다시 듣게 하는 방식은 사용자 행동 부담, 정확도, 동기화, 개인정보 및 지속 무료 여부가 검증되지 않아 핵심 경로로 채택하지 않는다.
+  2. IFrame captions 모듈 존재를 transcript 본문 취득 가능성으로 해석하지 않는다.
+  3. 문서화된 옵션 범위(fontSize, reload)를 확인했으므로 동일한 확인을 반복하지 않는다.
+  4. 새 후보는 일반 시청자가 Android에서 직접 사용할 수 있고 실제 텍스트 본문을 앱에 제공한다는 공식 근거가 있을 때만 검증한다.
+- 상세 기록: PROJECT_STATUS.md VB-22, RESEARCH_BENCHMARKS.md §26.
