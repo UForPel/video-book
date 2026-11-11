@@ -113,3 +113,11 @@
 - Privacy Policy는 계정을 성인(18세 이상)으로 제한한다고 명시한다. 따라서 이 프로젝트의 현재 사용자 환경에서 계정 생성/서비스 사용 후보로 채택하지 않는다.
 - 판정: 기술 구조/응답 데이터 형식의 참고 자료로만 기록. 연동 및 가입 진행하지 않음.
 - 출처: https://transcriptlayer.com/docs/ ; https://transcriptlayer.com/signup/ ; https://transcriptlayer.com/acceptable-use/ ; https://transcriptlayer.com/privacy/
+
+
+## 11. 무키 공개 체험형 자막 서비스의 자동 호출 적합성 — 2026-11-11
+- TranscriptFetch의 공개 비교 글은 무키 체험 경로를 소개하며 네트워크당 하루 10회 제한을 명시한다. 같은 글은 로컬 도구는 사용자 자신의 네트워크에서 동작하지만 클라우드 주소에서는 YouTube가 더 강하게 차단할 수 있다고 설명한다.
+- 관련 서비스 약관은 영상책이 스크립트/봇으로 자막을 수집하거나 방문자/계정별 사용 한도를 회피하는 행위를 금지한다.
+- 판정: 일회성 웹 UI 이용과 영상책 자동화 호출은 구분한다. 자동 호출/한도 공유/회피가 금지되는 서비스를 영상책 자막 공급원으로 채택하지 않는다.
+- 다음 검토는 영상 제작자 허가/공개 제공 자막 또는 공식적으로 허용된 임베드/데이터 인터페이스로 한정한다.
+- 출처: https://transcriptfetch.com/blog/youtube-transcript-api-no-key ; https://youtubetranscripts.io/terms/
