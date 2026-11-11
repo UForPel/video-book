@@ -13,7 +13,8 @@
 | 영역 | 상태 | 현재 확인된 사실 | 다음 확인/작업 |
 |---|---|---|---|
 | GitHub 저장소/문서 | [x] | 전용 저장소와 요구사항/결정/조사 문서 존재 | 변경 때 문서 갱신 |
-| GitHub Pages 및 기본 화면 | [x] | Android에서 기존 사이트 열림 확인 | 변경 후 회귀 확인 |
+| GitHub Pages 및 기본 화면 | [x] | Android에서 기존 사이트 열림 확인. Pages는 정적 파일 호스팅 | 변경 후 회귀 확인 |
+| GitHub Actions 실시간 백엔드 가능성 | [x] | 이벤트/수동/예약 실행형 작업이며 요청을 상시 수신하는 웹 서버가 아님 | 빌드·검사·배포 용도로만 활용 |
 | YouTube 영상 재생/시점 이동 | [x] | Android 실기기에서 재생과 예시 시점 이동 성공 보고 | 핵심 기능 변경 시 회귀 확인 |
 | 로컬 SRT/VTT 파서 | [?] | 코드 반영, 실제 한국어 파일 실기기 검증 미확인 | 자동 취득 경로 결정 후 보조 기능으로 검증 |
 | YouTube 자막 자동 취득 | [!] | 공식 API 외에 일반 웹페이지의 iframe 내부 DOM 직접 접근은 동일 출처 정책으로 제한됨. Android Chrome 확장 경로도 현재 지원되지 않음 | 호스팅형 자막 사이트의 서버/브라우저 흐름과 공개 호출 가능성 추가 확인 |
@@ -93,3 +94,13 @@
 - Chromium Extensions 담당자의 공개 답변에서 Chrome 모바일 확장 프로그램 지원 계획이 없음을 확인. Android Chrome 환경의 데스크톱 확장 프로그램 방식은 현재 적용 대상에서 제외.
 - 확인한 Web Speech API 문서는 마이크/선택한 미디어 파일 입력을 설명하며, YouTube iframe 오디오를 직접 입력받는 기능은 확인되지 않음.
 - 다음 작업 VB-05: 호스팅형 자막 사이트의 브라우저 직접 호출/서버 중계/CORS/인증/무료 한도 구분.
+
+
+## 9. GitHub Actions의 요청 시점 백엔드 가능성 — 2026-11-11
+- GitHub 공식 문서에서 Actions workflow는 저장소 이벤트, 외부에서 발생시킨 repository_dispatch, 수동 workflow_dispatch, 예약 실행으로 시작되는 자동화 작업임을 확인.
+- 각 job은 runner에서 실행되고, runner는 workflow job을 수행하는 실행 환경이다. 계속 HTTP 요청을 수신하는 상시 웹 서버가 아니다.
+- GitHub Pages는 HTML/CSS/JavaScript 등 정적 파일을 게시하는 서비스이며 서버 측 언어 실행을 지원하지 않는다.
+- Actions REST API로 workflow 실행을 요청할 수는 있지만, 브라우저 방문자마다 즉시 요청을 처리하고 동기식으로 결과를 반환하는 백엔드 API와는 구조가 다르다. 공개 정적 코드에 PAT/비밀 토큰을 포함하는 설계는 금지한다.
+- 판정: GitHub 내부 우선 원칙은 유지하되, Actions를 실시간 자막 추출 서버로 사용하지 않는다. Actions는 빌드/테스트/배포 및 관리 자동화 용도로 사용한다.
+- 자동 자막 목표는 변경하지 않는다. 다음은 GitHub 안에서 가능한 대안 중 브라우저에서 안전하게 동작하는 공개 기능/데이터 경로가 있는지 한 가지씩 검증한다.
+- 출처: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages ; https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows ; https://docs.github.com/en/actions/get-started/understand-github-actions ; https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows ; https://docs.github.com/en/rest/actions/workflow-runs
