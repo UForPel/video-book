@@ -3,6 +3,8 @@ const inputEl = document.getElementById("video-url");
 const loadButton = document.getElementById("load-video");
 const placeholder = document.getElementById("player-placeholder");
 const subtitleFile = document.getElementById("subtitle-file");
+const transcriptPasteEl = document.getElementById("transcript-paste");
+const loadPastedTranscriptButton = document.getElementById("load-pasted-transcript");
 const transcriptEl = document.getElementById("transcript");
 const transcriptHint = document.getElementById("transcript-hint");
 
@@ -176,7 +178,40 @@ function parseSubtitle(text) {
   return parsed.sort((a, b) => a.start - b.start);
 }
 
-function formatTime(seconds) {
+
+function parsePastedTranscript(text) {
+  const lines = text.replace(/\\r/g, "").split("\\n").map(line => line.trim()).filter(Boolean);
+  const timestampLine = /^((?:\\d{1,2}:)?\\d{1,2}:\\d{2}(?:[.,]\\d{1,3})?)\\s*(.*)$/;
+  const entries = [];
+  let current = null;
+
+  for (const line of lines) {
+    const match = line.match(timestampLine);
+    if (match) {
+      if (current && current.text.trim()) entries.push(current);
+      const start = parseTimestamp(match[1]);
+      current = start === null ? null : { start, text: match[2].trim() };
+    } else if (current) {
+      current.text += (current.text ? " " : "") + line;
+    }
+  }
+  if (current && current.text.trim()) entries.push(current);
+
+  const merged = [];
+  for (const entry of entries) {
+    const previous = merged[merged.length - 1];
+    if (previous && previous.start === entry.start) previous.text += " " + entry.text;
+    else merged.push({ start: entry.start, text: entry.text });
+  }
+
+  const duration = player && typeof player.getDuration === "function" ? player.getDuration() : 0;
+  return merged.map((entry, index) => {
+    const next = merged[index + 1];
+    const end = next ? next.start : (duration > entry.start ? duration : entry.start + 5);
+    return { start: entry.start, end, text: entry.text };
+  }).filter(cue => cue.end > cue.start && cue.text);
+}
+\nfunction formatTime(seconds) {
   const total = Math.max(0, Math.floor(seconds));
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
@@ -264,7 +299,20 @@ subtitleFile.addEventListener("change", async () => {
   }
 });
 
-function updateActiveCue() {
+
+loadPastedTranscriptButton.addEventListener("click", () => {
+  const pasted = transcriptPasteEl.value.trim();
+  const result = parsePastedTranscript(pasted);
+  if (!result.length) {
+    statusEl.textContent = "타임스탬프와 문장이 포함된 스크립트를 붙여넣어주세요. 예: 0:00 첫 번째 문장";
+    return;
+  }
+  cues = result;
+  activeCueIndex = -1;
+  renderTranscript();
+  statusEl.textContent = "붙여넣은 스크립트에서 자막 " + cues.length + "개를 불러왔습니다.";
+});
+\nfunction updateActiveCue() {
   if (!player || !cues.length || typeof player.getCurrentTime !== "function") return;
   const now = player.getCurrentTime();
   // Find the last cue that has started, then walk backward to handle overlapping cues.
