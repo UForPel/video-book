@@ -217,3 +217,19 @@
 - [ ] 앱 내부 검색 → 자동 자막 → 교정 → 표시/시간 동기화 E2E
 
 이번 회차는 생태계 조사와 문서 갱신만 수행했다. 코드·API·계정·외부 서비스·프록시·결제 변경은 없고 비용은 0원이다. Android 실기기 및 Pages 테스트는 미실행이다.
+
+
+## VB-24 — 스크래핑 유형별 조사 (2026-11-11)
+- [x] DOM scraping / page network interception / undocumented endpoint / headless browser 분류
+- [x] YouTube Copy Transcript, SubtideX, PromptTube의 transcript DOM 흐름 비교
+- [x] youtube-transcript-downloader의 fetch interception 구조 확인
+- [x] YouTube Copy Transcript의 최신/구형 DOM selector fallback 및 fixture test 확인
+- [x] Obsidian Clipper의 DOM selector 변경 및 timedtext empty-response 장애 사례 확인
+- [x] Defuddle의 모바일 Safari CORS/fallback 문제 확인
+- [x] YouTube ToS와 API Developer Policies의 적용 범위 구분
+- [x] Chrome Android 확장 미지원 및 Firefox Android 확장 호환성 제한 확인
+- [ ] Android Firefox에서 실제 extension compatibility 및 end-to-end 실행 검증
+- [ ] extension → Video Book 페이지 자동 전달 경로의 사용성/보안/정책 검증
+- [ ] 자동 검색 → transcript DOM → 교정 → 앱 표시/재생 동기화 E2E
+
+이번 회차는 자료 조사와 문서 기록만 수행했다. 코드 변경, 실기기 테스트, API/서버/프록시/계정 설정은 없고 비용은 0원이다.
