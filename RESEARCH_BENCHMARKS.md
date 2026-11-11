@@ -838,3 +838,107 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 - 실제 YouTube 영상에서 `getOptions('captions')` 실행: 미실행.
 - 코드 변경, API 호출, OAuth, 계정 생성, 외부 서비스, 결제: 없음.
 - 비용: 0원.
+
+
+## 27. 공개 자막 추출 프로젝트 및 커뮤니티 사례 비교 — 2026-11-11
+
+### 조사 방법
+- 서로 다른 검색 관점 10개 이상: YouTube transcript library, JavaScript/TypeScript, Python, Go, npm, browser-only app, CORS, InnerTube/timedtext, yt-dlp, GitHub issues, Reddit/Obsidian/Web Clipper, official policies.
+- 출처 유형: YouTube 공식 Developer Policies/Terms, GitHub 저장소와 실제 소스 코드, npm package page, Reddit, DEV Community, 기술 문서.
+- 아래 분석은 공개된 소스/문서의 기능 설명을 확인한 것이며, 모든 프로젝트를 Android 기기에서 직접 실행한 벤치마크는 아니다.
+
+### 프로젝트별 소스 코드 비교
+
+#### 1) jdepoix/youtube-transcript-api
+- Repository: https://github.com/jdepoix/youtube-transcript-api
+- 확인 파일: `youtube_transcript_api/_api.py`, `youtube_transcript_api/_transcripts.py`
+- 구현 구조: Python requests Session으로 transcript 목록을 찾고, 선택한 track URL에서 caption 본문을 받아 timestamped snippet(text/start/duration)으로 파싱한다.
+- 참고 가치: 트랙 메타데이터와 본문 fetch 분리, 수동/자동 생성 트랙 분리, 언어 선택, timestamp segment 모델, 오류 유형 구분.
+- 제약: Python 런타임/CLI·서버 성격이며 정적 브라우저 웹앱 구현이 아니다. 프로젝트 문서와 이슈는 cloud IP 차단 등 운영 이슈를 안내한다.
+- 판정: cue 모델/언어 선택/오류 처리만 구조 참고. 추출 네트워크 구현은 통합하지 않음.
+
+#### 2) neurelectra-oss/youtube-captions
+- Repository: https://github.com/neurelectra-oss/youtube-captions
+- 확인 파일: `src/transcript.js`
+- 구현 구조: Node.js axios, 문서화되지 않은 InnerTube client profile 요청, caption track의 timedtext URL fetch, JSON3/XML parser, optional httpsAgent/proxy routing.
+- 참고 가치: manual/ASR track 선택, 세그먼트 정규화, parser 분리, 로깅/오류 정보.
+- 제약: Node 네트워크 런타임과 내부 API 의존, proxy 옵션 및 client version 유지보수 필요. "no API key"는 공식 API라는 뜻이 아님.
+- 판정: 데이터 구조/파서 설계만 참고. InnerTube·timedtext 요청 및 proxy 경로는 통합하지 않음.
+
+#### 3) devhims/youtube-caption-extractor
+- Repository: https://github.com/devhims/youtube-caption-extractor
+- 확인 파일: `src/index.ts`, `README.md`
+- 구현 구조: TypeScript fetch로 InnerTube player 응답을 얻고 captionTracks에서 언어 트랙을 골라 timestamped captions를 파싱한다. custom fetch를 주입할 수 있고 README는 Next.js sample 및 token-protected Cloudflare Container API를 제시한다.
+- GitHub 페이지 표시: MIT license, 175 stars, 17 forks, 80 commits(조회 당시 표시).
+- 참고 가치: 작은 TypeScript 모듈, custom transport 주입, language track 선택, timestamp parser, sample/test 구조.
+- 제약: 소스는 InnerTube client profile을 직접 구성한다. Node/Cloudflare 환경의 custom transport 지원은 브라우저 CORS·정책 준수를 증명하지 않는다.
+- 판정: 타입·파서·테스트 설계만 참고. 비공식 요청은 통합하지 않음.
+
+#### 4) kepano/defuddle
+- Repository: https://github.com/kepano/defuddle
+- 확인 파일: `src/extractors/youtube.ts`, `website/src/convert.ts`
+- 구현 구조: 현재 DOM에서 transcript를 먼저 찾고, 부족하면 별도 fetch 경로 및 열린 transcript DOM fallback을 사용한다. 소스에는 InnerTube 및 timedtext 접근도 포함된다.
+- 참고 가치: DOM-first와 async fallback 구조, language preference, transcript segment 정리, 기존 페이지에서 이미 열린 transcript를 재사용.
+- 제약: 영상책은 youtube.com이 아닌 GitHub Pages 문서이며 임베드 iframe 내부 DOM을 읽을 수 없다. Web Clipper와 같은 원본 페이지 DOM 권한이 없다.
+- 호환성 문제: GitHub issue #310 https://github.com/kepano/defuddle/issues/310 에서 iOS Safari의 m.youtube.com 경로에 cross-origin caption fetch CORS preflight 실패가 보고됐다.
+- 판정: transcript DOM 정규화 및 비동기 fallback 구조는 참고. 추출 경로 자체는 통합하지 않음.
+
+#### 5) rapha30/yt-youtube-transcript
+- Repository: https://github.com/rapha30/yt-youtube-transcript
+- 확인 파일: `README.md`
+- 구현 구조: Go CLI/library. README는 Android/iOS InnerTube 요청과 watch-page의 `ytInitialPlayerResponse` scraping fallback을 명시한다. README 스스로 undocumented endpoints를 사용하므로 YouTube 변경에 따라 깨질 수 있다고 설명한다.
+- 참고 가치: fallback별 진단, offline fake transport 테스트, network canary 분리, cue/SRT/timestamp 출력.
+- 제약: Go CLI/라이브러리 실행 환경 필요, 비공식 API와 scraping 사용.
+- 판정: fallback 테스트 설계와 진단 방식만 참고. 네트워크 취득 코드는 통합하지 않음.
+
+#### 6) yt-dlp
+- Repository: https://github.com/yt-dlp/yt-dlp
+- 확인 파일: `yt_dlp/options.py`, `README.md`
+- 기능: CLI에서 manual subtitles와 auto-generated subtitles 목록/저장/변환 기능 제공.
+- 참고 가치: 자막 언어/포맷 구분, SRT/VTT 변환, 에러와 테스트 체계.
+- 제약: Python CLI 기반이며 GitHub Pages 브라우저 코드가 아니다.
+- 판정: CLI의 자막 포맷/파서 동작을 참고할 수 있으나 영상책 자동 추출 경로는 아님.
+
+### Reddit 및 커뮤니티 관찰
+- Obsidian Web Clipper Reddit: https://www.reddit.com/r/ObsidianMD/comments/1hbejjo/web_clipper_can_extract_the_transcript_from_a/
+  - 작성자는 YouTube transcript pane을 확장한 DOM에서 transcript segment를 선택해 클립하는 템플릿을 공개.
+  - 사용자가 transcript pane을 직접 열어야 하며, Web Clipper는 페이지에 존재하는 데이터만 접근할 수 있다고 답변.
+  - 후속 댓글은 YouTube 레이아웃 변경 후 예전 템플릿이 작동하지 않는 문제를 제기.
+  - 판정: viewer-visible DOM의 단서이나 별도 YouTube 페이지에서 패널을 열어야 하며 영상책의 iframe 문제를 해결하지 않는다.
+- Nootube-powered Obsidian plugin Reddit: https://www.reddit.com/r/ObsidianMD/comments/1twszej/made_an_obsidian_plugin_that_pulls_youtube/
+  - 작성자는 외부 Nootube 서비스가 플러그인에 동력을 제공한다고 disclosure.
+  - 댓글에서 YouTube caption track 우선, captions가 없으면 Whisper fallback이라고 설명.
+  - 판정: 외부 서비스/STT 의존이므로 0원·무서버·기존 자막 취득 기준의 독립 코드 사례가 아니다.
+
+### 기술 블로그·패키지·이슈에서 확인한 운영 리스크
+- npm: https://www.npmjs.com/package/youtube-caption-extractor — transcript/caption extraction 패키지 및 서버 예제 설명.
+- DEV Community: https://dev.to/casaucao/scraping-youtube-transcripts-at-scale-for-rag-and-the-3-things-that-break-it-2hdf — public captions와 대규모 scraping 운영 이슈.
+- GitHub issue: https://github.com/kepano/defuddle/issues/310 — iOS Safari CORS 문제.
+- 커뮤니티/벤치마크 글은 작성자의 테스트 환경과 이해관계가 있을 수 있으므로 공식 정책이나 독립적인 실기기 검증을 대체하지 않는다.
+
+### 공식 정책/약관과의 대조
+- YouTube API Developer Policies: https://developers.google.com/youtube/terms/developer-policies
+  - undocumented API 사용 금지와 YouTube/Google Applications scraping 및 scraped data 획득 금지 조항이 명시돼 있다.
+- YouTube Terms of Service: https://www.youtube.com/t/terms
+  - 자동화된 수단(robots.txt에 따른 공개 검색엔진 또는 사전 서면 허가 예외 외)을 통한 접근 제한을 포함한다.
+- 이 정책/약관 문구는 각 사례의 법적 지위를 개별 판단한 것이 아니다. 영상책 기본 구현 경로로 비공식 API/scraping을 채택하지 않는 정책 위험 근거다.
+- 공개 소스의 MIT 라이선스는 YouTube 서비스 접근 방식까지 허가하는 것이 아니다.
+
+### 비교 요약
+| 후보 | 자막 본문 | 런타임/구조 | 핵심 위험/제약 | 영상책 판정 |
+|---|---|---|---|---|
+| youtube-transcript-api | timestamped text | Python requests/CLI/server | 비공식 추출, cloud IP block | 파서/모델 참고 |
+| youtube-captions | timestamped text | Node axios | InnerTube/timedtext, proxy 옵션 | 파서/모델 참고 |
+| youtube-caption-extractor | timestamped text | TypeScript fetch + server sample | InnerTube, server deployment example | 타입/테스트 참고 |
+| Defuddle | DOM transcript + fetch fallback | 원본 페이지 DOM/웹 클리퍼 | 패널 오픈 필요, CORS, 비공식 fallback | DOM 정리 구조 참고 |
+| yt-youtube-transcript | timestamped text | Go CLI/library | undocumented endpoint + scraping | 테스트 구조 참고 |
+| yt-dlp | SRT/VTT | Python CLI | 명령/파일 흐름 | 포맷 참고 |
+| Obsidian Web Clipper | 현재 페이지 DOM transcript | 브라우저 clipper | transcript panel 직접 열기 | 별도 앱 동작, 핵심 기능 아님 |
+| Nootube plugin | captions 또는 Whisper fallback | 외부 hosted service | 외부 서비스 의존 | 부적합 |
+
+### 결론 및 한계
+- 공개 코드 중에는 실제로 public video의 caption text와 timestamps를 얻는 구현이 다수 존재한다. "기술 구현 사례 자체가 없다"고 말하면 부정확하다.
+- 그러나 조사한 대표 코드의 추출부는 InnerTube/timedtext 또는 YouTube 페이지 스크래핑에 의존하며, YouTube 정책/약관 위험이 있다. Node/Python/Go 서버·CLI 전제도 많아 정적 Android 앱과 다르다.
+- 브라우저 DOM 접근 사례는 원본 YouTube 페이지 안에서 사용자가 이미 연 transcript panel을 읽는 구조다. 영상책 별도 도메인에서 iframe 내부 DOM을 읽을 수 있다는 뜻은 아니다.
+- 현재 조사 범위에서는 0원·정적 GitHub Pages·Android 일반 시청자·정책 준수 조건을 모두 만족하는 자동 추출 코드를 채택하지 않는다.
+- 다음 우선순위는 원본 YouTube 페이지의 viewer-visible transcript DOM을 정책에 맞게 앱과 연계할 수 있는 공식/지원 경로가 있는지, Android에서 사용자 부담 없이 가능한지 확인하는 것이다. STT는 이 탐색보다 앞서지 않는다.
