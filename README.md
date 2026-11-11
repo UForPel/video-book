@@ -89,3 +89,10 @@ YouTube 공식 대본 페이지 링크는 보조 링크일 뿐, 영상책 내부
 - YouTube IFrame API의 captions 모듈은 공식 문서상 자막 표시 크기 조정과 자막 데이터 새로고침 옵션만 노출한다. 자막 문장/대본 본문을 반환하는 옵션은 문서에 없다.
 - 따라서 이 두 경로는 일반 시청자용 자동 자막 취득 핵심 기능으로 채택하지 않는다.
 - 상세 근거: [RESEARCH_BENCHMARKS.md §26](./RESEARCH_BENCHMARKS.md#26-브라우저-stt와-youtube-iframe-captions-모듈-검증-2026-11-11).
+
+
+## 자막 추출 생태계 조사 (VB-23)
+여러 공개 구현과 사용자 사례를 비교한 결과, 공개 라이브러리 다수는 YouTube의 문서화되지 않은 내부 요청(InnerTube/timedtext)이나 페이지 스크래핑에 의존한다. 일부는 Node/Python/Go 런타임 또는 서버·프록시를 요구한다. 브라우저에서 YouTube 페이지 DOM을 읽는 사례도 있지만 사용자가 YouTube 대본 패널을 먼저 열어야 하며, 영상책의 별도 GitHub Pages 문서에서 임베드 iframe DOM을 읽는 방법은 아니다.
+- 코드 참고 후보와 비채택 사유: [RESEARCH_BENCHMARKS.md §27](./RESEARCH_BENCHMARKS.md#27-공개-자막-추출-프로젝트-및-커뮤니티-사례-비교-2026-11-11).
+- 공개 코드가 있다는 사실은 YouTube 접근 방식의 허가 또는 정책 준수를 의미하지 않는다.
+- STT는 기존 자막 추출 경로 조사가 끝나기 전에 우선 검토할 주제가 아니었다. VB-22는 비채택 기록만 유지하고 핵심 탐색 우선순위를 대체하지 않는다.
