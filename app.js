@@ -16,16 +16,22 @@ let captionLoadToken = 0;
 
 function getVideoId(value) {
   const raw = value.trim();
-  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+  const isValidId = id => typeof id === "string" && /^[a-zA-Z0-9_-]{11}$/.test(id);
+  if (isValidId(raw)) return raw;
   try {
     const url = new URL(raw);
-    const host = url.hostname.replace(/^www\./, "");
-    if (host === "youtu.be") return url.pathname.split("/").filter(Boolean)[0] || null;
+    const host = url.hostname.replace(/^www\\./, "");
+    if (host === "youtu.be") {
+      const id = url.pathname.split("/").filter(Boolean)[0] || null;
+      return isValidId(id) ? id : null;
+    }
     if (["youtube.com", "m.youtube.com", "youtube-nocookie.com"].includes(host)) {
       const id = url.searchParams.get("v");
-      if (id) return id;
+      if (id) return isValidId(id) ? id : null;
       const parts = url.pathname.split("/").filter(Boolean);
-      if (["embed", "shorts", "live"].includes(parts[0]) && parts[1]) return parts[1];
+      if (["embed", "shorts", "live"].includes(parts[0]) && parts[1]) {
+        return isValidId(parts[1]) ? parts[1] : null;
+      }
     }
   } catch (_) { return null; }
   return null;
