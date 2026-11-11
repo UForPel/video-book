@@ -121,3 +121,32 @@
 - 판정: 일회성 웹 UI 이용과 영상책 자동화 호출은 구분한다. 자동 호출/한도 공유/회피가 금지되는 서비스를 영상책 자막 공급원으로 채택하지 않는다.
 - 다음 검토는 영상 제작자 허가/공개 제공 자막 또는 공식적으로 허용된 임베드/데이터 인터페이스로 한정한다.
 - 출처: https://transcriptfetch.com/blog/youtube-transcript-api-no-key ; https://youtubetranscripts.io/terms/
+
+
+## 12. 제작자 제공/허가 자막 경로 조사 — VB-08 — 2026-11-11
+
+### 공식 YouTube Captions API
+- `captions.list`는 OAuth 2.0 인증이 필요하고 영상의 자막 트랙 메타데이터만 반환한다. 자막 본문은 반환하지 않는다. 문서상 호출 비용은 50 quota units다.
+- `captions.download`는 OAuth 2.0 인증과 해당 영상에 대한 수정 권한을 요구한다. SRT/VTT 등으로 내려받을 수 있지만 호출 비용은 200 quota units다.
+- 따라서 영상 제작자/채널 소유자 또는 해당 영상 수정 권한을 부여받은 사용자에게는 공식 경로가 될 수 있지만, 임의 공개 영상의 시청자에게 제공되는 자동 자막 API는 아니다.
+- 영상책에 OAuth 계정 연결과 토큰 보관/보안 처리를 추가해야 하므로 현재의 서버 없는 단순 정적 앱에 바로 넣지 않는다.
+- IFrame Player API의 captions 모듈은 플레이어 안의 자막 표시 설정(글자 크기 등)과 reload 제어를 제공하지만, 자막 텍스트/타임스탬프 전문을 앱에 반환하지 않는다.
+
+### 제작자가 제공하는 SRT/VTT 파일
+- YouTube Studio는 제작자가 자막 파일을 업로드하거나 텍스트를 입력해 영상에 자막을 추가할 수 있도록 지원한다.
+- 영상책의 현재 코드에는 SRT/VTT 파서, 로컬 파일 선택, 재생 시점 기반 활성 자막 강조, 자막 클릭 시 seek가 이미 구현되어 있다. 다만 자동으로 자막 파일을 찾거나 가져오는 기능은 없다.
+- 가장 단순한 서버 없는 자동 연결 후보는 제작자가 제공/허가한 SRT/VTT 파일을 영상책 저장소의 정적 경로에 두고, 영상 ID와 파일 경로를 정적 목록(JSON 등)으로 연결하는 방식이다. Pages와 같은 출처에서 파일을 가져오면 외부 API 키/서버가 필요하지 않으며, 영상이 열릴 때 영상 ID로 등록된 자막 파일을 자동 로드할 수 있다.
+- 제작자가 별도 도메인에 파일을 호스팅하는 경우에는 해당 서버가 영상책 출처에 CORS 접근을 허용해야 브라우저 JavaScript의 fetch로 내용을 읽을 수 있다. 단순 공개 URL이라는 사실만으로 CORS가 허용되는 것은 아니다.
+- 이 방식은 제작자 제공 파일이 등록된 영상에만 자동 연결된다. 모든 YouTube 공개 영상의 자막을 자동으로 찾아오는 범용 기능은 아니다. 파일 배포/저장에 대한 제작자 허가와 저작권 조건도 확인해야 한다.
+
+### 판정 및 다음 단계
+- 공식 Captions API는 소유/수정 권한이 있는 영상의 선택적 경로로만 기록하고, 현재 MVP 기본 경로로 채택하지 않는다.
+- 영상책의 현재 제약을 유지하면서 검증할 다음 후보는 제작자 허가 SRT/VTT의 정적 호스팅 + 영상 ID 매핑이다.
+- 이번 조사에서는 코드 변경을 하지 않았다. 자동 연결 구현 전에 실제로 사용할 수 있는 허가된 샘플 자막과 대상 영상 한 건을 기준으로 자동 fetch 및 Android 동기화를 검증한다.
+- 출처:
+  - https://developers.google.com/youtube/v3/guides/implementation/captions
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+  - https://developers.google.com/youtube/iframe_api_reference
+  - https://support.google.com/youtube/answer/2734796?hl=en
+  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
