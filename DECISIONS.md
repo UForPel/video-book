@@ -93,3 +93,24 @@
 - 결정: 두 서비스 모두 timestamped transcript 데이터 형식의 참고 후보로만 둔다. API 키를 공개 저장소/클라이언트 코드에 넣지 않는다. 현재 정적 Pages + 서버 없음 + 무료/쿼터 최소화 조건에서는 핵심 의존성으로 채택하지 않는다.
 - 주의: YouTubeScribe/VideoQuill 브랜드와 가격/무료 조건의 최신 일관성이 확인되지 않았으므로 무제한 무료 API로 간주하지 않는다. YT2Text 문서 내 무료 한도/API 키 플랜 설명도 가입 전 재확인한다.
 - 참고: https://youtubescribe.com/docs ; https://youtubescribe.com/api-access ; https://videoquill.com/ ; https://docs.yt2text.cc/guide/getting-started/ ; https://docs.yt2text.cc/reference/faq/
+
+
+## 결정 016 — 일반 웹페이지의 YouTube iframe 내부 자막 직접 읽기
+- 상태: 브라우저 보안 문서 확인
+- 확인: 영상책과 YouTube iframe은 서로 다른 출처다. 동일 출처 정책에 따라 일반 페이지 JavaScript는 교차 출처 iframe의 내부 문서/DOM에 자유롭게 접근할 수 없다.
+- 결정: YouTube iframe 내부 자막 DOM을 영상책에서 직접 읽는 설계를 채택하지 않는다. 공식적으로 허용된 메시지/API 통로가 별도로 확인될 경우에만 재평가한다.
+- 출처:
+  - https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
+  - https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe
+
+## 결정 017 — Android Chrome 확장 프로그램 경로는 현재 환경에 부적합
+- 상태: 2026-10 공개 Chromium 담당자 답변 확인
+- 확인: Chromium Extensions 담당자는 Chrome 모바일에 확장 프로그램 지원 계획이 없다고 답변했다.
+- 결정: Android Chrome을 사용하는 영상책의 기본 해결책으로 데스크톱 Chrome/Edge 확장 프로그램을 요구하지 않는다.
+- 출처: https://groups.google.com/a/chromium.org/g/chromium-extensions/c/tCUm3kceybk
+
+## 결정 018 — 브라우저 음성 인식 입력 범위 구분
+- 상태: 공식 브라우저 문서 확인
+- 확인: 확인한 Web Speech API 문서는 마이크 또는 사용자가 선택한 오디오/비디오 파일을 입력으로 설명한다. YouTube iframe 내부에서 재생 중인 교차 출처 오디오를 자동으로 전달받는 기능은 확인되지 않았다.
+- 결정: 마이크/파일 기반 음성 인식은 YouTube iframe 오디오 자동 전사와 같은 기능으로 취급하지 않는다. 로컬 미디어 STT는 별도 후보로 유지한다.
+- 출처: https://learn.microsoft.com/en-us/microsoft-edge/web-platform/speech-recognition-api
