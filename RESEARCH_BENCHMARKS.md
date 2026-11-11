@@ -342,3 +342,29 @@
 4. 이번 단계에서는 문서 조사만 수행했으며 코드/배포 기능은 변경하지 않았다.
 5. 다음 단계는 허가된 샘플 영상 한 건과 SRT/VTT 파일을 기준으로 자동 fetch와 Android 재생 동기화를 검증하는 것이다.
 
+
+
+## 15. 제조사/호스팅 플랫폼의 스크립트 기능 재검증 — VB-09 — 2026-11-11
+
+### TI 공식 사이트
+- TI 제품 페이지에서 `View video with transcript` UI가 제공되는 사례를 확인했다.
+- 확인 가능한 공개 페이지 정보만으로는 스크립트 본문이 외부 JavaScript에 공개되는지, 시간 정보가 포함된 SRT/VTT 파일 또는 공개 자막 데이터 주소가 존재하는지 확인되지 않았다.
+- 판정: 제조사 자체 페이지의 접근성/읽기 기능 사례로만 기록한다. 영상책에서 일반 YouTube 자막을 가져오는 기술 경로로 채택하지 않는다.
+
+### Wistia
+- 공식 도움말은 Wistia 미디어의 captions와 time-coded transcripts를 구분하고, transcript embed로 Wistia 플레이어 옆에 스크립트를 표시할 수 있다고 설명한다.
+- Wistia 공식 API의 특정 미디어 captions 조회는 API token과 `Read all folder and media data` 등 권한을 요구한다. SRT/VTT/TXT 형식 응답을 지원하지만 Wistia 계정/미디어 권한이 전제된다.
+- 판정: Wistia에 호스팅된 미디어에 대해서는 유효한 기능이지만 일반 YouTube URL의 자막 공급원이 아니다. 별도 토큰 없이 모든 사용자의 YouTube 자막을 가져오는 경로가 아니므로 영상책의 핵심 자동 취득 후보에서 제외한다.
+- 출처: https://support.wistia.com/en/articles/8274062-transcripts-and-captions ; https://docs.wistia.com/reference/get_medias-mediahashedid-captions-languagecode ; https://docs.wistia.com/docs/transcript-embeds
+
+### Brightcove
+- 공식 문서는 제작자가 WebVTT 자막 파일을 영상에 등록하거나 원격 파일로 연결하고, Brightcove Player의 `<track>` 요소로 제공하는 방식을 설명한다. 원격 자막 파일은 브라우저에서 접근 가능해야 하며 CORS 설정이 필요할 수 있다.
+- 판정: Brightcove 호스팅 영상과 Brightcove Player를 위한 제작자 제공 자막 경로다. 일반 YouTube 영상에서 자막 전문을 추출하거나 영상책으로 전달하는 기능이 아니므로 핵심 자동 취득 후보에서 제외한다.
+- 출처: https://player.support.brightcove.com/user-interface/adding-captions-videos-programmatically.html ; https://mstudio.support.brightcove.com/media/managing-text-tracks.html
+
+### YouTube 영상책과의 구분
+- YouTube IFrame Player API는 플레이어 내 captions 표시 옵션과 reload를 제어하지만 자막 cue 전문을 영상책 JavaScript로 반환하는 문서화된 API를 제공하지 않는다.
+- 따라서 TI/Wistia/Brightcove의 자체 플레이어/자체 미디어 스크립트 기능을 YouTube 영상책의 일반 자막 자동 취득 기능으로 간주하지 않는다.
+- 현재 코드에는 SRT/VTT 파서, 로컬 파일 선택, 시간 동기화, 문장 클릭 seek가 구현되어 있으나, 자막 파일 자동 탐색/다운로드는 구현되어 있지 않다.
+- 현재 제약(일반 YouTube 공개 영상, 무료/무제한 우선, 서버 없음, GitHub Pages 정적 앱)을 모두 유지하면서 별도 자막 전문을 안정적으로 자동 취득하는 검증된 경로는 아직 확인되지 않았다.
+- 다음 결정은 제약을 유지한 상태에서 제작자 허가 자막이 제공되는 일부 영상만 지원할지, 아니면 서버/API 비용·계정·사용량 제한 중 일부를 허용할지 정하는 것이다.
