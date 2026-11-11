@@ -187,3 +187,12 @@
 - YouTube Data API의 공개 영상 검색은 별도 API 자격 증명이 필요하며 기본 `search.list` 할당량은 하루 100회다. API 자격 증명을 공개 오픈소스 프로젝트에 삽입해서는 안 되고, API Services Terms §3.2의 법적 계약 연령 조건도 적용된다. 현재 사용자에게 약관 수락·API 프로젝트·키·OAuth 설정을 안내하지 않는다.
 - 현재 확인된 범위에서 0원 지속, 무서버 GitHub Pages, 일반 시청자 권한, 공식 문서/정책 준수 조건을 모두 만족하는 자동 자막 취득 경로는 **미확인**이다. 모든 가능한 기술 경로가 존재하지 않는다고 단정하지 않는다.
 - 상세 근거: [RESEARCH_BENCHMARKS.md §25](./RESEARCH_BENCHMARKS.md#25-일반-시청자-자막-자동-취득-공식-경로-재검증--2026-11-11), [PROJECT_STATUS.md VB-20](./PROJECT_STATUS.md#15-vb-20--일반-시청자-자막-자동-취득-공식-경로-재검증-2026-11-11).
+
+
+## 17. 브라우저 STT 및 YouTube IFrame captions 모듈 조사 (2026-11-11)
+- Web Speech API `SpeechRecognition`은 음성 인식 서비스다. 기본적으로 마이크 입력을 사용하거나 `start(audioTrack)`에 제공된 오디오 트랙을 받을 수 있다. YouTube iframe의 원본 오디오 트랙을 영상책이 공식적으로 읽을 수 있다는 근거는 확인하지 못했다.
+- MDN은 일부 브라우저(Chrome 포함)에서 기본 SpeechRecognition이 서버 기반이며 음성이 웹 서비스로 전송될 수 있다고 설명한다. on-device 처리는 별도 지원/언어 팩이 필요하다.
+- MDN browser compatibility data는 `processLocally`가 Chrome Android에서 지원되지 않는 것으로 표시한다. `getDisplayMedia` 또한 Chrome Android에서 지원되지 않는 것으로 표시한다.
+- 따라서 마이크로 스피커 소리를 다시 듣는 실험은 사용자가 소리를 외부로 재생하고 마이크 권한을 주어야 하며, 에코 제거/주변 소음/인식 정확도/연속 동작/서버 전송 여부와 비용을 보장할 수 없다. 핵심 경로로 채택하지 않는다.
+- YouTube IFrame API는 `captions` 모듈의 `fontSize`와 `reload` 옵션을 문서화한다. 자막 문장/큐/전체 대본 본문을 반환하는 옵션은 목록에 없다.
+- 상세 근거: [RESEARCH_BENCHMARKS.md §26](./RESEARCH_BENCHMARKS.md#26-브라우저-stt와-youtube-iframe-captions-모듈-검증-2026-11-11), [PROJECT_STATUS.md VB-22](./PROJECT_STATUS.md#16-vb-22--브라우저-stt-및-iframe-captions-모듈-검증-2026-11-11).
