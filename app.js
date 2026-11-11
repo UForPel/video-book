@@ -68,16 +68,16 @@ window.onYouTubeIframeAPIReady = function () {
 
 function parseTimestamp(value) {
   // SRT: 00:00:01,250 / VTT: 00:01.250 or 00:00:01.250
-  const time = value.trim().split(/\\s+/)[0].replace(",", ".");
+  const time = value.trim().split(/\s+/)[0].replace(",", ".");
   const parts = time.split(":");
   if (parts.length !== 2 && parts.length !== 3) return null;
   const secondsPart = parts.pop();
-  const secondsMatch = secondsPart.match(/^(\\d{1,2})(?:\\.(\\d{1,3}))?$/);
+  const secondsMatch = secondsPart.match(/^(\d{1,2})(?:\.(\d{1,3}))?$/);
   if (!secondsMatch) return null;
   const minutesPart = parts.pop();
-  if (!/^\\d{1,2}$/.test(minutesPart)) return null;
+  if (!/^\d{1,2}$/.test(minutesPart)) return null;
   const hoursPart = parts.length ? parts.pop() : "0";
-  if (!/^\\d+$/.test(hoursPart)) return null;
+  if (!/^\d+$/.test(hoursPart)) return null;
   const fraction = secondsMatch[2] ? Number((secondsMatch[2] + "00").slice(0, 3)) / 1000 : 0;
   return Number(hoursPart) * 3600 + Number(minutesPart) * 60 + Number(secondsMatch[1]) + fraction;
 }
