@@ -335,3 +335,32 @@
 
 ### 다음 작업
 외부 API 통합 대신, 제작자가 명시적으로 제공하거나 사용 허가한 SRT/VTT 파일을 기존 정적 레지스트리에 연결하는 흐름만 유지한다. 범용 자동 자막 목표는 미해결로 표시한다.
+
+## 11. VB-16 — YouTube 공식 대본 페이지 fallback 추가 (2026-11-11)
+
+### 작업 전 확인
+- 이번 회차 시작 전 AGENT_WORK_RULES.md, README.md, PROJECT_CONTEXT.md, PROJECT_STATUS.md, ROADMAP.md, DECISIONS.md, RESEARCH_BENCHMARKS.md 및 최신 커밋을 다시 조회했다.
+- 시작 시 최신 기본 브랜치 커밋은 033e2e2021c556af329fa3206e4951a13a85ed18이었다.
+- 사용자 요청: YouTube 정책에 피해를 주지 않는 범위에서 합법적 대체 경로를 계속 진행. 기존 고정 조건(0원, Android, GitHub Pages 정적, 자동 자막 목표, 수동 transcript 붙여넣기 금지)을 유지했다.
+
+### 공식 근거
+- YouTube Help의 'View video transcripts'는 자막이 있는 영상에서 영상 설명의 'Show transcript'를 열고, 대본 문장을 선택해 해당 위치로 이동할 수 있다고 설명한다: https://support.google.com/youtube/answer/15930243
+- YouTube API Developer Policies는 문서화되지 않은 API 사용과 YouTube/Google 앱 스크래핑, 스크랩된 데이터 획득을 금지한다: https://developers.google.com/youtube/terms/developer-policies
+- 따라서 공식 대본 페이지로 사용자를 연결하는 것은 채택 가능한 fallback이지만, 대본 DOM을 자동 추출하거나 내부 패널로 복사하는 방식은 구현하지 않는다.
+
+### 코드 변경
+- index.html: transcript 안내 아래에 숨겨진 'YouTube에서 공식 대본 보기' 링크 추가.
+- app.js: 유효한 YouTube video ID가 입력되면 표준 시청 페이지 URL을 설정하고 링크를 표시한다. 잘못된 입력이면 링크를 숨긴다.
+- style.css: 링크 스타일 및 hidden 상태 스타일 추가.
+- 기존 iframe player, captions.json 정적 레지스트리, SRT/VTT 파서, cue 동기화, seek 동작은 변경하지 않았다.
+- 링크는 YouTube 공식 시청 페이지를 새 탭으로 연다. 영상책 내부 자막 패널로 대본 본문을 자동 전송하지 않는다.
+
+### 결과 상태
+- 성공: 세 코드 파일 업데이트 커밋 완료.
+- 부분 성공: 정책 준수 fallback UI 추가. 사용자가 YouTube 페이지에서 대본을 볼 수 있지만 영상책 내부 패널 자동 표시 문제는 해결되지 않았다.
+- 실패/미해결: 임의 공개 영상의 대본을 영상책 내부 패널에 자동 로드하는 정책 준수 범용 경로는 이번 단계에서도 확인되지 않았다.
+- 미실행: 브라우저 UI 테스트, Android 실기기 테스트, 실제 영상 대본 링크 테스트, GitHub Pages 배포 확인.
+- 비용/계정: 0원, 외부 계정 생성·API 연결·결제 없음.
+
+### 다음 단계
+- 정적 코드 검사를 수행하고, 사용자가 Android에서 링크를 열었을 때 YouTube 공식 대본 기능을 찾기 쉬운지 확인한다. 이후 제작자 제공 자막 파일의 등록 절차를 더 간단하게 하는 방법을 검토한다.
