@@ -290,3 +290,14 @@
 3. 공개 정적 JavaScript에 PAT나 기타 비밀 토큰을 포함하는 방식은 채택하지 않는다.
 4. GitHub 내부 우선 원칙은 유지한다. 다음 단계에서는 외부 서비스를 도입하기 전에 Pages 브라우저에서 공식적으로 접근 가능한 자막 데이터/통신 경로를 추가로 검증한다.
 5. 제품 목표는 바뀌지 않는다: 현재 영상의 자막 자동 취득, 시간대별 동기화, 자막 클릭 시 해당 시점 이동.
+
+
+## 12. TranscriptLayer — timestamped caption API 후보 검토 — 2026-11-11
+- 공식 API 문서는 YouTube를 첫 번째 source adapter로 지원하고, 공개 영상의 기존 caption track을 JSON, text, SRT, WebVTT로 반환한다고 설명한다. normalized segments는 start_ms, duration_ms, text를 포함한다.
+- POST /v1/transcripts는 200 완료 또는 202 비동기 job을 반환하고, GET polling/download는 무료라고 설명한다. 완료된 선택 트랙 1개당 1 credit이며 무료 계정은 100 credits를 제공한다. 무료 계정 API rate limit은 분당 120회.
+- API 요청에는 Bearer API key가 필요하다. 문서는 키를 공개하지 말고 URL/query string에 넣지 말라고 한다. 따라서 정적 공개 JavaScript에 키를 삽입하는 방식은 부적절하다.
+- 문서에서 브라우저 CORS 허용 여부는 확인되지 않았다. CORS가 허용되더라도 키를 공개해야 하는 문제는 해결되지 않는다.
+- Acceptable Use Policy는 접근 통제, 지역 제한, 플랫폼 보안 우회, 쿠키/로그인정보 제공, rate/concurrency/credit limit 회피를 금지한다. 공개 또는 별도 허가된 콘텐츠만 요청해야 한다.
+- Privacy Policy는 계정을 성인(18세 이상)으로 제한한다. 따라서 현재 프로젝트의 사용 후보로 채택하지 않고, 가입/키 발급/API 호출을 진행하지 않는다.
+- 판정: timestamped transcript 데이터 구조와 서비스형 처리 흐름만 참고한다. 무료 무제한 서비스로 취급하지 않는다.
+- 출처: https://transcriptlayer.com/docs/ ; https://transcriptlayer.com/signup/ ; https://transcriptlayer.com/acceptable-use/ ; https://transcriptlayer.com/privacy/
