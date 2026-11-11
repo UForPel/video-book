@@ -368,3 +368,19 @@
 - 현재 코드에는 SRT/VTT 파서, 로컬 파일 선택, 시간 동기화, 문장 클릭 seek가 구현되어 있으나, 자막 파일 자동 탐색/다운로드는 구현되어 있지 않다.
 - 현재 제약(일반 YouTube 공개 영상, 무료/무제한 우선, 서버 없음, GitHub Pages 정적 앱)을 모두 유지하면서 별도 자막 전문을 안정적으로 자동 취득하는 검증된 경로는 아직 확인되지 않았다.
 - 다음 결정은 제약을 유지한 상태에서 제작자 허가 자막이 제공되는 일부 영상만 지원할지, 아니면 서버/API 비용·계정·사용량 제한 중 일부를 허용할지 정하는 것이다.
+
+
+## 16. 무료 전용 아키텍처 조건 — 2026-11-11
+- 사용자 확정 조건: 무료만 허용하며 저렴한 유료 서비스도 사용하지 않는다.
+- GitHub Pages 공식 문서: GitHub Free 공개 저장소에서 정적 사이트 호스팅을 제공한다. HTML/CSS/JavaScript를 게시하지만 PHP/Ruby/Python 등 서버 측 언어 실행은 지원하지 않는다. 사이트/저장소 크기, 빌드 시간, 대역폭 등에 제한이 있다.
+- Cloudflare Workers 공식 제한 문서: Workers Free는 하루 100,000 요청, HTTP 요청당 CPU 10ms 등 무료 한도가 있다. Static Assets 요청은 무료·무제한이라고 문서화되어 있으나 Worker 스크립트 요청은 무료 플랜 한도를 적용받는다.
+- 판정: Workers Free의 존재는 기록하되, 무료 한도와 별도 서비스 의존성이 있고, 일반 YouTube 영상의 자막 전문을 공식적으로 공급하는 출처가 확인되지 않았으므로 현재 영상책의 핵심 경로로 채택하지 않는다.
+- YouTube 공식 Captions API: captions.list는 OAuth 인증을 요구하고 실제 자막 본문을 반환하지 않으며 50 quota units를 사용한다. captions.download는 OAuth와 영상 수정 권한이 필요하며 200 quota units를 사용한다. 일반 공개 영상 시청자를 위한 무료 범용 자막 API가 아니다.
+- 결론: 비용 0원과 기존 GitHub Pages/브라우저 처리 조건을 고정한다. 무료 체험, 결제 수단, 무료 한도 초과 시 유료 전환이 필요한 서비스는 핵심 기능에서 제외한다. 무료 서버를 붙이는 것만으로 자막 공급원 문제가 해결되는 것은 아니다.
+- 출처:
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
+  - https://developers.cloudflare.com/workers/platform/limits/
+  - https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
