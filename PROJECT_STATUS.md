@@ -199,3 +199,12 @@
   - https://developers.cloudflare.com/workers/platform/limits/
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+
+
+## 15. VB-11 코드 안정성 재검사 — 2026-11-11
+- 등록형 자동 자막 로더의 경로 검증, 요청 토큰 처리, 오류 안내 흐름을 재검토했다.
+- 추가로 발견한 경쟁 상태: 사용자가 SRT/VTT 파일을 선택한 직후 파일 읽기(arrayBuffer)가 끝나기 전에 영상을 바꾸면, 늦게 끝난 파일 읽기가 새 영상의 자막을 덮어쓸 수 있었다.
+- 수정: 수동 파일 선택 시 요청 토큰을 보관하고, 파일 읽기가 끝난 뒤에도 현재 토큰과 일치하는지 확인한다. 다른 영상/파일 선택으로 토큰이 바뀌었다면 오래된 결과를 폐기한다.
+- 검증: app.js 전체 JavaScript 구문 검사 통과. 기존 파서로 SRT 샘플 2개 cue, VTT 샘플 1개 cue를 정상 파싱하고 잘못된 형식은 0개 반환하는 것을 확인했다. 경로 검사에서 정상 captions 경로 허용 및 상위 경로 이동 문자열 거부를 확인했다.
+- 제한: 이는 코드 수준의 합성 입력 검사이며 실제 YouTube 영상·실제 제작자 허가 자막·Android 브라우저·GitHub Pages 배포 검증을 대체하지 않는다.
+- 비용: 추가 서비스/유료 API/서버 도입 없음. 0원 조건 유지.
