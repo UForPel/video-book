@@ -4,13 +4,11 @@
 저장소: https://github.com/UForPel/video-book  
 배포 페이지: https://uforpel.github.io/video-book/
 
-이 문서를 프로젝트의 **현재 상태 단일 기준표**로 사용합니다. 진행 상황이 바뀌면 이 문서와 관련 체크리스트를 함께 갱신합니다. 같은 상태를 여러 문서에 중복 기록해 서로 달라지지 않도록, 세부 진행 상태는 여기서 관리하고 `ROADMAP.md`는 큰 단계만 요약합니다.
+이 문서를 프로젝트의 **현재 상태 단일 기준표**로 사용합니다. 세부 진행 상태는 여기서 관리하고, `ROADMAP.md`는 큰 단계만 요약합니다.
 
 ## 1. 전체 상태
 
-<text-placeholder>
 상태 표기: [x] 확인 완료 · [~] 진행 중 · [?] 코드 반영/검증 대기 · [ ] 미착수 · [!] 막힘/결정 필요
-</text-placeholder>
 
 | 영역 | 상태 | 현재 확인된 사실 | 다음 확인/작업 |
 |---|---|---|---|
@@ -24,7 +22,9 @@
 | 자막 클릭 → 영상 이동 | [?] | 코드 반영, 실기기 결과 미확인 | 실제 자막 cue로 검증 |
 | 재생 중 현재 자막 강조 | [?] | 코드 반영, 실기기 결과 미확인 | 실제 재생으로 검증 |
 | YouTube 자막 자동 취득 | [!] | 공식 Captions API는 임의 공개 영상의 범용 취득 수단이 아님 | 정책/기술 대안 조사 |
-| Hyperaudio Lite UI 벤치마킹 | [~] | 공식 저장소/데모/기능 개요 조사 기록 | 기존 플레이어와 결합 구조 검토 |
+| Hyperaudio Lite 소스 검토 | [x] | README, YouTube 데모 HTML, JS 플레이어 어댑터, package.json, MIT LICENSE 확인 | 독립 최소 실험 |
+| Hyperaudio Lite 기존 앱 통합 | [!] | 양쪽에서 YouTube IFrame API 플레이어를 생성/관리하므로 이중 관리 충돌 위험 | 별도 데모 또는 사용자 정의 어댑터 검증 |
+| Hyperaudio Lite Android 실기기 테스트 | [ ] | 아직 테스트 안 함 | 최소 데모 완성 후 테스트 |
 | Hyperaudio Lite Editor/로컬 STT | [?] | 로컬 미디어 전사·교정 기능 설명 확인 | 라이선스/한국어/Android 성능 확인 |
 | 자막 자동 교정 | [ ] | 미구현 | 자동 자막 확보 후 설계 |
 | 앱 내 유튜브 검색 | [ ] | 미구현 | 검색 API 쿼터/대안 조사 후 진행 |
@@ -69,21 +69,22 @@
 
 ## 5. 다음에 할 단 하나의 작업
 
-**작업 ID: VB-01 — Hyperaudio Lite 동기화 구조 검토**
+**작업 ID: VB-02 — Hyperaudio Lite 독립 최소 데모**
 
-목표: 현재 영상책의 YouTube IFrame 플레이어를 유지하면서 Hyperaudio Lite의 timed transcript UI를 작은 범위로 시험할 수 있는지 판단합니다.
+목표: 현재 앱의 코드를 바꾸지 않고, 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube iframe + 미리 준비한 소량의 timed transcript를 동기화하는지 검증합니다.
 
 완료 조건:
-- [ ] 공식 저장소의 실제 진입 파일/사용 예제 확인
-- [ ] YouTube iframe 연결 방식 확인
-- [ ] transcript 데이터 형식과 타임스탬프 형식 확인
-- [ ] 의존성/빌드 단계/외부 서버 필요 여부 확인
-- [ ] 라이선스와 재사용 조건 확인
-- [ ] 현재 `app.js` 플레이어와 충돌 여부 확인
-- [ ] "통합", "일부 아이디어만 참고", "보류" 중 근거를 들어 결정
-- [ ] 결과를 `RESEARCH_BENCHMARKS.md`와 이 상황판에 기록
+- [ ] Hyperaudio Lite의 필요한 JS/CSS 파일만 별도 경로에 복사
+- [ ] MIT 저작권/라이선스 고지 보존
+- [ ] 테스트 전용 HTML에 YouTube iframe과 data-player-type 설정
+- [ ] 단어별 data-m/data-d 형식의 테스트 transcript 준비
+- [ ] 클릭 seek, 재생 중 활성 단어, 자동 스크롤 동작 확인
+- [ ] YouTube IFrame API 로딩 순서/콜백 충돌 여부 확인
+- [ ] Android Chrome 실기기에서 열기 및 동작 확인
+- [ ] 기존 영상책 파일은 변경하지 않고 결과 기록
+- [ ] 통과 후 기존 플레이어와 통합할 방식 결정
 
-이번 작업에서는 자동 자막 취득이나 전체 UI 개편을 동시에 구현하지 않습니다.
+이 작업은 자막 자동 취득이 아니라 확보된 timed transcript의 동기화만 시험합니다.
 
 ## 6. 테스트 기록 원칙
 
@@ -111,5 +112,4 @@
 4. 기술 결정이 바뀌면 `DECISIONS.md` 갱신
 5. 조사 결과면 `RESEARCH_BENCHMARKS.md` 갱신
 6. 큰 단계가 바뀌면 `ROADMAP.md` 갱신
-7. 사용자에게 다음 테스트 방법을 한 번에 하나씩 안내
-
+7. 사용자에게 한 번에 다음 작업 하나만 안내
