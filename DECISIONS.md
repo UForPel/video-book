@@ -3,102 +3,66 @@
 이 문서는 확정된 결정과 아직 검증 중인 선택지를 구분해 기록합니다.
 
 ## 결정 001 — GitHub 전용 저장소
-
 - 상태: 확정
-- 결정: `UForPel/video-book` 저장소를 영상책의 기준 저장소로 사용한다.
-- 이유: 코드, 요구사항, 조사 결과, 진행 상황을 대화 기억과 분리해 보존한다.
-- 기존 저장소: 기존 ReadTube/Bolt 작업물은 삭제하지 않고 참고 자료로 유지한다.
+- 결정: `UForPel/video-book`을 기준 저장소로 사용한다. 기존 ReadTube/Bolt 작업물은 보존한다.
 
 ## 결정 002 — 모바일 우선 정적 웹앱
-
-- 상태: 방향 확정, 배포 세부사항 검증 필요
-- 결정: Android 스마트폰에서 우선 사용할 수 있는 웹앱으로 만든다. GitHub Pages를 우선 호스팅 후보로 삼는다.
-- 이유: 앱스토어 등록 없이 브라우저에서 접근하고 무료 운영을 지향한다.
-- 주의: GitHub Pages는 정적 호스팅이며 백엔드 기능을 제공하지 않는다.
+- 상태: 방향 확정
+- 결정: Android 우선, GitHub Pages 정적 호스팅을 우선한다. Pages 자체는 백엔드를 제공하지 않는다.
 
 ## 결정 003 — 유료 및 사용량 제한 의존성 최소화
-
 - 상태: 필수 원칙
-- 결정: 유료 API와 유료 AI를 핵심 기능에 넣지 않는다. 무료 서비스도 쿼터와 한도를 확인한다.
-- 이유: 개인용으로 오래 사용하면서 비용과 사용량 걱정을 줄이기 위해서다.
-- 주의: 완전 무제한 무료를 보장하는 외부 서비스가 있다고 가정하지 않는다.
+- 결정: 유료 API/AI를 핵심 기능의 필수 의존성으로 두지 않는다. 무료 서비스도 쿼터와 한도를 확인한다. 완전 무제한 무료를 보장하지 않는다.
 
 ## 결정 004 — 영상 재생과 자막 UI 분리
-
 - 상태: 설계 방향
-- 결정: 영상 재생 모듈과 자막 표시·편집 모듈을 분리한다.
-- 후보: YouTube IFrame Player API + Hyperaudio Lite 계열 도구 검토.
-- 이유: 각 기능을 독립적으로 시험하고 교체할 수 있게 한다.
-- 검증 필요: 실제 YouTube 자막 취득은 별도 문제이며 Hyperaudio Lite만으로 해결된다고 가정하지 않는다.
+- 결정: 플레이어와 자막 표시/편집 모듈을 분리한다. Hyperaudio Lite는 시간 동기화 UI 참고 자료일 뿐 자막 공급원이 아니다.
 
-## 결정 005 — 공식 검색 API의 쿼터 위험
+## 결정 005 — 공식 검색 API의 쿼터
+- 상태: 위험 확인
+- 결정: YouTube Data API 검색은 쿼터가 있는 기능이며 무제한으로 취급하지 않는다.
 
-- 상태: 위험 확인, 최종 선택 미정
-- 결정: YouTube Data API 검색을 무제한으로 취급하지 않는다.
-- 이유: 공식 검색 API에는 쿼터가 존재한다.
-- 다음: 개인 사용 시 필요한 검색 빈도를 고려하고, 정책에 맞는 대안을 조사한다.
-
-## 결정 006 — 자막 확보는 별도 핵심 기술 과제
-
-- 상태: 제한 확인, 구현 방식 미정
-- 결정: 공개된 모든 YouTube 영상의 자막을 공식 API로 자유롭게 가져올 수 있다고 가정하지 않는다.
-- 공식 문서 확인 결과:
-  - `captions.list`는 OAuth 2.0 인증을 요구하며, 응답에 실제 자막 내용은 포함하지 않는다.
-  - `captions.download`도 OAuth 2.0 인증을 요구하고, 사용자가 해당 동영상을 수정할 권한이 있어야 한다.
-  - 따라서 일반 사용자가 임의의 공개 영상에서 자막을 자동으로 가져오는 범용 수단으로 공식 Captions API를 사용할 수 없다.
+## 결정 006 — 공식 Captions API는 임의 공개 영상 자막의 범용 취득 수단이 아님
+- 상태: 공식 문서 확인
+- 확인:
+  - `captions.list`는 OAuth 2.0 인증을 요구하며 실제 자막 본문을 반환하지 않는다.
+  - `captions.download`는 OAuth 2.0 인증과 영상 수정 권한을 요구한다.
+- 결론: 일반 사용자가 임의의 공개 영상에서 자막을 자동으로 가져오는 용도로 공식 Captions API를 사용할 수 없다.
 - 출처:
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
   - https://developers.google.com/youtube/v3/guides/implementation/captions
-- 결과: 공식 API만으로는 사용자가 원하는 '영상 주소를 넣으면 다른 사람의 영상 자막까지 자동으로 불러오기'를 구현할 수 없다.
-- 대안 후보: 사용자가 제공한 자막 파일/텍스트, 본인이 관리하는 영상의 공식 자막, 별도 서버가 필요한 합법적 자막 처리 경로, 사용 권한이 있는 로컬 미디어의 음성 인식.
-- 주의: 비공식 내부 인터페이스나 제3자 프록시가 무제한·안정적·약관 준수라고 가정하지 않는다. 안정성, 정책, 개인정보, 쿼터를 확인하기 전에는 핵심 기능으로 채택하지 않는다.
 
-## 결정 007 — 자동 자막 기능을 제품 목표로 유지
-
-- 상태: 제품 요구사항 확정, 기술 구현 미정
-- 결정: 기기에서 SRT/VTT를 직접 선택하는 기능은 개발 시험용 보조 기능일 뿐, 최종 사용자 흐름으로 간주하지 않는다.
-- 최종 목표: 유튜브 영상 선택 후 가능한 경우 자막을 자동으로 연결하고, 타임스탬프가 있는 자막을 영상과 동기화한다.
-- 자막을 자동 확보할 수 없는 경우에는 그 이유를 화면에 명확히 표시하고, 검증된 대체 경로를 제공한다.
-- 다음 단계: 무제한 무료를 보장하지 않는 외부 의존성을 무턱대고 추가하지 말고, 브라우저 정적 앱에서 가능한 범위와 백엔드가 필요한 범위를 구분해 설계한다.
+## 결정 007 — 자동 자막은 제품의 핵심 목표
+- 상태: 요구사항 확정, 기술 경로 미확정
+- 결정: 기기에서 SRT/VTT 파일을 직접 선택하는 기능은 보조 기능이며 최종 흐름이 아니다.
+- 목표: YouTube 영상 선택 후 가능한 경우 자막을 자동 연결하고 시간대별로 표시한다.
+- 원칙: 자막을 자동 확보할 수 없는 경우 그 사실과 이유를 명확히 알린다.
 
 ## 결정 008 — 실제 영상 장면 이미지
-
 - 상태: 후속 검증
-- 결정: 일반 YouTube 임베드 영상에서 임의 프레임을 직접 추출할 수 있다고 가정하지 않는다.
-- 이유: 브라우저 교차 출처 제한이 적용된다.
-- 다음: 썸네일과 실제 프레임을 구분하고, 사용 권한이 있는 로컬 미디어 처리 등 가능한 경로를 검토한다.
+- 결정: YouTube 임베드 영상의 임의 프레임을 브라우저 캔버스로 직접 추출할 수 있다고 가정하지 않는다. 교차 출처 제한과 권한을 검토한다.
 
-## 조사 후보 — 자막 편집
-
-- Hyperaudio Lite: 시간 동기화 자막을 표시하고 클릭으로 영상 위치를 이동하는 기능을 검토할 후보.
-- Hyperaudio Lite Editor: 자막 편집 및 로컬 미디어 처리 기능을 검토할 후보.
-- Android 기기 성능, 한국어 처리, YouTube 임베드 연동 한계를 실제로 시험하기 전에는 채택하지 않는다.
-
-## 결정 009 — 벤치마킹 자료는 재검증 후 저장소에 기록
-
+## 결정 009 — 벤치마킹 자료는 재검증 후 기록
 - 상태: 작업 방식 확정
-- 결정: 이전에 조사한 오픈소스 사이트/프로젝트는 공식 GitHub 저장소와 README/문서에서 확인 가능한 내용만 조사 문서에 기록한다.
-- 확인된 내용과 미확인/미검증 사항을 분리한다. README에 적힌 기능을 실제 작동 보장이나 사용자 경험 검증으로 과장하지 않는다.
-- 저장 문서: [RESEARCH_BENCHMARKS.md](./RESEARCH_BENCHMARKS.md)
-- 현재 우선 참고: Hyperaudio Lite의 YouTube iframe 연동 transcript 동기화 UI.
-- 별도 실험: Hyperaudio Lite Editor의 로컬 STT 및 자막 교정 UI. Android 성능·한국어 품질·라이선스를 별도 확인하기 전에는 통합하지 않는다.
-- Invidious, Piped, ViewTube, Materialious는 UI/구조 참고만 하며 서버/공개 인스턴스를 핵심 의존성으로 채택하지 않는다.
+- 결정: 공식 저장소/문서/실제 코드를 확인하고 확인된 사실과 미검증 사항을 분리한다. 벤치마킹은 참고를 뜻하며 무조건 통합한다는 뜻이 아니다.
 
-## 결정 010 — Hyperaudio Lite는 독립 실험 후 통합 여부 결정
+## 결정 010 — Hyperaudio Lite의 활용 범위
+- 상태: 참고 자료로 보관
+- 확인: Hyperaudio Lite 2.6.4, MIT. timed transcript 동기화 UI, 클릭 seek, 활성 단어, 자동 스크롤 기능을 제공한다.
+- 한계: 임의 공개 YouTube 영상의 자막을 자동 취득하지 않는다.
+- 결정: 영상책의 동기화 UI를 개선할 때 참고한다. 별도 실험 페이지를 사용자에게 테스트시키는 작업은 중단한다.
 
-- 상태: 조사 완료, 실험 대기
-- 확인한 버전: package.json의 2.6.4, MIT LICENSE
-- 장점: 프레임워크/외부 라이브러리 없이 사용할 수 있는 timed transcript UI, YouTube iframe adapter, 단어별 클릭 seek, 활성 단어 표시, 자동 스크롤.
-- transcript 데이터: HTML 단어 요소의 `data-m` 시작 시각(밀리초), `data-d` 단어 길이(밀리초). SRT는 editor/converter를 통한 변환 경로로 README에 설명되어 있으며 런타임의 핵심 데이터는 timed HTML임.
-- 통합 위험: 현재 영상책 `app.js`와 Hyperaudio Lite 기본 YouTube adapter가 각각 YouTube IFrame API의 `YT.Player`를 생성/관리한다. 두 플레이어 래퍼를 같은 화면의 동일 iframe에 바로 중첩하지 않는다.
-- 결정: 기존 영상책 코드는 유지하고 별도 테스트 페이지에서 Hyperaudio Lite 단독 플레이어와 미리 준비된 timed transcript로 기능을 검증한다.
-- 자동 자막 취득: Hyperaudio Lite의 README/데모/확인한 소스에서는 임의의 공개 YouTube 영상 자막 자동 다운로드 기능을 확인하지 못했다. 자막 공급원으로 간주하지 않는다.
-- 다음 작업: VB-02 독립 최소 데모. Android 실기기 검증 후에만 통합 여부 결정.
-- 공식 출처:
-  - https://github.com/hyperaudio/hyperaudio-lite
-  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/README.md
-  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/demos/youtube.html
-  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/js/hyperaudio-lite.js
-  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/package.json
-  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/LICENSE
+## 결정 011 — IFrame API에서 자막 텍스트를 직접 얻을 수 없음
+- 상태: 공식 문서 확인
+- 확인:
+  - YouTube IFrame Player API는 영상 재생/제어와 일부 플레이어 정보를 제공한다.
+  - `captions` 모듈에서 문서화된 옵션은 글자 크기와 캡션 데이터 reload 등 플레이어 내 표시 제어에 한정된다.
+  - 공개 API 문서에서 자막 전문이나 시간대별 자막 트랙을 앱으로 반환하는 메서드는 확인되지 않았다.
+- 결론: 플레이어 안에 CC 자막이 표시된다는 사실만으로 영상책이 그 자막 텍스트를 읽어올 수 있는 것은 아니다.
+- 출처: https://developers.google.com/youtube/iframe_api_reference
+
+## 결정 012 — 다음 단계는 자동 자막 공급 경로 판정
+- 상태: 진행 중
+- 결정: 코드에 임의의 추출 엔드포인트나 제3자 프록시를 연결하지 않는다.
+- 다음 작업: 정적 앱/별도 서버/권한이 있는 로컬 미디어의 경계를 비교하고, 사용자 제약과 충돌하는 조건을 명확히 기록한다.
