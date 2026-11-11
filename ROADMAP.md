@@ -24,7 +24,7 @@
 - [ ] 자막 자동 취득이 불가능할 때 사용자에게 안내하는 대체 흐름 설계
 - [ ] 브라우저 내 자막 편집과 저장 방식 시험
 - [x] Hyperaudio Lite 공식 README/데모/소스/package.json/LICENSE 검토
-- [ ] Hyperaudio Lite 독립 데모에서 YouTube 동기화 검증
+- [?] Hyperaudio Lite 독립 데모 페이지 코드 준비 완료; YouTube 동기화는 브라우저/Android 검증 대기
 
 ## 2단계 — MVP 화면 및 기능
 
@@ -53,7 +53,7 @@
 
 ## 현재 다음 작업
 
-**VB-02 — Hyperaudio Lite 독립 최소 데모**를 진행합니다. 현재 영상책의 `app.js`와 플레이어는 변경하지 않고 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube iframe과 미리 준비된 timed transcript를 동기화하는지 확인합니다. 이 실험은 자동 자막 취득 테스트가 아닙니다.
+**VB-02 — Hyperaudio Lite 독립 최소 데모**를 진행합니다. 별도 테스트 페이지와 공식 2.6.4 코어/CSS/라이선스 반영은 완료했고, 실기기 검증은 대기 중입니다. 현재 영상책의 `app.js`와 플레이어는 변경하지 않고 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube iframe과 미리 준비된 timed transcript를 동기화하는지 확인합니다. 이 실험은 자동 자막 취득 테스트가 아닙니다.
 
 ## 작업 기록
 
