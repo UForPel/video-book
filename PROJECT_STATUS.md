@@ -66,13 +66,20 @@
 - 별도 서버 방식은 서버 운영 비용, 용량, 요청 제한, 남용 방지와 유지보수가 필요하다.
 - 조사한 후보 중 임의 공개 영상 자동 자막 + 무료/무제한 + 서버 없음 + GitHub Pages만 사용을 모두 만족하는 안정적·정책 검증 경로는 확인되지 않았다.
 
-## 5. 현재 다음 작업 — VB-10
+## 5. VB-10 조사 결과 — 2026-11-11
 
-**목표: 자동 자막 기능의 필수 조건 중 무엇을 유지하거나 조정할지 결정한다.**
+공식 YouTube IFrame Player API의 captions 모듈은 플레이어 안 자막의 글자 크기와 reload를 제어한다. 별도 자막 패널에 필요한 cue 전문/타임스탬프를 반환하는 문서화된 메서드는 확인되지 않았다. 공식 Captions API의 `captions.list`는 트랙 메타데이터만 반환하고, `captions.download`는 OAuth 및 해당 영상 수정 권한을 요구하므로 일반 시청자의 임의 공개 영상용 API가 아니다.
 
-VB-09에서 공개 제조사/플랫폼 사례(Wistia, Brightcove)를 확인했으나, 이들은 각자의 호스팅 영상에 제작자가 제공한 스크립트/자막을 표시하는 기능이며 일반 YouTube 영상의 자막 공급원이 아니다. 공식 YouTube API, IFrame API, 공개 플랫폼 임베드/API를 대조한 현재까지의 결과로는 모든 공개 YouTube 영상에 대해 무료·무제한·서버 없음·GitHub Pages만으로 별도 자막 전문을 자동 확보하는 검증된 경로를 찾지 못했다.
+브라우저의 동일 출처 정책은 YouTube iframe 내부 DOM 직접 접근을 막으며, 외부 자막 파일 fetch에는 제공 서버의 CORS 허용이 필요하다. GitHub Pages는 정적 호스팅이므로, 요청 시점에 YouTube 자막을 추출하는 서버 역할을 하지 않는다.
 
-제작자 허가 SRT/VTT를 저장소에 정적으로 등록하고 영상 ID로 연결하는 방식은 특정 영상에 한해 기술적으로 가능하지만, 실제 허가된 샘플이 없어 자동 fetch 및 Android 동기화 검증은 보류한다. 허가되지 않은 영상의 자막을 임의 등록하거나 비공개 인터페이스/서비스 제한을 우회하지 않는다. 다음 단계에서는 기존 제약을 유지할지, 외부 서버/API 허용 등 한 가지 조건을 조정할지 결정한다.
+**결론:** 비용 0원 + 서버 없음 + GitHub Pages 조건을 유지하면 임의 공개 YouTube 영상의 자막 전문을 자동 취득하는 공식·안정적 경로는 현재 확인되지 않았다. 제작자 제공/허가 SRT/VTT 파일을 저장소에 등록하고 영상 ID와 매핑하면 해당 영상에 한해서는 자동 연결할 수 있다. 허가 샘플이 없으므로 자동 매핑 코드는 아직 추가하지 않는다. 기존 로컬 SRT/VTT 업로드와 동기화 기능은 유지한다.
+
+출처:
+- https://developers.google.com/youtube/iframe_api_reference
+- https://developers.google.com/youtube/data/reference/rest/v3/captions
+- https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
+- https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+- https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
 
 ## 6. 사용자 테스트 및 기록 원칙
 
