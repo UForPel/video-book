@@ -80,3 +80,12 @@ YouTube 공식 대본 페이지 링크는 보조 링크일 뿐, 영상책 내부
 - 현재까지 확인한 공식 경로에서는 일반 시청자가 볼 수 있는 YouTube 대본을 영상책이 읽어오는 API를 찾지 못했다.
 - YouTube 공식 대본 화면은 사용자가 YouTube 안에서 읽고 문장별 이동을 하는 기능이며, 영상책에 대본 본문을 전달하는 API가 아니다.
 - 상세 결과와 검증 한계는 [RESEARCH_BENCHMARKS.md §25](./RESEARCH_BENCHMARKS.md#25-일반-시청자-자막-자동-취득-공식-경로-재검증--2026-11-11)를 참조한다.
+
+
+## 음성 인식 및 IFrame 자막 모듈 조사 기록
+- 브라우저 Web Speech API는 자막 텍스트를 가져오는 기능이 아니라 마이크/오디오 트랙의 음성을 인식하는 별도 기능이다.
+- Chrome의 기본 음성 인식은 서버 기반일 수 있고, Android Chrome에서 오프라인 on-device 인식 지원은 현재 호환성 자료상 확인되지 않는다.
+- Android Chrome의 화면/시스템 오디오 캡처는 현재 호환성 자료에서 지원되지 않는 것으로 표시된다.
+- YouTube IFrame API의 captions 모듈은 공식 문서상 자막 표시 크기 조정과 자막 데이터 새로고침 옵션만 노출한다. 자막 문장/대본 본문을 반환하는 옵션은 문서에 없다.
+- 따라서 이 두 경로는 일반 시청자용 자동 자막 취득 핵심 기능으로 채택하지 않는다.
+- 상세 근거: [RESEARCH_BENCHMARKS.md §26](./RESEARCH_BENCHMARKS.md#26-브라우저-stt와-youtube-iframe-captions-모듈-검증-2026-11-11).
