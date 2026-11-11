@@ -444,3 +444,44 @@
 - YouTube API Developer Policies: https://developers.google.com/youtube/terms/developer-policies
 - Captions: list: https://developers.google.com/youtube/data/reference/rest/v3/captions/list
 - Captions: download: https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+
+
+## 14. VB-19 — 제작자 제공 자막 파일의 공식 확보·정적 연결 경로 확인 (2026-11-11)
+
+### 작업 전 확인
+- 최신 기본 브랜치 커밋: `8db9aa522cb938af385f5c485f547d56d6ab06b1`.
+- 작업 전 `AGENT_WORK_RULES.md`, `README.md`, `PROJECT_CONTEXT.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `DECISIONS.md`, `RESEARCH_BENCHMARKS.md`를 재조회했다.
+- 이번 단계는 제작자/권리자가 명시적으로 제공할 수 있는 자막 파일의 공식 확보 경로와 기존 앱의 정적 등록 구조가 연결되는지 확인하는 것으로 한정했다.
+
+### 공식 근거
+- YouTube Help의 'Edit or remove captions'는 YouTube Studio → Subtitles → 대상 영상 → 해당 언어의 Edit → Options → Download subtitles 순서로 자막 트랙 파일을 브라우저에 다운로드하는 절차를 명시한다.
+- YouTube Help의 'Supported subtitle and closed caption files'는 SRT(.srt)를 기본 형식으로 권장하며 UTF-8 일반 텍스트를 요구한다. WebVTT(.vtt)도 지원 형식 목록에 있다.
+- YouTube Help의 'Add subtitles & captions'는 자막 파일이 텍스트와 각 줄의 타임스탬프를 포함한다고 설명한다.
+- 중요 권리 구분: Studio에서 자막 파일을 내려받을 수 있다는 기능은 그 파일을 제3자 공개 웹사이트/저장소에 재배포할 권리를 자동 부여하지 않는다. 공개 저장소에 올리려면 실제 권리자의 명시적 허가가 필요하다. 이는 법률 자문이 아니며, 권리 범위가 불분명하면 공개 등록하지 않는다.
+
+### 기존 영상책 코드 구조 재조회
+- `app.js`는 `captions.json`에서 영상 ID별 파일 경로를 읽고, `captions/<파일명>.srt/.vtt` 파일을 정적 fetch로 불러오는 경로를 이미 구현하고 있다.
+- 경로 검증은 `captions/` 아래의 SRT/VTT만 허용하고 `..` 경로를 거부한다.
+- 자막 파서는 타임스탬프와 텍스트 cue를 읽고, 플레이어의 재생 시점과 동기화하며 문장 선택 시 해당 시점으로 이동한다.
+- 현재 `captions.json`에는 설명용 주석만 있고 실제 영상 ID/자막 파일 등록은 없다. 따라서 실제 자막 파일을 통한 자동 로드 성공은 아직 테스트되지 않았다.
+- 별도 파일 선택기는 사용자가 기기에 저장된 SRT/VTT 파일을 선택해 브라우저에서 읽는 기능이다. 텍스트 복사·붙여넣기를 요구하지 않지만, 임의 YouTube 영상의 자동 추출은 아니다.
+
+### 제한적 등록 절차
+1. 영상 제작자 또는 자막 권리자가 YouTube Studio에서 자막 파일을 다운로드하거나 별도로 SRT/VTT 파일을 제공한다.
+2. 실제 권리자가 GitHub 저장소에 자막 파일을 공개하는 것을 명시적으로 허가한 경우에만 `captions/` 아래에 파일을 저장한다.
+3. `captions.json`에 정확한 11자리 YouTube video ID와 파일 경로를 등록한다.
+4. 앱이 영상 ID를 받으면 기존 코드가 등록 파일을 자동 로드하고 시간 cue를 표시한다.
+
+### 판정
+- 성공: YouTube Studio 공식 자막 파일 다운로드 절차와 SRT/VTT 지원 여부 확인; 기존 정적 registry → 파일 fetch → parser → playback sync 코드 경로 확인.
+- 부분 성공: 제작자 제공/권리 허가 파일에 한해 내부 자동 표시로 연결 가능한 구조가 이미 존재한다.
+- 실패/미해결: 임의 공개 영상의 자동 자막 추출 및 앱 내부 YouTube 검색은 해결되지 않았다. 사용자 제1 목표의 대체 완료가 아니다.
+- 미실행: 실제 권리 허가 파일 확보, 실제 video ID 등록, 자막 파일 추가, end-to-end Pages fetch, Android 실기기 테스트, 자막 텍스트 교정 품질 테스트.
+- 코드 변경: 없음. `app.js`, `captions.json`, `index.html` 변경 없음.
+- 비용/계정: 0원. API 계정, OAuth, 외부 서비스, 결제 없음.
+- 다음 단계: 사용자가 권리자의 명시적 허가가 있는 SRT/VTT 파일을 실제로 제공할 수 있는 경우에만, 테스트용 파일 1개를 비공개 데이터가 아닌 공개 권한 확인 후 등록해 end-to-end 검증한다. 허가된 파일이 없으면 더미 콘텐츠를 실제 지원 사례처럼 꾸미지 않는다.
+
+### 출처 (공식 문서, 2026-11-11 조회)
+- YouTube Studio 자막 다운로드: https://support.google.com/youtube/answer/2734705
+- YouTube 자막 파일 형식: https://support.google.com/youtube/answer/2734698
+- YouTube 자막 추가 및 타임스탬프 설명: https://support.google.com/youtube/answer/2734796
