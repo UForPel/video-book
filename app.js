@@ -215,8 +215,8 @@ function renderTranscript() {
 subtitleFile.addEventListener("change", async () => {
   const file = subtitleFile.files && subtitleFile.files[0];
   if (!file) return;
-  // A manually selected file takes precedence over an in-flight registered-caption fetch.
-  captionLoadToken += 1;
+  // A manually selected file takes precedence over in-flight registered-caption loads.
+  const token = ++captionLoadToken;
   if (!/\.(srt|vtt)$/i.test(file.name)) {
     statusEl.textContent = "SRT 또는 VTT 파일만 불러올 수 있습니다.";
     subtitleFile.value = "";
@@ -229,6 +229,8 @@ subtitleFile.addEventListener("change", async () => {
   }
   try {
     const buffer = await file.arrayBuffer();
+    // Ignore this read if the user changed videos or selected another file meanwhile.
+    if (token !== captionLoadToken) return;
     const bytes = new Uint8Array(buffer);
     let decoded = "";
     try {
@@ -251,6 +253,7 @@ subtitleFile.addEventListener("change", async () => {
     renderTranscript();
     statusEl.textContent = file.name + " 파일에서 자막 " + cues.length + "개를 불러왔습니다.";
   } catch (_) {
+    if (token !== captionLoadToken) return;
     statusEl.textContent = "파일을 읽지 못했습니다. 다른 자막 파일로 다시 시도해주세요.";
   }
 });
