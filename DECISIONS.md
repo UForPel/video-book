@@ -149,3 +149,12 @@
   - https://transcriptlayer.com/signup/
   - https://transcriptlayer.com/acceptable-use/
   - https://transcriptlayer.com/privacy/
+
+
+## 결정 021 — TranscriptFetch 무키 체험 경로를 자동 공급원으로 채택하지 않음
+- 상태: 공개 안내 및 약관 검색 결과 확인
+- 서비스 안내 글은 무키 체험을 네트워크당 하루 10회로 제한한다고 설명한다.
+- 서비스 약관은 스크립트/봇을 통한 자막 수집, 경쟁 데이터셋 구축, 방문자/계정 한도 회피를 금지한다.
+- 결정: 사람의 일회성 웹 UI 사용과 영상책의 자동 호출을 구분한다. 자동화가 금지되는 서비스를 영상책의 자막 공급원으로 연결하지 않는다.
+- 다음 검토 범위: 제작자가 제공/허가한 자막과 공식적으로 허용된 인터페이스.
+- 출처: https://transcriptfetch.com/blog/youtube-transcript-api-no-key ; https://youtubetranscripts.io/terms/
