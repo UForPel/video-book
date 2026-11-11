@@ -39,15 +39,8 @@
         <span class="coming-soon">SRT · VTT</span>
       </div>
       <p id="transcript-hint" class="helper">자막 파일을 불러오면 영상과 함께 읽을 수 있습니다. 자막 파일은 이 브라우저 안에서만 읽으며 서버로 전송하지 않습니다.</p>
-      <div class="paste-transcript">
-        <label for="transcript-paste">유튜브 스크립트 붙여넣기</label>
-        <p>유튜브에서 ‘스크립트 보기’를 열고 타임스탬프가 포함된 내용을 복사해 여기에 붙여넣으세요.</p>
-        <textarea id="transcript-paste" rows="5" placeholder="0:00 첫 번째 문장&#10;0:12 다음 문장"></textarea>
-        <button id="load-pasted-transcript" type="button">붙여넣은 자막 불러오기</button>
-        <p class="paste-note">각 문장의 시작 시각을 이용합니다. 마지막 문장의 종료 시각은 영상 길이를 기준으로 계산합니다.</p>
-      </div>
       <div class="subtitle-picker">
-        <label for="subtitle-file">또는 내 기기에서 SRT/VTT 자막 파일 선택</label>
+        <label for="subtitle-file">내 기기에서 자막 파일 선택</label>
         <input id="subtitle-file" type="file" accept=".srt,.vtt,text/vtt,application/x-subrip">
       </div>
       <div id="transcript" class="sample-lines" aria-live="polite"></div>
