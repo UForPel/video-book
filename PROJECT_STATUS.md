@@ -16,7 +16,7 @@
 | GitHub Pages 및 기본 화면 | [x] | Android에서 기존 사이트 열림 확인 | 변경 후 회귀 확인 |
 | YouTube 영상 재생/시점 이동 | [x] | Android 실기기에서 재생과 예시 시점 이동 성공 보고 | 핵심 기능 변경 시 회귀 확인 |
 | 로컬 SRT/VTT 파서 | [?] | 코드 반영, 실제 한국어 파일 실기기 검증 미확인 | 자동 취득 경로 결정 후 보조 기능으로 검증 |
-| YouTube 자막 자동 취득 | [!] | 공식 API만으로 임의 공개 영상의 자막 본문을 얻을 수 없음. 비공식 대안도 확장 권한 또는 서버가 필요하고 요청 제한/정책 리스크가 있음 | 제약 완화 여부 결정 |
+| YouTube 자막 자동 취득 | [!] | 공식 API 외에 일반 웹페이지의 iframe 내부 DOM 직접 접근은 동일 출처 정책으로 제한됨. Android Chrome 확장 경로도 현재 지원되지 않음 | 호스팅형 자막 사이트의 서버/브라우저 흐름과 공개 호출 가능성 추가 확인 |
 | Hyperaudio Lite | [?] | timed transcript 동기화 UI 참고 자료. 자동 자막 취득 기능은 아님 | UI 개선 때 구조 참고 |
 | Hyperaudio 독립 실험 페이지 | [!] | 사용자에게 안내한 URL이 404였음. 사용자 테스트 대상에서 제외 | 재테스트 요청하지 않음 |
 | 자막 자동 교정 | [ ] | 미구현 | 자막 공급 경로가 해결된 뒤 설계 |
@@ -53,7 +53,7 @@
 |---|---|---|---|
 | 공식 YouTube Captions API | OAuth + 해당 영상 수정 권한 | 공식 API 정책/쿼터 적용 | 임의 공개 영상용으로 부적합 |
 | IFrame Player API | GitHub Pages 브라우저 | 플레이어 제어는 가능하지만 자막 전문 반환 기능 미확인 | 재생 전용 |
-| Transcript Studio | Chrome/Edge 확장 프로그램 + YouTube 탭 권한 | README가 YouTube 요청 제한 가능성을 전제 | Pages 앱에 그대로 적용 불가 |
+| Transcript Studio | Chrome/Edge 확장 프로그램 + YouTube 탭 권한 | README가 YouTube 요청 제한 가능성을 전제. Android Chrome 확장 미지원 | Pages 앱/현재 Android 환경에 부적합 |
 | yttext | Python/FastAPI 로컬 또는 별도 호스팅 서버 | YouTube 429 및 서버 자원/요청 제한 | 정적 Pages 단독 불가 |
 | 로컬 STT | 사용자가 제공한 미디어 + 브라우저 내 모델 | 외부 API 호출을 피할 수 있지만 기기 성능/파일 제약 | 후속 검증 후보 |
 | SRT/VTT 직접 제공 | 사용자 기기 브라우저 | 외부 API 쿼터 없음 | 보조 기능 |
@@ -86,3 +86,10 @@
 - 두 서비스 모두 API 키를 정적 공개 웹앱에 안전하게 보관할 수 없으므로 서버 없는 현재 구조의 핵심 의존성으로 채택하지 않음.
 - 자막 timestamp 데이터 구조 참고 후보로만 보관.
 - 현재 다음 작업 VB-04: 제약 우선순위 결정. 사용자가 별도 서버를 허용할지 결정하기 전에는 연동 코드 추가 금지.
+
+
+## 8. 브라우저 직접 접근 경로 조사 — 2026-11-11
+- 동일 출처 정책상 GitHub Pages에서 실행되는 일반 JavaScript는 교차 출처 YouTube iframe 내부 DOM/자막 텍스트를 직접 읽을 수 없음을 MDN 문서로 확인.
+- Chromium Extensions 담당자의 공개 답변에서 Chrome 모바일 확장 프로그램 지원 계획이 없음을 확인. Android Chrome 환경의 데스크톱 확장 프로그램 방식은 현재 적용 대상에서 제외.
+- 확인한 Web Speech API 문서는 마이크/선택한 미디어 파일 입력을 설명하며, YouTube iframe 오디오를 직접 입력받는 기능은 확인되지 않음.
+- 다음 작업 VB-05: 호스팅형 자막 사이트의 브라우저 직접 호출/서버 중계/CORS/인증/무료 한도 구분.
