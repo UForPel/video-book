@@ -5,6 +5,7 @@ const placeholder = document.getElementById("player-placeholder");
 const subtitleFile = document.getElementById("subtitle-file");
 const transcriptEl = document.getElementById("transcript");
 const transcriptHint = document.getElementById("transcript-hint");
+const youtubeTranscriptLink = document.getElementById("youtube-transcript-link");
 
 let player = null;
 let apiReady = false;
@@ -39,8 +40,10 @@ function getVideoId(value) {
 
 function loadVideo() {
   const id = getVideoId(inputEl.value);
-  if (!id) { statusEl.textContent = "올바른 유튜브 주소 또는 11자리 영상 ID를 입력해주세요."; return; }
+  if (!id) { youtubeTranscriptLink.hidden = true; statusEl.textContent = "올바른 유튜브 주소 또는 11자리 영상 ID를 입력해주세요."; return; }
   pendingVideoId = id;
+  youtubeTranscriptLink.href = "https://www.youtube.com/watch?v=" + encodeURIComponent(id);
+  youtubeTranscriptLink.hidden = false;
   loadRegisteredSubtitle(id);
   if (!apiReady) { statusEl.textContent = "유튜브 플레이어를 준비하고 있습니다…"; return; }
   if (player && typeof player.loadVideoById === "function") player.loadVideoById(id);
@@ -111,7 +114,7 @@ async function loadRegisteredSubtitle(videoId) {
 
     const path = registry[videoId];
     if (!path) {
-      transcriptHint.textContent = "이 영상에 등록된 자막이 없습니다. 제작자 제공/허가 SRT·VTT 파일을 선택할 수 있습니다.";
+      transcriptHint.textContent = "영상책에 등록된 자막이 없습니다. YouTube 공식 대본은 위 링크에서 확인하거나, 제작자 제공/허가 SRT·VTT 파일을 선택할 수 있습니다.";
       statusEl.textContent = "등록된 자막이 없습니다. 자막 파일을 직접 선택할 수 있습니다.";
       return;
     }
