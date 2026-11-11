@@ -157,3 +157,28 @@
 - https://github.com/Materialious/Materialious
 
 이 문서는 저장소 README/공식 문서와 일부 실제 소스 파일을 확인한 결과이며, Android 실기기에서 Hyperaudio Lite를 테스트했다는 뜻은 아니다.
+
+
+## 7. YouTube 공식 자막 접근 경로 — 2026-11-11 재확인
+
+### YouTube Data API Captions
+- `captions.list`: OAuth 2.0 인증이 필요하며 응답은 자막 트랙의 메타데이터 목록이다. 실제 자막 본문은 응답에 포함되지 않는다.
+- `captions.download`: OAuth 2.0 인증이 필요하고, 호출하는 사용자가 해당 동영상을 수정할 권한을 가져야 한다.
+- 따라서 다른 사람이 올린 임의의 공개 영상을 영상책에서 자동으로 가져오는 일반 사용자용 공개 API로 쓸 수 없다.
+- 공식 문서:
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+  - https://developers.google.com/youtube/v3/guides/implementation/captions
+
+### YouTube IFrame Player API
+- 공식 API는 임베드 영상 재생/일시정지/시점 이동/재생 정보 조회를 지원한다.
+- `captions` 모듈은 `fontSize`, `reload` 등 플레이어 안에서 자막 표시를 제어하는 옵션을 문서화한다.
+- 문서화된 공개 메서드 중 자막 전문이나 시간대별 caption cue를 외부 페이지의 JavaScript로 반환하는 기능은 확인되지 않았다.
+- 그러므로 플레이어에 CC가 표시되는 것과 영상책이 자막 텍스트를 받아 별도 패널에 표시할 수 있는 것은 별개의 기능이다.
+- 공식 문서: https://developers.google.com/youtube/iframe_api_reference
+
+### 영상책에 대한 판정
+- GitHub Pages 정적 앱 + 공식 YouTube API만으로 임의 공개 영상의 자막 텍스트를 자동 취득하는 경로는 확인되지 않았다.
+- 비공식 내부 인터페이스/스크래핑/공개 프록시를 즉시 붙이지 않는다. 가용성, 정책, 개인정보, 안정성 및 무료 사용 한도를 검증하지 않은 상태에서 핵심 기능으로 채택할 수 없다.
+- 다음 조사는 사용자의 핵심 제약(정적 Pages, Android, 비용/쿼터 최소화)을 기준으로 어떤 조건을 완화해야 실제 자동 자막이 가능한지 비교하는 것이다.
+- 이번 조사는 코드 구현이나 Android 실기기 검증이 아니다.
