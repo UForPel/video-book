@@ -309,3 +309,29 @@
 - youtube-transcript-api: https://github.com/jdepoix/youtube-transcript-api
 - YouTube.js: https://github.com/LuanRT/YouTube.js
 - yt-dlp: https://github.com/yt-dlp/yt-dlp
+
+## 10. VB-15 — 독립 호스팅 자막 API 검토 및 채택 보류 (2026-11-11)
+
+### 작업 전 확인
+- AGENT_WORK_RULES.md, README.md, PROJECT_CONTEXT.md, PROJECT_STATUS.md, ROADMAP.md, DECISIONS.md, RESEARCH_BENCHMARKS.md를 저장소 기본 브랜치에서 다시 조회했다.
+- 조회 당시 최신 커밋은 c86669598150133cccb0e78e9f05d87d2c2648b5이며 직전 VB-14 조사와 미해결 자동 자막 목표를 확인했다.
+- 목표와 고정 조건: YouTube URL 기반 자막 자동 확보, 별도 동기화 패널, 비용 0원, Android, GitHub Pages 정적 웹앱 우선, 수동 붙여넣기는 제품 흐름이 아님.
+
+### 이번 회차 조사
+- TranscriptFox API/Terms/Privacy를 최신 문서로 재확인했다. 익명 하루 1건·첫 10분, API key 불필요, JSON POST, 서비스 전체 한도, 공유 캐시와 기술 로그를 확인했다. API 자체는 기존 캡션/저장 transcript만 읽고 ASR을 시작하지 않는다고 명시한다. 웹사이트의 ASR 처리와 API 경로는 별개로 설명되어 이전 기록의 모호성을 정리했다.
+- TranscriptFox 약관은 공개 API의 가벼운 자동 사용을 공개 한도 안에서 허용하지만, 사용자가 읽을 권리가 있는 공개 미디어만 제출하도록 요구한다. YouTube 캡션을 어떤 권한으로 취득하는지와 영상책 사용 범위는 여전히 미확인이다.
+- Transcript.land 문서는 API key, 월 15분 무료, 외부 서버/ASR 경로를 안내한다. 약관은 미디어를 전사할 권리와 호스팅 플랫폼 약관 준수를 요구한다. 일부 공식 페이지는 HTTP 402로 직접 열리지 않아 원문 확인은 부분적이다.
+- GetYouTubeTranscript는 일회성 100 free credits와 API key/이메일 확인을 요구한다. 공개 README가 서비스 인프라를 YouTube 스크래핑 기반이라고 설명하므로 채택하지 않는다.
+- YouTube API Services Terms 3.2는 법적 계약 체결 연령에 미달하는 사람의 API 약관 수락 및 서비스 사용을 금지한다. 사용자의 연령을 고려해 API 가입/OAuth/약관 수락은 진행하지 않는다.
+- YouTube 공식 Studio는 제작자가 자막 파일을 추가/업로드할 수 있음을 확인했다. 이 파일을 제작자가 명시적으로 제공하면 기존 정적 SRT/VTT 등록 경로에 연결할 수 있다.
+
+### 결과 판정
+- 성공: 저장소 문서 재조회, 세 독립 서비스의 무료 한도/인증/실행 구조 비교, TranscriptFox API와 웹사이트 처리 경로 구분, YouTube API 연령 조항 확인.
+- 실패: 모든 제약(0원 지속, 무서버, Android, 명확한 권리, YouTube 정책 준수)을 충족하는 범용 공개 영상 자막 공급원 발견 실패.
+- 보류: TranscriptFox는 무료 API 접근성은 있으나 한도, 원본 캡션 취득 권한, CORS, 개인정보 검토가 미완료이므로 통합 보류.
+- 제외: Transcript.land(월 15분 무료·API key·서버 의존), GetYouTubeTranscript(일회성 100 credits·API key·README의 scraping 설명).
+- 미실행: 실제 API POST, 브라우저 CORS/OPTIONS, 특정 영상 자막 반환, Android 실기기, GitHub Pages 배포.
+- 코드/기능 변경: 없음. 계정 생성·OAuth·결제·카드 등록 없음. 비용 0원.
+
+### 다음 작업
+외부 API 통합 대신, 제작자가 명시적으로 제공하거나 사용 허가한 SRT/VTT 파일을 기존 정적 레지스트리에 연결하는 흐름만 유지한다. 범용 자동 자막 목표는 미해결로 표시한다.
