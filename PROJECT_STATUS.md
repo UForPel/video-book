@@ -81,6 +81,14 @@
 - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
 - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
 
+### VB-11 구현 진행 — 2026-11-11
+- `app.js`에 YouTube 영상 ID 기준의 정적 자막 등록 목록(`captions.json`) 조회 기능을 추가했다.
+- 등록된 경로가 `captions/` 폴더의 SRT/VTT 파일인지 검사한 뒤 동일 GitHub Pages 출처에서 fetch하고, 기존 자막 파서·시간 동기화·문장 클릭 seek를 재사용한다.
+- 영상 ID를 빠르게 바꿨을 때 이전 요청의 늦은 응답이 새 영상 자막을 덮어쓰지 않도록 요청 토큰을 적용했다.
+- `captions.json`은 현재 빈 등록 목록이며, `captions/README.md`에 제작자 제공/사용 허가 파일 등록 방법을 기록했다.
+- 실제 허가 샘플이 없으므로 등록 영상/실제 자막 자동 로드와 Android 실기기 동기화는 아직 검증되지 않았다. 임의 영상이나 가짜 자막은 등록하지 않았다.
+- 앱 코드 외에 자막 등록 파일과 안내 문서만 추가했다. GitHub Pages 배포 완료 및 Android 실기기 확인은 아직 주장하지 않는다.
+
 ## 6. 사용자 테스트 및 기록 원칙
 
 실기기 결과는 사용자가 직접 보고한 것만 기록합니다. 테스트가 필요할 때는 영상책의 실제 화면에서 핵심 기능을 확인하고, 별도 참고 프로젝트 페이지를 사용자 테스트로 떠넘기지 않습니다.
