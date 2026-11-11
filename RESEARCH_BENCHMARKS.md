@@ -384,3 +384,34 @@
   - https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+
+
+## 17. VB-10 — YouTube 공식 자막 인터페이스 최종 재검증 — 2026-11-11
+
+### IFrame Player API의 captions 모듈
+- 공식 참조: https://developers.google.com/youtube/iframe_api_reference
+- 문서는 captions 모듈의 문서화된 옵션으로 `fontSize`와 `reload`를 제시한다. `fontSize`는 플레이어 안에서 보이는 자막의 크기, `reload`는 플레이어의 자막 데이터를 다시 불러오는 동작이다.
+- `getOptions('captions')`, `getOption`, `setOption`은 플레이어 옵션을 확인/변경하기 위한 인터페이스다. 문서에서 자막 cue 텍스트 배열, cue별 시작/종료 시각을 영상책 페이지로 반환하는 메서드는 확인되지 않았다.
+- 판정: 플레이어 안의 CC 표시를 제어할 수 있다는 사실을 별도 transcript 패널 데이터 접근 권한으로 해석하지 않는다.
+
+### 공식 YouTube Captions API 재확인
+- 공식 참조: https://developers.google.com/youtube/data/reference/rest/v3/captions
+- `captions.list` 응답은 자막 트랙 리소스/메타데이터이며 실제 자막 본문은 포함하지 않는다.
+- 본문을 내려받는 `captions.download`는 OAuth 인증을 요구하며 영상 수정 권한이 필요하다. 이는 제작자/편집 권한 보유자에게 해당하는 관리 API이지 일반 공개 영상 시청자용 범용 자막 API가 아니다.
+- 판정: 일반 공개 영상 자동 자막 취득 경로로 채택하지 않는다.
+
+### 브라우저 보안과 정적 호스팅
+- MDN 동일 출처 정책: https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
+- MDN CORS: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+- YouTube iframe은 영상책 GitHub Pages와 다른 출처다. 일반 JavaScript가 iframe 내부 DOM을 직접 읽을 수 없고, 외부 자막 파일을 `fetch()`하려면 제공 서버가 CORS를 허용해야 한다.
+- GitHub Pages 공식 설명: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+- Pages는 HTML/CSS/JavaScript 등의 정적 파일을 게시한다. 방문자 요청마다 YouTube 자막을 추출해 응답하는 서버 실행 환경은 아니다.
+
+### VB-10 결론 및 구현 범위
+1. 비용 0원, 서버 없음, GitHub Pages 정적 호스팅 조건을 유지하면서 임의의 공개 YouTube 영상에 대해 자막 전문과 타임스탬프를 자동 취득하는 공식·안정적 경로는 이번 재검증에서도 확인되지 않았다.
+2. 제작자가 제공하거나 사용을 허가한 SRT/VTT를 저장소에 정적으로 등록하고 영상 ID와 매핑하는 방식은 등록된 영상에 한해 구현 가능하다. 같은 저장소에서 제공하면 브라우저가 동일 출처로 파일을 읽을 수 있다.
+3. 외부 사이트의 공개 자막 URL은 CORS 허용이 확인된 경우에만 브라우저에서 읽을 수 있다.
+4. 기존 로컬 SRT/VTT 파일 선택, 파싱, 재생 시점 동기화, 문장 클릭 seek 기능은 유지한다. 임의 영상의 가짜 자막이나 권한이 확인되지 않은 파일은 추가하지 않는다.
+5. 실제 허가 샘플 파일이 없으므로 자동 매핑 코드 추가 및 Android 실기기 검증은 보류한다. 허가된 샘플이 확보되면 해당 파일을 대상으로만 자동 fetch와 동기화를 검증한다.
+6. 앱 코드와 배포 설정은 이번 단계에서 변경하지 않았다.
+
