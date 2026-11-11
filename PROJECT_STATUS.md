@@ -66,11 +66,13 @@
 - 별도 서버 방식은 서버 운영 비용, 용량, 요청 제한, 남용 방지와 유지보수가 필요하다.
 - 조사한 후보 중 임의 공개 영상 자동 자막 + 무료/무제한 + 서버 없음 + GitHub Pages만 사용을 모두 만족하는 안정적·정책 검증 경로는 확인되지 않았다.
 
-## 5. 현재 다음 작업 — VB-09
+## 5. 현재 다음 작업 — VB-10
 
-**목표: 제작자 허가 SRT/VTT 파일의 자동 연결을 한 건으로 검증한다.**
+**목표: 자동 자막 기능의 필수 조건 중 무엇을 유지하거나 조정할지 결정한다.**
 
-VB-08 조사 결과, 현재 제약을 유지하면서 검증할 수 있는 가장 단순한 경로는 영상책 저장소의 정적 자막 파일과 YouTube 영상 ID를 연결하는 방식이다. 다음 작업에서는 사용 허가가 확인된 영상 한 건과 SRT/VTT 파일을 대상으로 자동 fetch 및 기존 동기화 기능을 검증한다. 허가된 샘플이 확보되기 전에는 임의 영상 자막을 등록하거나 자동 수집하지 않는다.
+VB-09에서 공개 제조사/플랫폼 사례(Wistia, Brightcove)를 확인했으나, 이들은 각자의 호스팅 영상에 제작자가 제공한 스크립트/자막을 표시하는 기능이며 일반 YouTube 영상의 자막 공급원이 아니다. 공식 YouTube API, IFrame API, 공개 플랫폼 임베드/API를 대조한 현재까지의 결과로는 모든 공개 YouTube 영상에 대해 무료·무제한·서버 없음·GitHub Pages만으로 별도 자막 전문을 자동 확보하는 검증된 경로를 찾지 못했다.
+
+제작자 허가 SRT/VTT를 저장소에 정적으로 등록하고 영상 ID로 연결하는 방식은 특정 영상에 한해 기술적으로 가능하지만, 실제 허가된 샘플이 없어 자동 fetch 및 Android 동기화 검증은 보류한다. 허가되지 않은 영상의 자막을 임의 등록하거나 비공개 인터페이스/서비스 제한을 우회하지 않는다. 다음 단계에서는 기존 제약을 유지할지, 외부 서버/API 허용 등 한 가지 조건을 조정할지 결정한다.
 
 ## 6. 사용자 테스트 및 기록 원칙
 
@@ -148,3 +150,20 @@ VB-08 조사 결과, 현재 제약을 유지하면서 검증할 수 있는 가�
   - https://developers.google.com/youtube/iframe_api_reference
   - https://support.google.com/youtube/answer/2734796?hl=en
   - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+
+
+## 13. 제조사 스크립트 플랫폼 후보 재검증 — VB-09 — 2026-11-11
+- TI의 `View video with transcript`는 TI 자체 사이트가 영상과 스크립트를 함께 표시하는 사례다. 그러나 스크립트 원문을 외부 사이트의 일반 JavaScript가 읽을 수 있는지, 자막 파일/SRT/VTT 주소가 있는지는 확인되지 않았다. 따라서 영상책의 자막 공급원으로 채택하지 않는다.
+- Wistia 공식 문서는 자사 미디어의 transcript/captions 생성, 업로드, 다운로드와 transcript embed를 설명한다. 별도 Captions API의 자막 조회는 계정 권한이 있는 API token을 요구한다. Wistia 미디어 전용 기능이므로 일반 YouTube 영상의 자막을 가져오는 경로가 아니다.
+- Brightcove 공식 문서는 제작자가 WebVTT/SRT 등을 등록하고 자체 Brightcove Player에 `<track>`으로 연결하는 방식을 설명한다. 외부 호스팅 파일은 CORS 허용이 필요하다. 이는 Brightcove에 호스팅된 영상/자체 플레이어 경로이며 일반 YouTube 영상의 자막 공급원이 아니다.
+- 판정: TI/Wistia/Brightcove를 일반 YouTube 자막 자동 취득 후보에서 제외한다. 각 플랫폼 자체 영상에 자막을 표시하는 기능과 YouTube 자막을 영상책에 가져오는 기능을 혼동하지 않는다.
+- 현재 `app.js` 재확인: YouTube 영상 재생, SRT/VTT 파일 파싱, 문장 클릭 시 seek, 재생 시점에 따른 활성 cue 강조는 이미 구현되어 있다. 자동 자막 전문 취득/자동 파일 연결은 구현되어 있지 않다.
+- 코드/배포 변경: 없음. 허가된 샘플 파일이 없는 상태에서 임의 자막 파일을 추가하거나 실제 영상과 맞지 않는 가짜 자막을 매핑하지 않았다.
+- 판정 이후 남은 현실적인 경로: (1) 제작자 허가 SRT/VTT 파일이 제공되는 영상에 한정한 자동 연결, 또는 (2) 외부 서버/API 도입을 허용하는 별도 설계 검토. 두 경로 모두 현재의 ‘모든 공개 YouTube 영상 + 무료/무제한 + 서버 없음’ 요구를 동시에 만족한다고 확인된 것은 아니다.
+- 공식 출처:
+  - https://support.wistia.com/en/articles/8274062-transcripts-and-captions
+  - https://docs.wistia.com/reference/get_medias-mediahashedid-captions-languagecode
+  - https://docs.wistia.com/docs/transcript-embeds
+  - https://player.support.brightcove.com/user-interface/adding-captions-videos-programmatically.html
+  - https://mstudio.support.brightcove.com/media/managing-text-tracks.html
+  - https://developers.google.com/youtube/iframe_api_reference
