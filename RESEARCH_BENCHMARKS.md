@@ -199,3 +199,39 @@
 - https://github.com/kkensuke/yttext/blob/main/docs/deployment.md
 
 이 문서는 저장소 README와 일부 실제 소스/설계 문서를 확인한 결과이며, Android 실기기에서 위 후보들을 실행해 검증했다는 뜻은 아니다.
+
+
+## 9. 호스팅형 자막 사이트/API 비교 — 2026-11-11
+
+이번 조사는 스마트폰 브라우저에서 YouTube URL을 붙여 넣어 자막을 표시하는 웹서비스와, 그 서비스가 공개하는 개발자 API를 구분해 확인했다. 사이트가 브라우저에서 작동한다는 사실만으로 영상책의 GitHub Pages 코드에서 그 결과를 직접 읽을 수 있는 것은 아니다.
+
+### YouTubeScribe / 현재 VideoQuill로 연결되는 페이지
+- 검색 결과에 남아 있는 YouTubeScribe API 문서: https://youtubescribe.com/docs
+- 검색 결과에 남아 있는 API 소개/가격 페이지: https://youtubescribe.com/api-access
+- 현재 홈페이지 열기 결과는 https://videoquill.com/ 으로 리디렉션되었다. 따라서 이전 YouTubeScribe 브랜드/무료 조건을 현재 운영 조건으로 단정하지 않는다.
+- API 문서는 REST API https://api.youtubescribe.com 및 Bearer API key 인증을 설명한다.
+- /youtube/transcript는 영상 자막을 구조화된 segment 또는 텍스트로 반환하고 시작 시각/길이를 포함할 수 있다. language 매개변수로 언어 우선순위를 지정하며 asr는 자동 생성 자막 트랙 요청으로 문서화되어 있다.
+- 자막 추출은 성공한 응답(200)당 1 credit이며, 검색 API도 페이지당 1 credit. 문서에 분당 300 요청의 rate limit이 표시되어 있다. Credit 한도와 rate limit은 서로 다른 제한이다.
+- 문서는 API 키를 환경 변수에 보관하고 클라이언트 코드에 넣지 말라고 명시한다.
+- 검색된 가격 안내는 무료 자막 추출을 표방하지만 API는 key/credit 잔액을 요구한다. 별도 최신 공식 약관/현재 서비스 페이지가 일치하는지 확인되지 않았고, 현재 사이트 리디렉션도 있으므로 ‘무제한 무료 API’로 판정하지 않는다.
+- 영상책 판정: timestamped transcript 응답 형식은 기술적으로 유용한 참고다. 그러나 비밀 키를 GitHub Pages 클라이언트에 넣을 수 없고, 안전한 호출에는 별도 서버/중계 계층이 필요하다. 현재의 서버 없음/무료 쿼터 최소화 조건과 맞지 않아 통합 보류.
+- 확인 출처: https://youtubescribe.com/docs ; https://youtubescribe.com/api-access ; https://youtubescribe.com/
+
+### YT2Text
+- 공식 문서: https://docs.yt2text.cc/guide/getting-started/
+- FAQ: https://docs.yt2text.cc/reference/faq/
+- 확인된 구조: yt2text.cc 웹 앱과 api.yt2text.cc API 백엔드는 분리되어 있다. API는 계정에서 발급한 API key를 매 요청 Bearer 또는 X-API-Key 헤더로 전달한다.
+- 영상 처리 요청은 job ID를 반환하고, 백엔드가 자막을 추출한 후 상태 조회/결과 조회로 결과를 받는 비동기 작업 구조다.
+- 자막이 있는 공개 영상의 기존 캡션 트랙을 읽는다고 설명한다. 자체 음성 인식으로 자막이 없는 영상을 전사하는 기능이라고 확인되지는 않았다.
+- FAQ 가격표는 Free 5 videos/month, Plus 200/month, Pro 1,000/month라고 안내한다. 별도 rate limit 문서에서는 Free 5/day 및 5/month 등 계획별 제한을 제시한다.
+- FAQ는 API 키를 클라이언트 코드/버전 관리에 노출하지 말라고 명시하며, API 백엔드는 별도 VPS에 있다고 설명한다.
+- 문서 내부에 API key 이용 가능 플랜 설명이 서로 완전히 일치하지 않는 부분이 있으므로 실제 가입/결제 전 최신 대시보드 조건을 재확인해야 한다.
+- 영상책 판정: API가 있어 연결 자체는 가능하지만 인증 키 보호를 위한 서버가 필요하고 무료 사용량도 제한된다. 현재 요구사항의 핵심 의존성으로 채택하지 않는다.
+- 확인 출처: https://docs.yt2text.cc/guide/getting-started/ ; https://docs.yt2text.cc/reference/faq/
+
+### 영상책에 대한 기술적 결론
+1. 모바일 웹사이트에서 URL을 붙여 넣어 자막을 얻는 서비스는 보통 서비스 운영 서버가 요청을 처리한다. 모바일 브라우저가 직접 YouTube 자막 데이터를 모두 가져온다는 증거가 되지 않는다.
+2. 공개 API가 있더라도 API key가 필요한 경우 GitHub Pages의 JavaScript에 키를 넣으면 공개된다. 문서가 키를 클라이언트에 넣지 말라고 하면 서버 중계가 필요하다.
+3. 무료 웹 UI, 무료 API, 무료 무제한 API는 서로 다른 조건이다. API credit, 계정 제한, 분당 rate limit, 서버 운영 한도를 각각 확인해야 한다.
+4. 이번 후보들은 자막 형식/타임스탬프 데이터 구조의 참고 자료로는 유용하지만, 현재의 ‘GitHub Pages 단독 + 별도 서버 없음 + 무료/쿼터 최소화’ 핵심 조건을 만족하는 채택 후보는 아니다.
+5. 다음 단계는 사용자가 별도 서버를 허용할지 여부를 결정하는 것이다. 승인 전에는 제3자 API 키를 앱 코드에 넣거나 연동 코드를 추가하지 않는다.
