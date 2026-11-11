@@ -269,3 +269,24 @@
 3. Web Speech API/로컬 STT는 마이크 또는 사용자가 제공한 파일 입력과 YouTube iframe의 오디오를 구분해서 평가한다.
 4. 이는 자동 자막 전체가 불가능하다는 결론이 아니다. 서비스 자체 서버가 자막을 제공하는 경로, 허용된 공식 인터페이스, 사용자 제공 자막/미디어 등은 각각 따로 검증한다.
 5. 다음 조사는 자막 웹사이트가 브라우저에서 직접 데이터를 받는지, 서비스 서버가 중계하는지, 영상책에서 안전하게 호출 가능한 공개 인터페이스가 있는지 확인하는 데 집중한다.
+
+
+## 11. GitHub Pages와 GitHub Actions의 실행 모델 — 2026-11-11
+
+### GitHub Pages
+- 공식 문서는 Pages를 저장소의 HTML, CSS, JavaScript 등의 정적 파일을 게시하는 서비스로 설명한다.
+- Pages는 PHP, Ruby, Python 같은 서버 측 언어를 지원하지 않는다.
+- 출처: https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages ; https://docs.github.com/ko/pages/getting-started-with-github-pages/creating-a-github-pages-site
+
+### GitHub Actions
+- workflow는 저장소 이벤트, 외부 repository_dispatch, 수동 workflow_dispatch, 예약 실행 등으로 트리거된다.
+- workflow는 하나 이상의 job으로 구성되고, job은 runner 실행 환경에서 수행된다. 공식 개념 문서는 각 workflow run이 새로 프로비저닝된 가상 머신에서 실행된다고 설명한다.
+- REST API로 workflow run을 조회/관리하거나 실행을 트리거할 수 있는 경우가 있지만, 이는 계속 요청을 기다리는 HTTP 백엔드와 다르다.
+- 출처: https://docs.github.com/en/actions/concepts/workflows-and-actions/workflows ; https://docs.github.com/en/actions/get-started/understand-github-actions ; https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows ; https://docs.github.com/en/rest/actions/workflow-runs
+
+### 영상책 판정
+1. Pages는 영상책 프런트엔드를 계속 호스팅할 수 있다.
+2. Actions는 빌드/검사/배포 자동화에는 적합하지만, 재생 중인 영상마다 자막 요청을 받아 즉시 처리하는 서버로는 적합하지 않다.
+3. 공개 정적 JavaScript에 PAT나 기타 비밀 토큰을 포함하는 방식은 채택하지 않는다.
+4. GitHub 내부 우선 원칙은 유지한다. 다음 단계에서는 외부 서비스를 도입하기 전에 Pages 브라우저에서 공식적으로 접근 가능한 자막 데이터/통신 경로를 추가로 검증한다.
+5. 제품 목표는 바뀌지 않는다: 현재 영상의 자막 자동 취득, 시간대별 동기화, 자막 클릭 시 해당 시점 이동.
