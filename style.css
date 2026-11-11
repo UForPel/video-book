@@ -30,13 +30,6 @@ h1 { margin: 0; font-size: clamp(25px, 6vw, 36px); line-height: 1.25; letter-spa
 .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 h2 { margin: 0; font-size: 20px; letter-spacing: -.04em; }
 .helper { margin: 12px 0 14px; color: var(--muted); font-size: 12px; line-height: 1.6; }
-.paste-transcript { display: grid; gap: 8px; margin: 14px 0; padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: #faf9f5; }
-.paste-transcript label { font-size: 13px; font-weight: 700; }
-.paste-transcript p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
-.paste-transcript textarea { width: 100%; min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 9px; background: white; color: var(--ink); font: inherit; font-size: 13px; line-height: 1.5; resize: vertical; }
-.paste-transcript textarea:focus { outline: 1px solid var(--accent); }
-.paste-transcript button { min-height: 40px; border: 0; border-radius: 9px; background: var(--accent); color: white; font-weight: 700; }
-.paste-transcript .paste-note { color: #89867e; font-size: 11px; }
 .subtitle-picker { display: grid; gap: 8px; padding: 13px; border: 1px dashed #c9c4b8; border-radius: 12px; background: #faf9f5; }
 .subtitle-picker label { font-size: 13px; font-weight: 700; }
 .subtitle-picker input { width: 100%; min-width: 0; color: var(--muted); font-size: 12px; }
