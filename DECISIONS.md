@@ -240,3 +240,15 @@
   - https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
   - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
   - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+
+
+## 결정 026 — 등록된 허가 자막은 동일 출처 정적 파일로 자동 연결
+- 상태: 코드 골격 반영, 실제 샘플 검증 대기
+- 구현:
+  - 저장소 루트 `captions.json`에 YouTube video ID → `captions/` 내 SRT/VTT 상대 경로를 등록한다.
+  - `app.js`가 영상을 불러올 때 등록 목록을 조회하고, 등록된 경로만 동일 GitHub Pages 출처에서 fetch한다.
+  - 파일 경로는 `captions/` 하위 SRT/VTT로 제한하고 상위 경로 이동 문자열을 거부한다.
+  - 기존 파서와 cue 동기화/seek UI를 재사용하며, 영상 변경 시 이전 비동기 응답이 새 영상 자막을 덮지 않도록 요청 식별자를 사용한다.
+- 현재 등록 목록은 비어 있다. 실제 사용 허가가 확인된 샘플 파일이 없으므로 어떤 YouTube 영상도 새 자동 등록 자막을 제공하지 않는다.
+- 검증 대기: 실제 허가 SRT/VTT 파일을 등록한 뒤 GitHub Pages에서 fetch 성공, cue 표시, 재생 동기화, 문장 클릭 seek를 확인하고 Android 실기기에서 회귀 테스트한다.
+- 기존 로컬 SRT/VTT 선택 기능은 유지한다. 범용 공개 YouTube 자막 자동 취득으로 확대 해석하지 않는다.
