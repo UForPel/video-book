@@ -158,3 +158,24 @@
 - 결정: 사람의 일회성 웹 UI 사용과 영상책의 자동 호출을 구분한다. 자동화가 금지되는 서비스를 영상책의 자막 공급원으로 연결하지 않는다.
 - 다음 검토 범위: 제작자가 제공/허가한 자막과 공식적으로 허용된 인터페이스.
 - 출처: https://transcriptfetch.com/blog/youtube-transcript-api-no-key ; https://youtubetranscripts.io/terms/
+
+
+## 결정 022 — 제작자 허가 SRT/VTT 정적 파일을 우선 검증
+- 상태: 공식 문서 및 현재 코드 확인
+- 확인:
+  - YouTube `captions.list`는 OAuth 인증과 50 quota units가 필요하며, 자막 본문이 아닌 트랙 정보를 반환한다.
+  - `captions.download`는 OAuth 인증, 해당 영상 수정 권한, 200 quota units가 필요하다. 제작자/소유자 권한이 있는 영상에는 공식 경로지만 임의 공개 영상 시청자용 범용 API가 아니다.
+  - IFrame Player API의 captions 모듈은 플레이어 내 표시 설정과 reload를 제어하지만 자막 전문을 앱에 반환하지 않는다.
+  - YouTube Studio는 제작자가 SRT/VTT 등 자막 파일을 업로드할 수 있도록 한다.
+  - 영상책 현재 코드에는 SRT/VTT 로컬 파서와 시간 동기화 UI가 구현되어 있다.
+- 결정: 현재 GitHub Pages 정적 앱/서버 없음/무료 우선 조건에서 다음 검증 후보는 제작자가 제공 또는 사용을 허가한 SRT/VTT 파일을 저장소의 정적 경로에 두고, 영상 ID와 파일 경로를 매핑해 자동 로드하는 방식이다. 동일 출처 파일은 서버/API 키 없이 브라우저에서 읽을 수 있다.
+- 외부 호스트의 자막 URL은 CORS 허용이 확인되어야 브라우저 fetch가 가능하다. 공개 URL만으로 접근 가능하다고 가정하지 않는다.
+- 범위: 등록된 허가 영상에만 자동 연결되는 방식이며, 모든 공개 영상의 자막을 자동 취득하는 해결책은 아니다.
+- 구현 전 조건: 허가된 샘플 영상 및 SRT/VTT 파일로 Android 실기기 검증. 이번 VB-08에서는 코드 변경을 하지 않는다.
+- 출처:
+  - https://developers.google.com/youtube/v3/guides/implementation/captions
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+  - https://developers.google.com/youtube/iframe_api_reference
+  - https://support.google.com/youtube/answer/2734796?hl=en
+  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
