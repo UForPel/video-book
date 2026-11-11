@@ -660,3 +660,42 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 - 검색 API를 현재 사용자 조건으로 구현 가능: 부적합/보류
 - 임의 공개 영상의 범용 자동 자막 취득: 확인되지 않음
 - Android/CORS/실영상/Pages 테스트: 미실행
+
+
+## 24. YouTube Studio 제작자 자막 파일과 영상책 정적 등록 경로 — 2026-11-11
+
+### 공식 확보 경로
+- YouTube Help, Edit or remove captions: https://support.google.com/youtube/answer/2734705
+- 문서상 제작자/편집 권한자는 YouTube Studio → Subtitles → 영상 선택 → 해당 언어의 Edit → Options → Download subtitles로 자막 트랙 파일을 브라우저에 내려받을 수 있다.
+- YouTube Help, Supported subtitle and closed caption files: https://support.google.com/youtube/answer/2734698
+- SRT(.srt)는 기본 형식으로 권장되며 UTF-8 plain text 요구가 명시되어 있다. WebVTT(.vtt)도 지원 형식에 포함된다.
+- YouTube Help, Add subtitles & captions: https://support.google.com/youtube/answer/2734796
+- 자막 파일은 대사 텍스트와 표시 시점을 나타내는 타임스탬프를 포함한다.
+
+### 기존 앱과 연결 가능성
+- `app.js`의 `getCaptionRegistry()`는 정적 `captions.json`을 읽는다.
+- `loadRegisteredSubtitle(videoId)`는 해당 ID에 매핑된 `captions/...` 경로를 확인하고 SRT/VTT 파일을 가져와 파싱한다.
+- 파싱된 cue는 기존 YouTube IFrame Player의 현재 시점과 동기화되고, 문장을 누르면 플레이어가 해당 시점으로 이동한다.
+- `captions.json`에는 현재 실제 영상 ID 등록이 없고 `captions/`에 검증된 실제 자막 파일도 없다. 따라서 구조상 연결은 가능하지만 실제 자막 파일을 사용한 E2E 검증은 완료되지 않았다.
+
+### 권리·공개 범위
+- YouTube Studio의 자막 다운로드는 해당 제작자/편집 권한이 있는 계정이 파일을 내려받는 기능이다. 이 기능 자체가 파일의 외부 재배포 권한을 부여하지는 않는다.
+- GitHub 저장소에 자막을 넣으면 저장소 및 Pages 경로를 통해 공개 접근 가능해진다. 실제 권리자가 공개 저장소 재배포를 명시적으로 허가한 파일만 추가한다.
+- 권리 허가가 명확하지 않으면 저장소에 업로드하지 않는다. 법적 판단을 보증하지 않는다.
+
+### 영상책에서 가능한 제한적 사용 흐름
+1. 제작자 또는 권리자가 SRT/VTT 파일을 제공하거나 Studio에서 다운로드한다.
+2. 공개 재배포 허가가 있는 경우에만 저장소의 `captions/` 폴더에 파일을 둔다.
+3. `captions.json`에서 정확한 11자리 영상 ID를 해당 파일 경로와 매핑한다.
+4. 영상책에서 해당 영상을 불러오면 등록 자막을 자동 로드하고 기존 시간 동기화 UI를 사용한다.
+
+이 경로는 영상책의 기존 정적 구조에 맞으며, 제3자 API·OAuth·서버·결제 없이 동작하도록 설계되어 있다. 그러나 제작자/권리자 파일을 누군가 저장소에 제공·등록해야 하므로 **임의 공개 영상의 무인 자동 추출**은 아니다. 사용자 요구인 앱 내부 검색과 범용 자동 추출을 완료한 것으로 표시하지 않는다.
+
+### 확인 상태
+- YouTube Studio 공식 다운로드 단계: 확인됨
+- YouTube 공식 SRT/VTT 지원: 확인됨
+- 앱의 정적 registry/fetch/parser/sync 코드: 소스 조회로 확인됨
+- 실제 자막 파일과 video ID 등록: 없음
+- 실제 브라우저/Android/GitHub Pages E2E: 미실행
+- 비용 및 API 계정: 0원, 없음
+- 적합성: 권리자가 공개 제공한 파일에 대한 제한적 보조 경로; 핵심 목표 대체 아님
