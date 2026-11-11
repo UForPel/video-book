@@ -127,6 +127,7 @@
 - [x] YouTube 공식 대본 보기 도움말과 Developer Policies 확인
 - [x] 영상 로드 시 YouTube 공식 시청 페이지 대본 링크를 표시하도록 구현
 - [x] 기존 영상 재생·정적 자막 등록·cue 동기화 코드 변경 없이 fallback만 추가
+- [ ] JavaScript 정적 구문 검사 (현재 컨테이너의 DNS 오류로 원격 소스 다운로드 실패)
 - [ ] 브라우저에서 유효/잘못된 URL별 링크 표시 검증
 - [ ] Android에서 YouTube 대본 보기 링크 및 공식 UI 확인
 - [ ] GitHub Pages 배포 후 실제 동작 확인
