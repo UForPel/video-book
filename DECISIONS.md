@@ -75,12 +75,6 @@
 - Hyperaudio Lite Editor: 자막 편집 및 로컬 미디어 처리 기능을 검토할 후보.
 - Android 기기 성능, 한국어 처리, YouTube 임베드 연동 한계를 실제로 시험하기 전에는 채택하지 않는다.
 
-## 변경 기록
-
-- 2026-11-11: 초기 기술 방향과 검증 필요 항목 기록.
-- 2026-11-11: YouTube 공식 Captions API의 OAuth 및 영상 수정 권한 제약을 확인하고 자동 자막 취득을 별도 핵심 과제로 명시.
-
-
 ## 결정 009 — 벤치마킹 자료는 재검증 후 저장소에 기록
 
 - 상태: 작업 방식 확정
@@ -90,3 +84,21 @@
 - 현재 우선 참고: Hyperaudio Lite의 YouTube iframe 연동 transcript 동기화 UI.
 - 별도 실험: Hyperaudio Lite Editor의 로컬 STT 및 자막 교정 UI. Android 성능·한국어 품질·라이선스를 별도 확인하기 전에는 통합하지 않는다.
 - Invidious, Piped, ViewTube, Materialious는 UI/구조 참고만 하며 서버/공개 인스턴스를 핵심 의존성으로 채택하지 않는다.
+
+## 결정 010 — Hyperaudio Lite는 독립 실험 후 통합 여부 결정
+
+- 상태: 조사 완료, 실험 대기
+- 확인한 버전: package.json의 2.6.4, MIT LICENSE
+- 장점: 프레임워크/외부 라이브러리 없이 사용할 수 있는 timed transcript UI, YouTube iframe adapter, 단어별 클릭 seek, 활성 단어 표시, 자동 스크롤.
+- transcript 데이터: HTML 단어 요소의 `data-m` 시작 시각(밀리초), `data-d` 단어 길이(밀리초). SRT는 editor/converter를 통한 변환 경로로 README에 설명되어 있으며 런타임의 핵심 데이터는 timed HTML임.
+- 통합 위험: 현재 영상책 `app.js`와 Hyperaudio Lite 기본 YouTube adapter가 각각 YouTube IFrame API의 `YT.Player`를 생성/관리한다. 두 플레이어 래퍼를 같은 화면의 동일 iframe에 바로 중첩하지 않는다.
+- 결정: 기존 영상책 코드는 유지하고 별도 테스트 페이지에서 Hyperaudio Lite 단독 플레이어와 미리 준비된 timed transcript로 기능을 검증한다.
+- 자동 자막 취득: Hyperaudio Lite의 README/데모/확인한 소스에서는 임의의 공개 YouTube 영상 자막 자동 다운로드 기능을 확인하지 못했다. 자막 공급원으로 간주하지 않는다.
+- 다음 작업: VB-02 독립 최소 데모. Android 실기기 검증 후에만 통합 여부 결정.
+- 공식 출처:
+  - https://github.com/hyperaudio/hyperaudio-lite
+  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/README.md
+  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/demos/youtube.html
+  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/js/hyperaudio-lite.js
+  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/package.json
+  - https://github.com/hyperaudio/hyperaudio-lite/blob/main/LICENSE
