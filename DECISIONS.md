@@ -29,9 +29,8 @@
   - `captions.download`는 OAuth 2.0 인증과 영상 수정 권한을 요구한다.
 - 결론: 일반 사용자가 임의의 공개 영상에서 자막을 자동으로 가져오는 용도로 공식 Captions API를 사용할 수 없다.
 - 출처:
-  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
-  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
-  - https://developers.google.com/youtube/v3/guides/implementation/captions
+  - https://developers.google.com/youtube/v3/docs/captions/list
+  - https://developers.google.com/youtube/v3/docs/captions/download
 
 ## 결정 007 — 자동 자막은 제품의 핵심 목표
 - 상태: 요구사항 확정, 기술 경로 미확정
@@ -62,7 +61,25 @@
 - 결론: 플레이어 안에 CC 자막이 표시된다는 사실만으로 영상책이 그 자막 텍스트를 읽어올 수 있는 것은 아니다.
 - 출처: https://developers.google.com/youtube/iframe_api_reference
 
-## 결정 012 — 다음 단계는 자동 자막 공급 경로 판정
-- 상태: 진행 중
-- 결정: 코드에 임의의 추출 엔드포인트나 제3자 프록시를 연결하지 않는다.
-- 다음 작업: 정적 앱/별도 서버/권한이 있는 로컬 미디어의 경계를 비교하고, 사용자 제약과 충돌하는 조건을 명확히 기록한다.
+## 결정 012 — 비공식 자막 취득 경로를 검증 없이 연결하지 않음
+- 상태: 확정
+- 결정: 비공식 내부 인터페이스, 스크래핑, 공개 프록시를 영상책에 바로 연결하지 않는다. 안정성, 정책, 개인정보, 가용성, 운영 한도를 확인하기 전에는 핵심 기능으로 채택하지 않는다.
+
+## 결정 013 — API 키 없는 자막 추출 프로젝트의 구조적 한계
+- 상태: 저장소 문서 확인
+- 확인:
+  - Transcript Studio for YouTube는 Chrome/Edge 확장 프로그램으로, YouTube 탭에 대한 확장 권한과 비공개 내부 요청 경로를 설명한다. 일반 GitHub Pages 웹페이지에 동일한 브라우저 권한이 제공되는 구조가 아니다.
+  - yttext는 Python/FastAPI 서버에서 자막을 가져오는 브라우저 앱/CLI다. 정적 Pages만으로 동작하는 웹앱이 아니다.
+  - yttext README는 YouTube HTTP 429 요청 제한이 발생할 수 있다고 안내한다.
+- 결정: 두 프로젝트는 API 쿼터를 피하는 무제한 정적 웹앱의 해법으로 간주하지 않는다. 구조 비교 자료로만 사용한다.
+- 참고:
+  - https://github.com/krishnakanthb13/yt-transcript-studio
+  - https://github.com/kkensuke/yttext
+  - https://github.com/kkensuke/yttext/blob/main/docs/architecture.md
+  - https://github.com/kkensuke/yttext/blob/main/docs/deployment.md
+
+## 결정 014 — 핵심 제약을 모두 동시에 만족한다고 가정하지 않음
+- 상태: 확정
+- 요구사항: 임의 공개 YouTube 영상 자동 자막, 무제한 무료, 별도 서버 없음, GitHub Pages 정적 앱, Android 사용.
+- 결론: 조사한 후보 중 이 조건을 모두 안정적·정책 검증 상태로 만족하는 방식은 확인되지 않았다.
+- 결정: 다음 구현 전에 어떤 제약을 완화할 수 있는지 사용자와 결정한다. 승인 전에는 자동 자막 취득 코드를 추가하지 않는다.
