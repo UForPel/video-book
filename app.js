@@ -20,7 +20,7 @@ function getVideoId(value) {
   if (isValidId(raw)) return raw;
   try {
     const url = new URL(raw);
-    const host = url.hostname.replace(/^www\\./, "");
+    const host = url.hostname.replace(/^www\./, "");
     if (host === "youtu.be") {
       const id = url.pathname.split("/").filter(Boolean)[0] || null;
       return isValidId(id) ? id : null;
@@ -148,9 +148,9 @@ function parseTimestamp(value) {
   if (parts.length !== 2 && parts.length !== 3) return null;
   const secondsPart = parts.pop();
   const secondsMatch = secondsPart.match(/^(\d{1,2})(?:\.(\d{1,3}))?$/);
-  if (!secondsMatch) return null;
+  if (!secondsMatch || Number(secondsMatch[1]) > 59) return null;
   const minutesPart = parts.pop();
-  if (!/^\d{1,2}$/.test(minutesPart)) return null;
+  if (!/^\d{1,2}$/.test(minutesPart) || Number(minutesPart) > 59) return null;
   const hoursPart = parts.length ? parts.pop() : "0";
   if (!/^\d+$/.test(hoursPart)) return null;
   const fraction = secondsMatch[2] ? Number((secondsMatch[2] + "00").slice(0, 3)) / 1000 : 0;
