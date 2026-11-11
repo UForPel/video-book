@@ -180,8 +180,8 @@ function parseSubtitle(text) {
 
 
 function parsePastedTranscript(text) {
-  const lines = text.replace(/\\r/g, "").split("\\n").map(line => line.trim()).filter(Boolean);
-  const timestampLine = /^((?:\\d{1,2}:)?\\d{1,2}:\\d{2}(?:[.,]\\d{1,3})?)\\s*(.*)$/;
+  const lines = text.replace(/\r/g, "").split("\n").map(line => line.trim()).filter(Boolean);
+  const timestampLine = /^((?:\d{1,2}:)?\d{1,2}:\d{2}(?:[.,]\d{1,3})?)\s*(.*)$/;
   const entries = [];
   let current = null;
 
@@ -211,7 +211,7 @@ function parsePastedTranscript(text) {
     return { start: entry.start, end, text: entry.text };
   }).filter(cue => cue.end > cue.start && cue.text);
 }
-\nfunction formatTime(seconds) {
+function formatTime(seconds) {
   const total = Math.max(0, Math.floor(seconds));
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);
@@ -312,7 +312,7 @@ loadPastedTranscriptButton.addEventListener("click", () => {
   renderTranscript();
   statusEl.textContent = "붙여넣은 스크립트에서 자막 " + cues.length + "개를 불러왔습니다.";
 });
-\nfunction updateActiveCue() {
+function updateActiveCue() {
   if (!player || !cues.length || typeof player.getCurrentTime !== "function") return;
   const now = player.getCurrentTime();
   // Find the last cue that has started, then walk backward to handle overlapping cues.
