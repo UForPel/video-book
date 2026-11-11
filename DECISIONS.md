@@ -222,3 +222,21 @@
   - https://developers.cloudflare.com/workers/platform/limits/
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
   - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+
+
+## 결정 025 — 범용 공개 YouTube 자동 자막은 현재 구조에서 보류
+- 상태: 공식 YouTube API/IFrame API 및 브라우저 보안 문서 재검증 완료
+- 확인:
+  - IFrame Player API captions 모듈의 문서화된 옵션은 플레이어 내 자막의 `fontSize`와 `reload`다. 별도 자막 패널용 cue 텍스트/타임스탬프 반환 메서드는 확인되지 않았다.
+  - YouTube Data API의 `captions.list`는 자막 본문이 아닌 트랙 정보를 반환한다. `captions.download`는 OAuth 및 영상 수정 권한이 필요하다.
+  - 교차 출처 YouTube iframe 내부 DOM은 일반 페이지 JavaScript에서 읽을 수 없다. 외부 자막 파일을 브라우저에서 fetch하려면 제공 서버가 CORS를 허용해야 한다.
+  - GitHub Pages는 정적 사이트 호스팅이며 요청 시점의 자막 추출 서버가 아니다.
+- 결정: 비용 0원, 서버 없음, GitHub Pages 정적 호스팅 조건에서 임의 공개 YouTube 영상의 자막 전문 자동 취득 기능을 구현하지 않는다. 비공식 인터페이스/프록시/서비스 한도 우회도 채택하지 않는다.
+- 유지할 수 있는 범위: 사용자가 선택한 SRT/VTT 파일의 파싱·동기화·문장 클릭 seek. 제작자 제공/허가 파일이 준비되면 저장소 정적 파일 + 영상 ID 매핑으로 등록 영상에 한해 자동 연결할 수 있다.
+- 구현 조건: 실제 사용 허가가 확인된 샘플 영상과 자막 파일을 확보한 뒤 자동 fetch 및 Android 실기기 동기화를 검증한다. 샘플이 없는 상태에서 자동 매핑 코드를 추측으로 추가하지 않는다.
+- 출처:
+  - https://developers.google.com/youtube/iframe_api_reference
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions
+  - https://developer.mozilla.org/en-US/docs/Web/Security/Defenses/Same-origin_policy
+  - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
