@@ -168,7 +168,7 @@
 - 상세 조사: [RESEARCH_BENCHMARKS.md §23](./RESEARCH_BENCHMARKS.md#23-youtube-공식-검색-api자막-본문-접근의-분리-검증--2026-11-11), [PROJECT_STATUS.md §13](./PROJECT_STATUS.md#13-vb-18--youtube-공식-검색-api와-자막-본문-접근-재검증-2026-11-11).
 
 
-## 15. 제작자 제공 자막 파일의 제한적 공식 경로 (2026-11-11)
+## 15. 참고 기록: 제작자 제공 자막 파일 경로 (일반 시청자용 해결책 아님, 2026-11-11)
 - YouTube Studio는 권한 있는 제작자/편집자가 영상별 자막 트랙 파일을 다운로드할 수 있는 UI를 제공한다: YouTube Studio → Subtitles → 영상 선택 → 언어별 Edit → Options → Download subtitles.
 - YouTube 공식 도움말은 SRT와 WebVTT를 지원하며 SRT는 UTF-8 plain text를 요구한다.
 - 영상책 `app.js`는 `captions.json`의 video ID를 `captions/<file>.srt/.vtt`와 매핑하면 파일을 자동 fetch/parse하고 플레이어 시간과 동기화하는 구조를 이미 갖고 있다.
@@ -176,3 +176,14 @@
 - GitHub 저장소에 자막을 올리면 공개 접근 가능해진다. YouTube Studio에서 다운로드 가능하다는 사실만으로 재배포 권한이 생기지 않으므로 실제 권리자의 명시적 공개 허가가 있는 파일만 등록한다.
 - 이 경로는 제작자 제공 파일에 한정된 보조 수단이다. 임의 공개 영상의 자동 추출이나 영상책 내부 검색을 구현한 것이 아니다.
 - 참고: [PROJECT_STATUS.md §14](./PROJECT_STATUS.md#14-vb-19--제작자-제공-자막-파일의-공식-확보정적-연결-경로-확인-2026-11-11), [RESEARCH_BENCHMARKS.md §24](./RESEARCH_BENCHMARKS.md#24-youtube-studio-제작자-자막-파일과-영상책-정적-등록-경로--2026-11-11).
+
+
+## 16. 일반 시청자용 자동 자막 취득 — 현재 확인된 제약 (2026-11-11)
+- 제품 사용자는 일반 유튜브 시청자다. 영상책은 사용자가 제작자에게 연락하거나, YouTube Studio에 접근하거나, SRT/VTT 파일을 직접 구해 오도록 요구하지 않는다.
+- YouTube Help의 'View video transcripts'는 자막이 있는 영상에서 YouTube 시청 화면의 대본을 보여주고, 문장 선택으로 해당 시점으로 이동하는 공식 사용자 기능이다. 이것은 제3자 앱이 대본 본문을 가져오는 API가 아니다.
+- YouTube Data API `captions.list`는 자막 트랙 메타데이터만 반환하고 본문을 반환하지 않으며 OAuth가 필요하다. `captions.download`는 OAuth와 해당 영상 편집 권한이 필요하다. 따라서 일반 시청자의 임의 공개 영상 자동 추출 수단이 아니다.
+- YouTube IFrame Player API는 영상 재생 제어와 재생 시간 조회를 지원하지만, 공식 문서에서 자막 본문을 가져오는 메서드는 확인되지 않았다.
+- 브라우저의 동일 출처 정책 때문에 영상책 페이지가 YouTube iframe 내부 DOM을 직접 읽는 방식은 허용되지 않는다. YouTube 정책은 YouTube 애플리케이션 스크래핑과 문서화되지 않은 API 사용을 금지한다.
+- YouTube Data API의 공개 영상 검색은 별도 API 자격 증명이 필요하며 기본 `search.list` 할당량은 하루 100회다. API 자격 증명을 공개 오픈소스 프로젝트에 삽입해서는 안 되고, API Services Terms §3.2의 법적 계약 연령 조건도 적용된다. 현재 사용자에게 약관 수락·API 프로젝트·키·OAuth 설정을 안내하지 않는다.
+- 현재 확인된 범위에서 0원 지속, 무서버 GitHub Pages, 일반 시청자 권한, 공식 문서/정책 준수 조건을 모두 만족하는 자동 자막 취득 경로는 **미확인**이다. 모든 가능한 기술 경로가 존재하지 않는다고 단정하지 않는다.
+- 상세 근거: [RESEARCH_BENCHMARKS.md §25](./RESEARCH_BENCHMARKS.md#25-일반-시청자-자막-자동-취득-공식-경로-재검증--2026-11-11), [PROJECT_STATUS.md VB-20](./PROJECT_STATUS.md#15-vb-20--일반-시청자-자막-자동-취득-공식-경로-재검증-2026-11-11).
