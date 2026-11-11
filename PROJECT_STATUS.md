@@ -567,3 +567,66 @@
 
 ### 재발 방지 핵심
 앞으로 영상책의 대안은 반드시 "일반 시청자가 Android 스마트폰과 현재 허용된 계정/권한만으로 실제 수행할 수 있는가?"를 먼저 통과해야 한다. 통과하지 못하면 핵심 해결책으로 제시하지 않는다.
+
+
+## 16. VB-22 — 브라우저 STT 및 IFrame captions 모듈 검증 (2026-11-11)
+
+### 목표
+일반 유튜브 시청자가 Android 스마트폰과 무료·정적 GitHub Pages 환경에서 영상의 음성 또는 YouTube 자막을 영상책 안의 텍스트로 자동 취득할 수 있는 공식 브라우저 경로가 있는지 확인.
+
+### A. 브라우저 Web Speech API
+- MDN SpeechRecognition 문서는 일부 브라우저(Chrome 포함)의 기본 구현이 서버 기반 음성 인식을 사용하고, 오디오가 웹 서비스로 전송되므로 오프라인 작동하지 않는다고 설명한다.
+- `SpeechRecognition.start()`는 오디오 트랙을 전달할 수 있지만, 오디오 트랙을 지정하지 않으면 마이크 입력을 사용한다.
+- MDN Browser Compatibility Data는 SpeechRecognition API 자체가 Chrome Android에서 Chrome 지원을 미러링한다고 표시하지만, `processLocally`는 Chrome Android에서 지원되지 않는 것으로 표시한다.
+- 마이크 입력으로 YouTube 플레이어 스피커 소리를 다시 듣게 하는 방법은 영상책이 YouTube의 실제 오디오 스트림을 직접 받는 것이 아니다. 외부 소리 재생, 마이크 권한, 환경/에코 제거 영향, 온라인 음성 인식 서비스 의존성이 생긴다. 정확도·시간 동기화·개인정보·지속 무료 여부가 보장되지 않는다.
+- 공식 근거:
+  - https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
+  - https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
+  - https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/start
+  - https://github.com/mdn/browser-compat-data/blob/main/api/SpeechRecognition.json
+
+### B. Android 화면/시스템 오디오 캡처
+- `getDisplayMedia()`의 오디오 반환 여부는 브라우저/OS별로 달라질 수 있으며, 요청해도 오디오 트랙이 반환된다고 보장되지 않는다.
+- MDN Browser Compatibility Data는 Chrome Android에서 `getDisplayMedia`가 지원되지 않는 것으로 표시한다. `systemAudio` 옵션도 Chrome Android에서 지원되지 않는 것으로 표시한다.
+- Chrome 개발자 문서의 systemAudio 설명은 데스크톱 Chrome 기준이다. 이를 Android에서 가능한 기능으로 간주하지 않는다.
+- 공식 근거:
+  - https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getDisplayMedia
+  - https://github.com/mdn/browser-compat-data/blob/main/api/MediaDevices.json
+  - https://developer.chrome.com/docs/web-platform/screen-sharing-controls
+
+### C. YouTube IFrame API captions 모듈 — 새로 확인한 핵심 사실
+- 공식 IFrame API는 `onApiChange` 이후 `getOptions('captions')`로 captions 모듈 옵션을 확인할 수 있다고 설명한다.
+- 공식 문서가 나열한 captions 옵션은 `fontSize`(플레이어 내 표시 글꼴 크기)와 `reload`(현재 영상의 자막 데이터 다시 불러오기)뿐이다.
+- 문서화된 옵션 목록에는 자막 본문, 개별 cue, 타임스탬프, transcript 문자열을 반환하는 기능이 없다.
+- 따라서 "IFrame API에 captions 모듈이 있다"는 사실은 "영상책이 자막 텍스트를 읽을 수 있다"는 뜻이 아니다.
+- 공식 근거: https://developers.google.com/youtube/iframe_api_reference (onApiChange / captions module options section)
+
+### 적합성 판정
+| 후보 | 기술적 사실 | 일반 시청자·Android·무료 정적 앱 적합성 |
+|---|---|---|
+| SpeechRecognition 마이크 입력 | 일부 Chrome에서 가능, 서버 기반일 수 있음 | 부적합한 보조 실험. 실제 영상 오디오를 직접 읽지 않으며 사용자 마이크/스피커 작업이 필요 |
+| SpeechRecognition on-device | 언어 팩 기반 기능이 있으나 Chrome Android 지원 근거 없음 | 현재 조건에서 채택 불가 |
+| getDisplayMedia 시스템 오디오 | 브라우저/OS에 따라 다름 | Chrome Android 지원되지 않는 것으로 표시 |
+| IFrame captions module | 표시 글꼴 조절 및 자막 데이터 reload | 자막 본문 취득 기능이 아님 |
+| 전체 자막 자동 취득 | 일반 시청자에게 공식적으로 노출된 본문 API 없음 | 여전히 미해결 |
+
+### 결론
+- **확인됨:** IFrame captions 모듈은 자막 표시 설정과 reload만 노출하며, 공식 문서에 transcript 본문 반환 옵션은 없다.
+- **확인됨:** Web Speech API는 STT이며 YouTube 자막을 가져오는 API가 아니다. 기본 Chrome 인식은 서버 기반일 수 있다.
+- **확인됨:** Android Chrome의 on-device SpeechRecognition 및 getDisplayMedia 지원은 현재 MDN 호환성 자료에서 확인되지 않는다.
+- **미채택:** 마이크로 휴대폰 스피커 음성을 재인식하는 방법. 사용자 행동 부담·정확도·동기화·개인정보·비용 조건이 맞지 않고 실제 Android 실험도 하지 않았다.
+- **미해결:** 일반 시청자가 보는 YouTube 대본을 영상책 내부로 자동 취득하는 공식 경로.
+- 이 결과는 문서화된 기능 검토다. 모든 비공식 기술 경로의 존재 여부를 증명하거나 허용 가능성을 판단한 것이 아니다.
+
+### 테스트·비용
+- 공식 MDN 및 YouTube IFrame API 문서 조사: 완료.
+- Android 실기기 SpeechRecognition/마이크/스피커 테스트: 미실행.
+- Android getDisplayMedia 실험: 미실행.
+- 실제 YouTube 영상의 captions module getOptions 호출: 미실행.
+- 코드 변경: 없음.
+- API 계정/키/OAuth/외부 STT 서비스/결제: 없음.
+- 비용: 0원.
+
+### 다음 단계
+- YouTube IFrame API captions module의 공식 옵션 범위를 이번 조사에서 확인했으므로, 동일한 옵션 확인을 반복하지 않는다.
+- 새 후보를 검토할 때는 일반 시청자가 Android에서 수행할 수 있고, 자막 본문을 실제로 앱 내부에 제공한다는 공식 근거부터 확인한다. UI에 자막이 표시되는 것만으로 텍스트 취득 가능성을 추정하지 않는다.
