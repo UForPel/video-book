@@ -167,3 +167,20 @@ VB-09에서 공개 제조사/플랫폼 사례(Wistia, Brightcove)를 확인했�
   - https://player.support.brightcove.com/user-interface/adding-captions-videos-programmatically.html
   - https://mstudio.support.brightcove.com/media/managing-text-tracks.html
   - https://developers.google.com/youtube/iframe_api_reference
+
+
+## 14. 비용 조건 확정 — 2026-11-11
+- 사용자 결정: 영상책 개발은 **무료만 허용**한다. 저렴한 유료 서비스도 사용하지 않는다.
+- 제외: 유료 API/서버/AI, 유료 플랜으로의 전환이 필요한 서비스, 무료 체험 후 결제, 결제 수단 등록을 요구하는 핵심 의존성.
+- 핵심 경로 원칙: 무료 사용량이 소진되면 기능이 중단되거나 유료 전환을 요구하는 외부 서비스를 핵심 자막 공급원으로 채택하지 않는다.
+- 유지: GitHub Free 공개 저장소 + GitHub Pages 정적 호스팅, 브라우저 내 처리, 기존 SRT/VTT 파서와 동기화 UI.
+- 공식 문서 확인: GitHub Pages는 GitHub Free 공개 저장소에서 사용할 수 있는 정적 호스팅이며 서버 측 언어 실행을 지원하지 않는다. GitHub Pages 사용량에는 권장 저장소/사이트 크기와 soft bandwidth/build limits가 있다.
+- 무료 Workers 등의 서버리스 플랜은 일일 요청/CPU 제한이 있는 별도 서비스다. 현재 확인한 무료 한도만으로 YouTube 자막 전문을 합법적·공식적으로 공급할 수 있는 것은 아니므로 채택하지 않는다.
+- 공식 YouTube Captions API는 OAuth 인증 및 영상 수정 권한이 필요하며, captions.list는 자막 본문을 반환하지 않는다. 일반 공개 영상 시청자의 무료 범용 자막 공급원으로 사용할 수 없다.
+- 다음 작업 VB-10은 비용 0원 조건을 고정한 상태에서 브라우저/공식 API/정적 호스팅만으로 가능한 범위를 재검토한다. 비용이 발생하거나 무료 한도 소진 시 결제가 필요한 경로는 제안·구현하지 않는다.
+- 출처:
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
+  - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
+  - https://developers.cloudflare.com/workers/platform/limits/
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
