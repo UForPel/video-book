@@ -72,7 +72,7 @@
 
 브라우저의 동일 출처 정책은 YouTube iframe 내부 DOM 직접 접근을 막으며, 외부 자막 파일 fetch에는 제공 서버의 CORS 허용이 필요하다. GitHub Pages는 정적 호스팅이므로, 요청 시점에 YouTube 자막을 추출하는 서버 역할을 하지 않는다.
 
-**결론:** 비용 0원 + 서버 없음 + GitHub Pages 조건을 유지하면 임의 공개 YouTube 영상의 자막 전문을 자동 취득하는 공식·안정적 경로는 현재 확인되지 않았다. 제작자 제공/허가 SRT/VTT 파일을 저장소에 등록하고 영상 ID와 매핑하면 해당 영상에 한해서는 자동 연결할 수 있다. 허가 샘플이 없으므로 자동 매핑 코드는 아직 추가하지 않는다. 기존 로컬 SRT/VTT 업로드와 동기화 기능은 유지한다.
+**결론:** 비용 0원 + 서버 없음 + GitHub Pages 조건을 유지하면 임의 공개 YouTube 영상의 자막 전문을 자동 취득하는 공식·안정적 경로는 현재 확인되지 않았다. 제작자 제공/허가 SRT/VTT 파일을 저장소에 등록하고 영상 ID와 매핑하면 해당 영상에 한해서는 자동 연결할 수 있다. 허가 샘플이 없으므로 등록형 자동 연결의 실제 자막 로드는 아직 검증하지 않았다. VB-11에서 빈 등록 목록과 자동 fetch 골격은 추가했으며, 기존 로컬 SRT/VTT 업로드와 동기화 기능은 유지한다.
 
 출처:
 - https://developers.google.com/youtube/iframe_api_reference
@@ -192,7 +192,7 @@
 - 공식 문서 확인: GitHub Pages는 GitHub Free 공개 저장소에서 사용할 수 있는 정적 호스팅이며 서버 측 언어 실행을 지원하지 않는다. GitHub Pages 사용량에는 권장 저장소/사이트 크기와 soft bandwidth/build limits가 있다.
 - 무료 Workers 등의 서버리스 플랜은 일일 요청/CPU 제한이 있는 별도 서비스다. 현재 확인한 무료 한도만으로 YouTube 자막 전문을 합법적·공식적으로 공급할 수 있는 것은 아니므로 채택하지 않는다.
 - 공식 YouTube Captions API는 OAuth 인증 및 영상 수정 권한이 필요하며, captions.list는 자막 본문을 반환하지 않는다. 일반 공개 영상 시청자의 무료 범용 자막 공급원으로 사용할 수 없다.
-- 다음 작업 VB-10은 비용 0원 조건을 고정한 상태에서 브라우저/공식 API/정적 호스팅만으로 가능한 범위를 재검토한다. 비용이 발생하거나 무료 한도 소진 시 결제가 필요한 경로는 제안·구현하지 않는다.
+- 후속 작업 VB-11은 허가된 SRT/VTT의 등록형 자동 연결을 실제 샘플로 검증한다. 비용이 발생하거나 무료 한도 소진 시 결제가 필요한 경로는 제안·구현하지 않는다.
 - 출처:
   - https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages
   - https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
