@@ -179,3 +179,21 @@
   - https://developers.google.com/youtube/iframe_api_reference
   - https://support.google.com/youtube/answer/2734796?hl=en
   - https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+
+
+## 결정 023 — Wistia/Brightcove/TI 스크립트 기능은 일반 YouTube 자막 공급원에서 제외
+- 상태: 공식 문서 및 공개 페이지 범위 확인
+- 확인:
+  - TI의 `View video with transcript`는 TI 사이트의 스크립트 제공 사례지만 외부에서 읽을 수 있는 자막 전문/API/파일 주소는 확인되지 않았다.
+  - Wistia는 자사 미디어의 transcript embed와 captions 다운로드/API를 지원하지만 API 조회에는 권한이 있는 계정 token이 필요하다.
+  - Brightcove는 제작자가 제공한 WebVTT 등의 자막을 Brightcove Player에 연결하는 구조이며, 외부 자막 파일은 CORS 설정이 필요할 수 있다.
+  - 세 사례 모두 일반 YouTube 영상의 자막 전문을 영상책으로 전달하는 인터페이스가 아니다.
+- 결정: 이 플랫폼들을 일반 YouTube 자막 자동 취득 경로로 구현하지 않는다. 각 서비스의 자체 영상용 기능이라는 범위를 유지한다.
+- 남은 선택지: 제작자 허가 SRT/VTT 파일이 있는 일부 영상만 자동 연결하거나, 외부 서버/API를 허용하는 별도 아키텍처를 검토한다. 현재 조건 전체를 만족하는 범용 경로는 확인되지 않았다.
+- 출처:
+  - https://support.wistia.com/en/articles/8274062-transcripts-and-captions
+  - https://docs.wistia.com/reference/get_medias-mediahashedid-captions-languagecode
+  - https://docs.wistia.com/docs/transcript-embeds
+  - https://player.support.brightcove.com/user-interface/adding-captions-videos-programmatically.html
+  - https://mstudio.support.brightcove.com/media/managing-text-tracks.html
+  - https://developers.google.com/youtube/iframe_api_reference
