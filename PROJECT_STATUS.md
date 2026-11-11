@@ -401,3 +401,46 @@
 - 코드 변경: 없음. 문서만 갱신.
 - 비용/계정: 0원. 새 계정, API 연결, OAuth, 결제, 카드 등록 없음.
 - 다음 작업: 공식·권한 기반 YouTube 검색과 공개 영상 스크립트 추출 가능성을 별개로 검증하고, 검색 API의 연령·약관·쿼터 조건을 확인한다. 자막 추출 경로가 확인되기 전에는 교정 기능을 핵심 진전으로 포장하지 않는다.
+
+
+## 13. VB-18 — YouTube 공식 검색 API와 자막 본문 접근 재검증 (2026-11-11)
+
+### 작업 전 확인
+- 최신 기본 브랜치 커밋: `ff3f24de6b6c35ab27c41cf165253840a448d8ec` (`docs: record primary in-app transcript workflow`).
+- 작업 전 `AGENT_WORK_RULES.md`, `README.md`, `PROJECT_CONTEXT.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `DECISIONS.md`, `RESEARCH_BENCHMARKS.md`를 다시 조회했다.
+- 사용자 제1 목표는 영상책 내부 YouTube 검색 → 영상 선택 → 자동 자막 추출 → 한국어 맞춤법·띄어쓰기 교정 → 내부 표시다. 모바일 YouTube에서 수동 복사하는 흐름은 금지한다.
+
+### 공식 문서에서 확인한 사항 (2026-11-11)
+1. **검색 API는 존재한다.** YouTube Data API `search.list`는 공개 동영상 검색 결과를 반환하며, 사용자 계정 OAuth 없이 공개 동영상 검색을 할 수 있는 경우가 있다고 Developer Policies가 설명한다. 다만 API 프로젝트와 API 자격 증명은 필요할 수 있다.
+2. **검색 쿼터는 무제한이 아니다.** 기본 할당은 `search.list` 하루 100회이며 호출당 1 quota unit이다. 추가 페이지 요청도 별도 호출이다.
+3. **공개 검색 결과를 앱이 임의로 수정할 수 없다.** Developer Policies는 검색 결과의 텍스트·이미지·정보를 수정하거나 대체하지 못하도록 규정한다. YouTube 출처 표시 등 API Client 요구사항도 따라야 한다.
+4. **공개 저장소에 API 자격 증명을 넣을 수 없다.** Developer Policies는 API Credentials를 공개 오픈소스 프로젝트에 삽입하거나 제3자에게 공개하지 말라고 명시한다. GitHub Pages 정적 앱은 브라우저 코드가 공개되므로 비밀 자격 증명을 안전하게 보관할 수 없다. 서버를 두지 않는 현재 구조와 충돌한다.
+5. **검색 API 이용에는 연령 계약 조건이 적용된다.** API Services Terms §3.2는 법적 구속력이 있는 계약을 체결할 법적 연령에 미달한 사람은 약관을 수락하거나 API 서비스를 이용하지 못한다고 명시한다. 사용자의 연령을 고려해 API 프로젝트 생성, 약관 수락, API 키 발급, OAuth를 진행하지 않았다.
+6. **자막 목록 API는 본문을 주지 않는다.** `captions.list`는 지정 영상의 자막 트랙 목록만 반환하며 실제 자막 본문은 포함하지 않는다. OAuth scope가 필요하고 호출 비용은 50 units다.
+7. **자막 다운로드는 영상 편집 권한이 필요하다.** `captions.download`는 OAuth scope와 해당 영상 편집 권한을 요구하며 호출 비용은 200 units다. 따라서 임의의 공개 영상을 시청하는 일반 사용자에게 제공되는 범용 자막 다운로드 경로가 아니다.
+8. **정책 경계 재확인.** Developer Policies는 문서화되지 않은 API 사용과 YouTube/Google 애플리케이션 스크래핑 및 스크랩된 데이터 취득을 금지한다. 내부 API, DOM 읽기, 자동 브라우저 수집, 프록시 우회는 구현하지 않는다.
+
+### 제약별 판정
+| 하위 기능 | 공식 경로 | 영상책 조건 판정 |
+|---|---|---|
+| 앱 안 YouTube 검색 | Data API `search.list` | 기술적으로 가능하지만 API 프로젝트/자격 증명, 일일 100회 쿼터, 계약 연령 조건, 공개 저장소 자격 증명 금지 때문에 현재 사용자·정적 앱 경로로 채택하지 않음 |
+| 공개 영상 자막 트랙 목록 | `captions.list` | OAuth scope 필요, 본문 미반환, 일반 공개 영상의 시청자 권한으로는 부족 |
+| 자막 본문 다운로드 | `captions.download` | OAuth scope와 영상 편집 권한 필요, 범용 공개 영상 추출 불가 |
+| 자막 교정 및 내부 표시 | 브라우저 내 후처리 | 입력 스크립트 자동 확보 경로가 없으므로 본 회차 구현·검증하지 않음 |
+
+### 결과 상태
+- 성공: 공식 검색 API, 쿼터 계산기, API 이용 약관, Developer Policies, captions.list/download 원문 재조회.
+- 부분 성공: YouTube 내부 검색은 공식 API로 기술 지원됨을 확인했으나, 사용자의 연령/비용/정적 공개 저장소 조건에 맞는 직접 사용 경로는 확인되지 않음.
+- 실패/미해결: 임의 공개 영상의 자막 본문을 일반 시청자 권한으로 영상책에 자동 제공하는 공식 경로를 찾지 못함.
+- 미실행: API 프로젝트 생성, 키 발급, 실제 search.list 요청, captions.list/download 호출, OAuth, CORS/브라우저 테스트, Android 실기기, GitHub Pages 배포.
+- 코드 변경: 없음. 외부 API·비공식 API·스크래핑·프록시 통합 없음.
+- 비용/계정: 0원. API 계정 설정·키 발급·OAuth·결제·카드 등록 없음.
+- 다음 작업: 제작자 본인/명시적 권한이 있는 영상에서 제공되는 자막 파일을 영상책이 자동 연결할 수 있는 정적·권한 기반 공급 형태가 있는지 확인한다. 범용 공개 영상 자동 추출 경로가 확인되기 전에는 교정 UI를 핵심 진전으로 구현하지 않는다.
+
+### 출처 (공식 문서, 2026-11-11 조회)
+- Search: list: https://developers.google.com/youtube/data/reference/rest/v3/search/list
+- Quota calculator: https://developers.google.com/youtube/data/determine_quota_cost
+- YouTube API Services Terms §3.2: https://developers.google.com/youtube/terms/api-services-terms-of-service/
+- YouTube API Developer Policies: https://developers.google.com/youtube/terms/developer-policies
+- Captions: list: https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+- Captions: download: https://developers.google.com/youtube/data/reference/rest/v3/captions/download
