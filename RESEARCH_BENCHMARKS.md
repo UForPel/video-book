@@ -310,3 +310,35 @@
 - 따라서 무키 체험이 가능하더라도 그것이 영상책에서 자동 호출할 수 있는 공개 API라는 뜻은 아니다. 수동 UI 체험과 제품 내 자동화 호출을 구분한다.
 - 판정: 자동화 호출 공급원으로 채택하지 않음. 한도 공유/회피 또는 약관 위반을 시도하지 않는다.
 - 출처: https://transcriptfetch.com/blog/youtube-transcript-api-no-key ; https://youtubetranscripts.io/terms/
+
+
+## 14. 제작자 제공/허가 자막 및 공식 API — VB-08 — 2026-11-11
+
+### YouTube 공식 Captions API
+- 구현 가이드: https://developers.google.com/youtube/v3/guides/implementation/captions
+- `captions.list`: OAuth 2.0 인증이 필요하며 지정 영상의 자막 트랙 목록/메타데이터를 반환한다. 응답에는 자막 본문이 없다. 문서상 quota cost는 50 units.
+- `captions.download`: OAuth 2.0 인증이 필요하고, 호출 사용자는 해당 영상을 수정할 권한이 있어야 한다. 원본 형식 또는 SRT/VTT 등 지정 형식으로 다운로드할 수 있다. 문서상 quota cost는 200 units.
+- 제작자 또는 채널/영상 편집 권한을 받은 사람의 영상에서는 공식 API를 통해 자막을 받을 수 있는 길이 존재한다. 그러나 일반 시청자가 임의 공개 영상의 자막을 다운로드하는 범용 API가 아니다.
+- 영상책에서 이 경로를 사용하려면 Google OAuth 로그인, 적절한 scope, 토큰 수명/보안, 사용자의 영상 수정 권한 확인을 구현해야 한다. 현재 정적 Pages 개인용 MVP에 바로 추가할 만큼 단순한 경로가 아니다.
+
+### IFrame Player API
+- 공식 참조: https://developers.google.com/youtube/iframe_api_reference
+- captions 모듈의 문서화된 옵션은 자막 글자 크기 및 자막 데이터 reload 등 플레이어 내 표시 제어다.
+- 자막 텍스트 전문이나 시간대별 cue를 영상책 JavaScript로 반환하는 API는 문서에서 확인되지 않았다.
+- 따라서 플레이어 내부 CC 표시를 켜는 기능과 영상책의 별도 텍스트 패널에 자막을 제공하는 기능은 구분해야 한다.
+
+### 제작자가 제공하는 SRT/VTT 파일
+- YouTube 도움말: https://support.google.com/youtube/answer/2734796?hl=en
+- 제작자는 YouTube Studio에서 자막 파일을 업로드하거나 직접 텍스트를 입력해 자막을 추가할 수 있다. 자막 파일은 텍스트뿐 아니라 각 문장의 표시 시각도 포함할 수 있다.
+- 영상책의 현재 `app.js`에는 SRT/VTT 파싱, 사용자가 선택한 파일 읽기, 재생 시점에 따른 활성 cue 강조, cue 클릭 시 `seekTo`가 이미 존재한다. 자동 파일 탐색/다운로드/영상 ID 매핑은 아직 없다.
+- 구현 후보: 제작자가 제공하거나 사용을 허락한 자막 파일을 영상책 저장소 내 정적 폴더에 두고, 별도의 정적 매핑 데이터에서 YouTube video ID → 자막 파일 경로를 연결한다. 영상 로드 시 매핑을 확인해 등록된 파일만 자동 fetch한다. 이는 GitHub Pages와 동일 출처이므로 별도 API key나 서버 없이 동작할 수 있는 구조다.
+- 제작자가 외부 사이트에 파일을 호스팅하면 MDN의 CORS 정책에 따라 해당 호스트가 영상책의 출처를 허용해야 JavaScript `fetch()`로 파일 내용을 읽을 수 있다. 공개 URL이더라도 CORS 허용이 없으면 브라우저에서 읽지 못할 수 있다.
+- 동일 저장소 정적 파일 방식은 등록/허가된 영상만 지원한다. 무작위 공개 영상 자막을 자동 수집하는 방식이 아니며, 영상 ID와 자막 파일의 정확한 연결 및 파일 사용 허가를 확인해야 한다.
+
+### 영상책 판정
+1. 공식 YouTube Captions API는 영상 제작자/수정 권한 보유자에게만 의미 있는 선택 경로로 남긴다. OAuth와 quota 부담 때문에 현재 MVP 기본 경로로 채택하지 않는다.
+2. IFrame Player API는 재생 및 플레이어 자막 표시 제어용이며, 별도 자막 패널의 텍스트 공급원은 아니다.
+3. 현재 앱의 로컬 SRT/VTT 파서와 동기화 기능을 재사용해, 제작자 허가 파일을 저장소 정적 경로에서 영상 ID로 자동 연결하는 방식을 다음 검증 후보로 선정한다.
+4. 이번 단계에서는 문서 조사만 수행했으며 코드/배포 기능은 변경하지 않았다.
+5. 다음 단계는 허가된 샘플 영상 한 건과 SRT/VTT 파일을 기준으로 자동 fetch와 Android 재생 동기화를 검증하는 것이다.
+
