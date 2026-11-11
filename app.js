@@ -11,6 +11,8 @@ let apiReady = false;
 let pendingVideoId = null;
 let cues = [];
 let activeCueIndex = -1;
+let captionRegistryPromise = null;
+let captionLoadToken = 0;
 
 function getVideoId(value) {
   const raw = value.trim();
@@ -33,6 +35,7 @@ function loadVideo() {
   const id = getVideoId(inputEl.value);
   if (!id) { statusEl.textContent = "올바른 유튜브 주소 또는 11자리 영상 ID를 입력해주세요."; return; }
   pendingVideoId = id;
+  loadRegisteredSubtitle(id);
   if (!apiReady) { statusEl.textContent = "유튜브 플레이어를 준비하고 있습니다…"; return; }
   if (player && typeof player.loadVideoById === "function") player.loadVideoById(id);
   else createPlayer(id);
@@ -45,7 +48,9 @@ function createPlayer(videoId) {
     events: {
       onReady: () => {
         placeholder.hidden = true;
-        statusEl.textContent = "영상이 준비됐습니다. 자막 파일을 불러와보세요.";
+        statusEl.textContent = cues.length
+          ? "영상이 준비됐습니다. 등록된 자막을 함께 읽을 수 있습니다."
+          : "영상이 준비됐습니다. 자막이 없다면 SRT/VTT 파일을 선택해주세요.";
       },
       onError: event => {
         const messages = {
@@ -65,6 +70,64 @@ window.onYouTubeIframeAPIReady = function () {
   apiReady = true;
   if (pendingVideoId) createPlayer(pendingVideoId);
 };
+
+function getCaptionRegistry() {
+  if (!captionRegistryPromise) {
+    captionRegistryPromise = fetch("./captions.json")
+      .then(response => {
+        if (!response.ok) throw new Error("caption registry unavailable");
+        return response.json();
+      })
+      .then(data => {
+        if (!data || typeof data !== "object" || Array.isArray(data)) {
+          throw new Error("invalid caption registry");
+        }
+        return data;
+      });
+  }
+  return captionRegistryPromise;
+}
+
+async function loadRegisteredSubtitle(videoId) {
+  const token = ++captionLoadToken;
+  cues = [];
+  activeCueIndex = -1;
+  renderTranscript();
+  transcriptHint.textContent = "등록된 자막이 있는지 확인하고 있습니다.";
+
+  try {
+    const registry = await getCaptionRegistry();
+    if (token !== captionLoadToken) return;
+
+    const path = registry[videoId];
+    if (!path) {
+      transcriptHint.textContent = "이 영상에 등록된 자막이 없습니다. 제작자 제공/허가 SRT·VTT 파일을 선택할 수 있습니다.";
+      return;
+    }
+
+    if (typeof path !== "string" ||
+        !/^captions\/[A-Za-z0-9._/-]+\.(srt|vtt)$/i.test(path) ||
+        path.includes("..")) {
+      throw new Error("invalid registered caption path");
+    }
+
+    const response = await fetch("./" + path);
+    if (!response.ok) throw new Error("registered caption file unavailable");
+    const text = await response.text();
+    if (token !== captionLoadToken) return;
+
+    const parsed = parseSubtitle(text);
+    if (!parsed.length) throw new Error("registered caption file is empty or invalid");
+
+    cues = parsed;
+    activeCueIndex = -1;
+    renderTranscript();
+    statusEl.textContent = "등록된 자막 " + cues.length + "개를 자동으로 불러왔습니다.";
+  } catch (_) {
+    if (token !== captionLoadToken) return;
+    transcriptHint.textContent = "등록된 자막을 자동으로 불러오지 못했습니다. SRT/VTT 파일을 직접 선택할 수 있습니다.";
+  }
+}
 
 function parseTimestamp(value) {
   // SRT: 00:00:01,250 / VTT: 00:01.250 or 00:00:01.250
