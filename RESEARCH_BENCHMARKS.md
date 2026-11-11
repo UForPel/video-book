@@ -699,3 +699,78 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 - 실제 브라우저/Android/GitHub Pages E2E: 미실행
 - 비용 및 API 계정: 0원, 없음
 - 적합성: 권리자가 공개 제공한 파일에 대한 제한적 보조 경로; 핵심 목표 대체 아님
+
+
+## 25. 일반 시청자 자막 자동 취득 공식 경로 재검증 — 2026-11-11
+
+### 질문
+일반 유튜브 시청자가 YouTube에서 볼 수 있는 영상 대본/자막을, 제작자에게 연락하거나 자막 파일을 직접 구하지 않고 영상책의 정적 GitHub Pages 앱이 자동으로 가져올 수 있는가?
+
+### 1차 자료 확인
+1. **YouTube 사용자 대본 UI**
+   - 공식 도움말: https://support.google.com/youtube/answer/15930243
+   - 자막이 있는 영상이면 영상 설명에서 'Show transcript'를 선택해 전체 대본을 볼 수 있고, 문장을 누르면 해당 시점으로 이동한다.
+   - 이 안내는 YouTube 웹/앱에서 사용자가 대본을 보는 기능을 설명한다. 제3자 앱이 대본 본문을 가져오는 공개 API를 제공한다고 하지 않는다.
+   - 판정: YouTube 사용자 UI 기능은 확인됨. 외부 앱의 자동 접근 권한은 확인되지 않음.
+
+2. **Captions API**
+   - 공식 구현 안내: https://developers.google.com/youtube/data/guides/implementation/captions
+   - `captions.list`: https://developers.google.com/youtube/data/reference/rest/v3/captions/list
+     - 응답은 영상에 연결된 자막 트랙 목록이며, 실제 자막 본문은 포함하지 않는다.
+     - OAuth 2.0 authorization 필요, quota 50 units.
+   - `captions.download`: https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+     - 자막 트랙 파일을 반환하지만 OAuth가 필요하고, 요청 사용자가 해당 영상을 편집할 권한이 있어야 한다.
+     - quota 200 units.
+   - 판정: 일반 시청자에게 공개된 영상이라는 이유만으로 임의 영상의 자막 본문을 다운로드할 수 있는 공식 API가 아니다.
+
+3. **IFrame Player API**
+   - 공식 문서: https://developers.google.com/youtube/iframe_api_reference
+   - 문서는 임베드 플레이어를 JavaScript로 제어하고 영상 재생/일시정지/탐색/재생 위치와 상태를 조회하는 API로 설명한다.
+   - 검토한 공개 API 문서에서 자막 문장 또는 전체 대본 본문을 읽는 메서드는 확인되지 않았다. 이 문장만으로 문서에 없는 모든 내부 기능이 존재하지 않는다고 단정하지 않는다.
+   - 판정: 현재 앱의 플레이어 동기화에는 사용할 수 있으나 자막 본문 취득 API로 채택할 근거는 없음.
+
+4. **브라우저 보안 경계**
+   - MDN iframe 문서: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe
+   - 교차 출처 iframe의 DOM/문서 접근은 same-origin policy의 제한을 받는다. 서로 다른 출처 간 통신은 제한된 `postMessage` 등을 사용한다.
+   - 판정: 영상책 JavaScript가 임베드된 YouTube 페이지의 DOM을 직접 읽어 대본을 수집하는 설계는 브라우저에서 일반적으로 허용되지 않는다. 공식 IFrame API로 노출된 기능을 사용해야 한다.
+
+5. **YouTube 정책**
+   - https://developers.google.com/youtube/terms/developer-policies
+   - §III.D.7은 명시적 허가 없이 undocumented API 사용을 금지한다.
+   - §III.E.6은 YouTube/Google 애플리케이션을 직접 또는 간접으로 스크래핑하거나 스크랩된 YouTube 데이터/콘텐츠를 취득하는 행위를 금지한다.
+   - 판정: 내부 API 복제, DOM 스크래핑, 스크랩 데이터를 제공하는 프록시/중계 방식은 영상책의 구현 후보에서 제외한다. 이 조사는 개별 외부 서비스에 대한 법률 자문이 아니다.
+
+6. **검색 API와 개발자 자격**
+   - Search list: https://developers.google.com/youtube/data/reference/rest/v3/search/list
+   - Authentication: https://developers.google.com/youtube/data/guides/authentication
+   - API Terms: https://developers.google.com/youtube/terms/api-services-terms-of-service
+   - 공개 검색에는 API key가 필요하고 기본 `search.list` 할당량은 하루 100회다. 추가 페이지도 요청별 쿼터를 소비한다.
+   - Developer Policies는 API credentials를 오픈소스 프로젝트에 삽입하지 못하도록 한다. API Services Terms §3.2는 법적 구속력 있는 계약을 체결할 법적 연령 미달자의 API 서비스 이용을 제한한다.
+   - 판정: 현재 프로젝트의 무서버 공개 저장소 조건과 사용자의 API 계약 제약을 고려해 키/프로젝트/OAuth 설정을 진행하지 않는다.
+
+### 종합 판단
+| 단계 | 현재 근거 | 판정 |
+|---|---|---|
+| 일반 시청자의 YouTube 대본 보기 | YouTube UI에서 제공 | 확인됨 |
+| 외부 앱이 공개 API로 일반 시청자 대본 본문 취득 | 공식 API 근거 없음; captions.list 본문 미포함 | 미확인/현재 미채택 |
+| 임의 영상의 captions.download | 영상 편집 권한 + OAuth 필요 | 일반 시청자 경로 아님 |
+| IFrame API를 통한 transcript 추출 | 플레이어 제어/시간 조회 문서만 확인 | 미확인 |
+| iframe DOM 직접 읽기 | 브라우저 교차 출처 제한 | 직접 접근 불가 |
+| 내부 API/스크래핑 | YouTube 정책 금지 조항 | 제외 |
+| 0원·정적·일반 시청자용 전체 자동화 | 적합한 공식 경로 확인 못함 | 미해결 |
+
+### 제작자 파일 경로의 위치 정정
+이전 §24의 Studio/SRT/VTT 경로는 제작자/편집자 또는 권리자가 파일을 제공할 수 있는 경우에만 가능한 제한적 기술 경로다. 일반 시청자에게 파일 취득을 요구하는 방법이 아니며, 제품 핵심 기능의 대안으로 제안하지 않는다.
+
+### 추가 후보: 브라우저 음성 인식
+- MDN SpeechRecognition: https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition
+- 일부 브라우저(Chrome 포함)의 Web Speech API는 서버 기반 음성 인식 서비스를 사용하고 오디오를 웹 서비스로 전송할 수 있으며, 기능 지원도 브라우저별로 제한적이다.
+- 이 API는 YouTube 캡션/대본을 읽는 기능이 아니며, 현재 조사에서는 YouTube iframe의 내부 오디오 트랙을 직접 전달받는 보장된 경로를 확인하지 않았다.
+- 판정: 일반 시청자 자막 자동 취득의 해결책으로 채택하지 않는다. 마이크 기반 별도 STT를 핵심 경로로 제안하거나 구현하지 않았다.
+
+### 검증 범위와 한계
+- 공식 YouTube Help/API/Developer Policies/Terms 및 MDN 문서 조회: 완료.
+- 앱 코드 재검토: 기존 player/registry 경로는 앞선 작업에서 확인; 이번에는 자막 취득 코드 변경 없음.
+- 실제 YouTube 영상의 네트워크 요청 분석, API 호출, CORS/OPTIONS, 브라우저 iframe 접근 테스트, Android 실기기, GitHub Pages 배포: 미실행.
+- 비용: 0원. API 프로젝트/계정/키/OAuth/결제 없음.
+- 결론은 공식 문서 조사 범위에 대한 판단이며, 가능한 모든 외부 기술을 완전히 증명하거나 반증한 것은 아니다.
