@@ -298,3 +298,20 @@
   6. 코드 합성 테스트를 실제 Android/브라우저/배포 성공으로 과장하지 않는다.
 - 상세 절차: [AGENT_WORK_RULES.md](./AGENT_WORK_RULES.md)
 - 이번 회차에서 확인한 운영상 결함: 이전 대화에서 조사·실수·검증 여부를 매번 저장소에 반영하지 못했다. 이번 결정으로 절차를 명문화했으며, 이후 실제 준수 여부를 매 회차 점검한다.
+
+
+## Decision 032 — 비공식 YouTube 스크래핑/내부 API 기반 자막 취득은 채택하지 않음 (2026-11-11)
+- 상태: 확정
+- 배경: 공개된 오픈소스 프로젝트 중 YouTube 자막을 읽는 Python 라이브러리, 브라우저 지원 JavaScript 내부 API 클라이언트, CLI 도구를 조사했다.
+- 근거:
+  1. YouTube 이용약관은 허가되지 않은 자동 접근(robots/scrapers 등)을 제한한다.
+  2. YouTube API Developer Policies는 undocumented API 사용과 YouTube 애플리케이션 스크래핑 및 스크랩된 데이터 획득을 금지한다.
+  3. MIT/Unlicense 등 오픈소스 코드 라이선스는 해당 코드의 재사용 권한이지 YouTube 데이터 취득 권한을 부여하지 않는다.
+  4. YouTube.js가 브라우저에서 실행된다는 사실만으로 내부 API 접근이 허용되는 것은 아니다.
+- 결정:
+  - youtube-transcript-api, YouTube.js의 비공식/내부 인터페이스 기반 수집 경로, yt-dlp 자동 수집을 영상책의 일반 공개 영상 자막 기능에 적용하지 않는다.
+  - 정책 제한 우회, 프록시를 통한 스크래핑, 비공개 요청 인터페이스 복제 등을 구현하지 않는다.
+  - 공식 API는 영상 소유/편집 권한이 있는 경우에 한해 별도 검토한다.
+- 공식 API 제한: captions.list는 트랙 메타데이터만 반환하고 OAuth 및 50 quota units가 필요하다. captions.download는 영상 편집 권한과 OAuth가 필요하고 200 quota units가 든다.
+- 결과: 현재 무료 0원·무서버·Android·임의 공개 영상 자동 취득을 모두 만족하는 정책 준수 경로는 확인되지 않았다. 제품 목표 자체를 변경한 것은 아니며, 목표 달성 경로가 미해결 상태임을 명확히 한다.
+- 참고: [AGENT_WORK_RULES.md](./AGENT_WORK_RULES.md), [VB-14 조사 기록](./PROJECT_STATUS.md#9-vb-14--공개-자막-추출-프로젝트-조사-및-정책-적합성-판정-2026-11-11)
