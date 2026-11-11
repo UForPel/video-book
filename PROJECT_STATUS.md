@@ -696,3 +696,92 @@
 - STT를 우선 경로로 삼지 않는다.
 - 다음 탐색은 브라우저 원본 YouTube 페이지 DOM에서 사용자가 이미 볼 수 있는 transcript를 어떤 공식·정책 준수 범위에서 활용할 수 있는지, Android에서 실제로 앱 간 연결이 가능한지에 초점을 둔다. 구현 전 사용자 조작 부담과 Android 호환성을 확인한다.
 - 비공식 API/스크래핑 코드는 벤치마크 참고에만 두고 영상책에 통합하지 않는다.
+
+
+## 18. VB-24 — YouTube 자막 스크래핑 유형별 심층 조사 (2026-11-11)
+
+### 사용자 질문과 조사 범위
+사용자는 스크래핑이 가장 적합해 보이는데 문제가 많은지, 관련 자료를 폭넓게 조사해 달라고 요청했다. 스크래핑을 단일 방식으로 간주해 배제하지 않고 다음 유형을 나눠 조사했다.
+A. 시청자에게 보이는 transcript DOM 읽기
+B. YouTube 페이지의 transcript 네트워크 요청/응답 가로채기
+C. InnerTube/timedtext 등 문서화되지 않은 endpoint 직접 요청
+D. 서버/헤드리스 브라우저에서 페이지를 렌더링해 추출
+검색 질의 20개 이상을 사용했고, GitHub 저장소/실제 구현 설명·이슈, YouTube 공식 약관/정책, Chrome/Mozilla 문서, Reddit 및 커뮤니티 사례를 비교했다.
+
+### 핵심 발견 — A. 화면 DOM 읽기
+1. [reconcrete/youtube-copy-transcript](https://github.com/reconcrete/youtube-copy-transcript)
+   - 실제 흐름: YouTube의 Show transcript 버튼을 사용해 패널을 열고, 클래식 `ytd-transcript-segment-renderer`, 최신 `transcript-segment-view-model`, 범용 fallback에서 타임스탬프/문장을 읽는다.
+   - YouTube 자체 패널의 현재 언어를 그대로 읽으며 별도 추출 서버를 두지 않는다.
+   - 코드 구조상 영상책이 원하는 text + timestamp 데이터에 가깝다.
+   - 단점: YouTube DOM 구조에 의존. README는 실제 2026 마크업 변화에 대응하기 위한 세 가지 reader 및 fixture 테스트를 기록한다.
+2. [yniijia/SubtideX](https://github.com/yniijia/SubtideX)
+   - transcript panel을 열고 `.segment-text`, `#segments-container` 등의 selector로 caption rows를 읽는다.
+   - 가상 스크롤된 transcript는 패널을 스크롤해 구간을 로드한 후 CSV로 만든다.
+   - 토큰으로 보호되지 않은 경우에만 player caption data fallback을 시도하고, token-protected caption endpoint는 panel DOM 경로에 의존한다고 README가 설명한다.
+   - 설치/지원 대상은 데스크톱 Chrome/Edge/Brave 등. Firefox 미지원으로 표시.
+3. [brnrd/PromptTube](https://github.com/brnrd/PromptTube)
+   - Firefox content script가 YouTube transcript panel을 열고 DOM segment를 읽는다.
+   - DOM에 transcript가 없으면 내부 caption track endpoint fetch로 fallback한다. 따라서 DOM 전용 구현과 내부 endpoint 혼합형이다.
+   - YouTube UI label/DOM 변경에 따라 자동 패널 열기와 selector가 깨질 수 있다고 README가 명시한다.
+4. Reddit의 Obsidian Web Clipper 사례(이전 VB-23 기록)는 transcript pane을 사용자가 열어야 하고, 클리퍼가 원본 페이지의 DOM에 이미 표시된 내용만 읽는 방식이라고 작성자가 설명했다.
+
+### 핵심 발견 — B. 페이지 네트워크 응답 가로채기
+1. [ColinEberhardt/youtube-transcript-downloader](https://github.com/ColinEberhardt/youtube-transcript-downloader)
+   - content script가 YouTube 페이지 환경에서 `window.fetch`를 관찰/가로채 InnerTube transcript 응답을 캐시한다.
+   - 순서: 캐시된 응답 → 필요 시 continuation fetch → 이미 렌더링된 transcript DOM 순으로 시도한다.
+   - 로컬 브라우저에서 파일로 저장하고 외부 서버로 전송하지 않는다고 프로젝트는 설명한다.
+   - 이 방법은 순수 DOM 읽기가 아니라 페이지 내부의 비공개 API 응답을 활용하는 혼합형이다. API/endpoint의 비공개성 및 정책 위험을 별도로 평가해야 한다.
+
+### 핵심 발견 — C. 비공식 endpoint 직접 요청
+1. [jdepoix/youtube-transcript-api](https://github.com/jdepoix/youtube-transcript-api)
+   - README는 cloud provider IP 차단, 429/IP block 등을 명시하고 proxy 사용을 안내한다.
+   - 최근 issue 목록에는 PoTokenRequired, 429 재시도, proxy 관련 이슈 등이 나타난다.
+   - 프록시 회전이나 차단 회피는 영상책의 해결책으로 채택하지 않는다.
+2. VB-23에서 확인한 `neurelectra-oss/youtube-captions`, `devhims/youtube-caption-extractor`, `rapha30/yt-youtube-transcript`도 InnerTube/timedtext 또는 watch-page scraping 의존 사례로 분류했다.
+
+### 핵심 발견 — D. 서버/헤드리스 브라우저
+- 서버/헤드리스 브라우저는 SPA 렌더링 및 DOM 접근을 제공할 수 있지만, GitHub Pages만으로 실행할 수 없다. 별도 서버/실행 환경이 필요하고, cloud IP 차단·운영비·유지보수 부담이 추가된다.
+- 이번 회차에서는 이를 영상책 제약과 맞지 않는 참고 유형으로 분류했다. 실제 서버 배포·테스트는 하지 않았다.
+
+### 실제 고장 사례와 기술 위험
+- Obsidian Clipper issue #946 (2026-08-28): YouTube 마크업이 `yt-core-attributed-string`에서 `ytAttributedStringHost`로 바뀌어 segment text selector가 0개를 찾고, timedtext 응답은 0-byte HTTP 200으로 약 8초 지연된 사례를 보고했다. 즉 DOM 경로와 네트워크 경로가 같은 시기에 함께 실패할 수 있다.
+- Defuddle issue #310 (2026-06-11): 모바일 Safari에서 커스텀 User-Agent 헤더가 CORS preflight를 유발해 timedtext fetch가 실패하고, mobile DOM fallback도 패널 버튼 조건/시간 제한 때문에 빈 결과가 되는 사례가 기록됐다.
+- SubtideX README는 가상 스크롤 때문에 패널을 스크롤해야 하고, empty/partial CSV가 나올 수 있음을 안내한다.
+- YouTube는 SPA이므로 페이지 내비게이션 후 DOM 재탐색과 패널 open/close 상태 관리도 필요하다.
+
+### 법률·정책 구분
+- YouTube Terms of Service: 자동화된 수단(예: scraper)을 통한 서비스 접근을 제한하는 조항이 확인된다. 해당 약관은 일반 서비스 이용에 대한 문서다.
+- YouTube API Services Developer Policies: API Client에 적용되는 정책 문맥에서 YouTube/Google Applications scraping 및 scraped data 취득 금지, undocumented API 사용 금지 조항을 확인했다.
+- 두 문서는 적용 범위가 다르므로 혼동하지 않는다. 이 기록은 법률 자문이 아니며 특정 DOM 확장 프로그램이 법적으로 위법하다고 판정하지 않는다.
+- 사용자가 직접 transcript panel을 열고 브라우저 확장이 보이는 DOM만 읽는 방식도 약관상 자동화 접근에 해당하지 않는다고 단정할 근거는 확인하지 못했다.
+- 자막/대본 텍스트는 영상 콘텐츠의 일부이므로 개인적 표시, 저장, 공개 배포, 상업적 이용은 서로 다른 권리/약관 문제를 가질 수 있다. 권리자의 허가나 법적 근거 없이 공개 저장소에 자막 본문을 재배포하는 방식은 채택하지 않는다.
+
+### Android 및 영상책 적합성
+- Chrome for Android는 확장 프로그램을 지원하지 않는 것으로 확인했다. Chrome Extensions 담당자의 2026-10 답변도 모바일 확장 지원 계획이 없다고 밝혔다.
+- Firefox for Android는 Add-ons를 지원하지만 Mozilla는 일부 확장이 Android와 호환되지 않을 수 있다고 명시한다.
+- SubtideX는 Chrome MV3, PromptTube는 Firefox desktop add-on으로 안내되어 있어 그대로 Android에 쓸 수 있다고 볼 수 없다.
+- Chrome extension content scripts는 일치하는 페이지에 주입되어 DOM에 접근할 수 있지만, 이 기능은 브라우저 확장 환경의 기능이다. GitHub Pages 웹페이지 자체에 자동으로 주어지는 권한이 아니다.
+- GitHub Pages의 영상책 페이지가 YouTube iframe DOM을 읽는 방식은 동일 출처 정책으로 차단된다. 확장으로 원본 YouTube 탭의 DOM을 읽는 방식은 구조적으로 다르지만, 그 결과를 영상책 페이지로 넘기는 안전하고 사용하기 쉬운 모바일 흐름은 아직 설계/검증하지 않았다.
+
+### 현재 평가
+- 기술적 후보로 가장 가까운 것은 A. 화면 DOM 읽기다. 사용자가 YouTube에서 실제로 볼 수 있는 transcript panel을 데이터 원천으로 삼고, timestamp도 함께 가져올 수 있다.
+- B는 구현상 가능성이 있지만 내부 API 응답에 의존하므로 A보다 정책·변경 위험이 크다.
+- C는 네트워크 차단, PoToken, 429, undocumented API, 약관 위험이 커서 채택하지 않는다. 차단 회피 프록시/토큰 절차도 구현하지 않는다.
+- D는 서버 비용/운영과 정적 GitHub Pages 제약 때문에 부적합하다.
+- A도 자동화된 DOM scraping의 약관상 지위가 확인되지 않았으므로 즉시 구현 대상으로 승인하지 않는다.
+- Android에서는 Chrome 확장 미지원이 큰 장벽이다. Firefox Android 확장 호환 및 영상책과의 무복사 데이터 전달 가능성을 별도 검증해야 한다.
+
+### 조사량·검증·비용
+- 서로 다른 검색 질의: 20개 이상.
+- 출처 유형: YouTube 약관/개발자 정책, GitHub README/실제 소스 설명/이슈, Chrome 공식 개발자 문서, Mozilla 공식 도움말, Reddit/커뮤니티.
+- 실제로 확인한 공개 구현: YouTube Copy Transcript, SubtideX, PromptTube, youtube-transcript-downloader, youtube-transcript-api 및 VB-23 프로젝트들.
+- 실기기 Android/Firefox/Chrome 테스트: 미실행.
+- 영상책 코드 변경: 없음.
+- API key/OAuth/계정/서버/프록시/유료 서비스/결제: 사용하지 않음.
+- 비용: 0원.
+
+### 다음 검증 단계
+1. Android Firefox에서 실제로 설치 가능한 확장과 호환성을 확인한다(사용자에게 설치를 요구하기 전에 문서/지원 범위부터 확인).
+2. 원본 YouTube 페이지의 DOM에서 읽은 transcript를 영상책 페이지로 자동 전달할 수 있는 WebExtension 구조를 설계 수준에서 비교한다. 사용자에게 수동 복사/붙여넣기를 요구하지 않는다.
+3. 이 흐름이 약관상 허용되는지 확인 가능한 근거가 없으면, 정책 검토 미해결로 표시하고 실제 제품 기능으로 배포하지 않는다.
+4. 사용자 시나리오(일반 시청자, Android, 본인 계정, 앱 내부 검색/선택, 자동 추출, 교정, 시간 동기화)를 기준으로 검증한다.
