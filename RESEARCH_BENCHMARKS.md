@@ -459,3 +459,48 @@
 - youtube-transcript-api 프로젝트 소개(보조 자료, 2026-11-11 조회): https://topopensource.ai/projects/jdepoix-youtube-transcript-api
 - TranscriptFox API (서비스 제공자 문서, 2026-11-11 조회): https://www.transcriptfox.com/docs/api
 - TranscriptFox Privacy (서비스 제공자 문서, 2026-11-11 조회): https://www.transcriptfox.com/privacy
+
+
+## 20. 공개 자막 추출 프로젝트 3종과 YouTube 정책 검증 — 2026-11-11
+
+### A. youtube-transcript-api
+- 원문: https://github.com/jdepoix/youtube-transcript-api
+- README는 Python API가 YouTube 영상의 수동/자동 생성 자막을 가져오고, 언어 선택 및 시간 정보가 있는 snippet을 제공한다고 설명한다.
+- 현재 default branch의 pyproject.toml에서 버전 1.2.5, MIT, Python >=3.8,<3.16, requests 의존성을 확인했다.
+- PyPI 배포 정보는 2026-11-05 릴리스와 MIT 라이선스를 표시한다.
+- 적합성: Python 패키지이므로 GitHub Pages 브라우저에서 직접 실행되는 JS 모듈이 아니다. 서버/런타임을 추가하면 기존 무서버 요구와 충돌한다. YouTube 정책상 스크래핑 기반 자동 접근은 채택하지 않는다.
+
+### B. YouTube.js
+- 원문: https://github.com/LuanRT/YouTube.js
+- README는 Node.js, Deno, 최신 브라우저 지원을 설명하며 YouTube의 내부 API인 InnerTube용 JavaScript 클라이언트라고 명시한다.
+- 현재 package.json에서 버전 18.3.0, browser export, MIT 라이선스를 확인했다. GitHub Releases에는 18.3.0이 2026-10-23 공개된 것으로 표시된다.
+- 적합성: 브라우저에서 실행될 수 있는 형태라는 기술적 장점은 있으나, 내부/문서화되지 않은 API 접근을 공식적으로 허가받았다는 근거는 없다. YouTube API Developer Policies의 undocumented API 및 scraping 금지 조항과 충돌하므로 영상책에 채택하지 않는다. 자막 전문을 가져오는 특정 API가 최신 문서에서 안정적으로 지원되는지도 이번 회차에는 확정하지 않았다.
+
+### C. yt-dlp
+- 원문: https://github.com/yt-dlp/yt-dlp
+- README는 명령행 기반 미디어 도구이며 `--list-subs`, `--write-subs`, `--write-auto-subs` 옵션을 문서화한다.
+- 현재 pyproject.toml은 Python >=3.11을 요구한다. LICENSE는 Unlicense다.
+- 적합성: CLI/Python 런타임이 필요하므로 GitHub Pages만으로 방문자의 브라우저에서 실행할 수 없다. 자동 수집 경로는 YouTube 정책 제한을 해결하지 못하므로 채택하지 않는다.
+
+### D. YouTube 공식 정책 및 API
+- 이용약관: https://www.youtube.com/t/terms — 허가되지 않은 자동 수단(robots, scrapers 등)을 통한 서비스 접근을 제한하며, 공개 검색엔진 예외 또는 사전 서면 허가를 명시한다.
+- API Developer Policies: https://developers.google.com/youtube/terms/developer-policies — undocumented API 사용 및 YouTube/Google 앱 스크래핑 또는 스크랩된 데이터 획득을 금지한다고 명시한다.
+- Captions list: https://developers.google.com/youtube/data/reference/rest/v3/captions/list — 트랙 메타데이터만 반환하고 실제 자막 본문은 반환하지 않는다. OAuth 필요, quota cost 50.
+- Captions download: https://developers.google.com/youtube/data/reference/rest/v3/captions/download — OAuth 및 해당 동영상 편집 권한 필요, quota cost 200.
+- IFrame Player API: https://developers.google.com/youtube/iframe_api_reference — captions 모듈은 표시 옵션과 reload를 제공하지만 외부 앱에 자막 본문과 cue 배열을 반환하는 공개 메서드는 문서에서 확인되지 않았다.
+
+### E. 결론 및 채택 여부
+- 공개 코드 3종은 기술적으로 자막 취득 또는 미디어 처리를 제공하지만, 각각 Python/CLI 런타임 또는 내부 API/자동 스크래핑 의존성이 있다.
+- 오픈소스 코드 라이선스는 YouTube 콘텐츠/데이터에 대한 취득 권한을 부여하지 않는다.
+- 이번 조사에서 무료 0원, 카드 등록 없음, Android, GitHub Pages 정적 실행, YouTube 정책 준수를 모두 만족하는 범용 공개 영상 자막 취득 방법은 확인하지 못했다.
+- 후보를 앱에 통합하지 않았고 코드도 변경하지 않았다.
+- 후속 조사는 제작자 본인/명시적 허가 영상의 공식 API 경로와 권리 허가가 명확한 독립 자막 공급원에 한정한다.
+
+### 확인 상태
+- README/LICENSE/pyproject/package.json 원문 확인: 성공
+- YouTube 공식 약관/Developer Policies/Caption API/IFrame 문서 조회: 성공
+- 후보들의 Android 실기기 실행: 미실행
+- 실제 영상 자막 반환 테스트: 미실행
+- 브라우저 CORS 및 POST 테스트: 미실행
+- GitHub Pages 배포 테스트: 미실행
+- 적합 후보 발견: 실패 (현재 조사 범위 내)
