@@ -415,3 +415,15 @@
 5. 실제 허가 샘플 파일이 없으므로 자동 매핑 코드 추가 및 Android 실기기 검증은 보류한다. 허가된 샘플이 확보되면 해당 파일을 대상으로만 자동 fetch와 동기화를 검증한다.
 6. 앱 코드와 배포 설정은 이번 단계에서 변경하지 않았다.
 
+
+
+## 18. VB-11 — 등록형 정적 자막 연결 구현 — 2026-11-11
+- 저장소 루트에 `captions.json`을 추가했다. 현재 등록 항목은 없으며 예시 형식만 설명한다.
+- `captions/README.md`에 제작자 제공/사용 허가 자막 파일만 추가하고, video ID와 상대 경로를 연결하는 등록 절차를 기록했다.
+- `app.js`는 영상 ID로 등록 목록을 조회한 뒤 `captions/` 폴더의 SRT/VTT만 동일 출처 fetch하도록 구현했다. 외부 URL을 등록 경로로 허용하지 않는다.
+- 등록 파일은 기존 `parseSubtitle`, `renderTranscript`, `updateActiveCue`를 사용하므로 기존 cue 시간 동기화 및 클릭 seek 흐름을 재사용한다.
+- 영상 ID 변경 시 이전 fetch 응답이 뒤늦게 도착해 현재 영상 자막을 덮지 않도록 요청 토큰을 사용한다. 사용자가 로컬 파일을 직접 선택한 경우에도 진행 중인 자동 fetch를 무효화해 수동 선택이 우선하도록 했다.
+- 등록 목록 fetch 실패 시 다음 시도에서 재요청할 수 있도록 실패한 Promise를 초기화한다.
+- MDN Fetch 문서에 따르면 동일 출처 요청은 브라우저에서 기본적으로 처리할 수 있고, 교차 출처 응답은 서버의 CORS 허용 헤더가 필요하다. 따라서 자막 파일을 Pages와 같은 출처에 두는 방식은 별도 외부 API나 CORS 설정을 요구하지 않는다.
+- 출처: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch ; https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS
+- 제한: 등록 목록은 현재 비어 있다. 허가된 샘플 파일이 없으므로 실제 fetch 성공, 실제 cue 표시, Android 재생 동기화는 아직 테스트되지 않았다. 코드 반영 사실을 실기기 검증 완료로 표현하지 않는다.
