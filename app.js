@@ -261,12 +261,19 @@ subtitleFile.addEventListener("change", async () => {
 function updateActiveCue() {
   if (!player || !cues.length || typeof player.getCurrentTime !== "function") return;
   const now = player.getCurrentTime();
-  let low = 0, high = cues.length - 1, found = -1;
-  while (low <= high) {
+  // Find the last cue that has started, then walk backward to handle overlapping cues.
+  let low = 0, high = cues.length;
+  while (low < high) {
     const mid = Math.floor((low + high) / 2);
-    if (now < cues[mid].start) high = mid - 1;
-    else if (now >= cues[mid].end) low = mid + 1;
-    else { found = mid; break; }
+    if (cues[mid].start <= now) low = mid + 1;
+    else high = mid;
+  }
+  let found = -1;
+  for (let i = low - 1; i >= 0; i--) {
+    if (cues[i].end > now) {
+      found = i;
+      break;
+    }
   }
   if (found === activeCueIndex) return;
   activeCueIndex = found;
