@@ -630,3 +630,69 @@
 ### 다음 단계
 - YouTube IFrame API captions module의 공식 옵션 범위를 이번 조사에서 확인했으므로, 동일한 옵션 확인을 반복하지 않는다.
 - 새 후보를 검토할 때는 일반 시청자가 Android에서 수행할 수 있고, 자막 본문을 실제로 앱 내부에 제공한다는 공식 근거부터 확인한다. UI에 자막이 표시되는 것만으로 텍스트 취득 가능성을 추정하지 않는다.
+
+
+## 17. VB-23 — 공개 자막 추출 프로젝트·코드·커뮤니티 사례 조사 (2026-11-11)
+
+### 사용자 지적 및 조사 우선순위 수정
+- 사용자는 STT 조사로 방향을 넓힌 것이 핵심 과제에서 벗어난다고 지적했다.
+- 지적이 맞다. 영상책의 질문은 음성 재인식이 아니라 일반 시청자가 YouTube에서 볼 수 있는 기존 자막/대본을 앱 내부로 가져오는 방법이다.
+- 공식 문서 조사 후 STT로 옮겨가기 전에 공개 라이브러리·실제 소스 코드·커뮤니티 사용 사례를 폭넓게 조사했어야 했다. 이는 조사 순서의 오류다.
+- 이번 회차에서는 STT를 추가 조사하지 않고 자막 추출 구현만 조사했다.
+
+### 조사 범위 및 양
+- 10개를 넘는 서로 다른 검색 질의로 탐색. 검색 주제: transcript extraction library, GitHub JS/Python/Go 구현, npm 패키지, 브라우저 전용 앱, CORS, InnerTube/timedtext, yt-dlp, Reddit Obsidian/Web Clipper/self-hosted 사용자 사례, 공식 정책/약관.
+- 출처 유형: YouTube 공식 정책/약관, GitHub 저장소와 실제 소스, npm, Reddit, DEV Community 및 기술 문서.
+- 실제 소스 코드 파일 확인:
+  1. `neurelectra-oss/youtube-captions/src/transcript.js`
+  2. `devhims/youtube-caption-extractor/src/index.ts`
+  3. `kepano/defuddle/src/extractors/youtube.ts`
+  4. `jdepoix/youtube-transcript-api/youtube_transcript_api/_api.py`
+  5. `jdepoix/youtube-transcript-api/youtube_transcript_api/_transcripts.py`
+  6. `yt-dlp/yt-dlp/yt_dlp/options.py`
+  7. `rapha30/yt-youtube-transcript/README.md` 및 공개 프로젝트 구조
+- Reddit 사례 2건 이상과 GitHub issue 1건을 교차 확인했다.
+
+### 대표 구현 분석
+| 프로젝트 | 실제 구현 성격 | 영상책 적합성 |
+|---|---|---|
+| jdepoix/youtube-transcript-api | Python requests로 영상 페이지의 caption track을 찾고 timedtext를 가져오는 CLI/서버용 라이브러리 | Python 런타임/서버 성격, 내부 구현 의존성 및 IP 차단 이슈. 정적 브라우저 앱 아님 |
+| neurelectra-oss/youtube-captions | Node axios, InnerTube client 설정, timedtext JSON3/XML 파서, 선택적 proxy agent | Node/서버 네트워크 계층과 비공식 API 의존. 정적 브라우저 앱 아님 |
+| devhims/youtube-caption-extractor | TypeScript fetch, InnerTube client profile 순회, caption track 선택·파싱; Next.js/Cloudflare Container API 예제 | README가 scraper로 설명, 서버 예제가 포함. 공개 fetch만으로 브라우저 적합성을 입증하지 않음 |
+| kepano/defuddle | 기존 YouTube 페이지 DOM transcript를 먼저 추출하고, 비공식 API fetch를 보조 경로로 사용 | Web Clipper는 원본 YouTube 페이지의 DOM을 읽음. 영상책의 별도 페이지/iframe에서 바로 쓸 수 없음. iOS Safari CORS 이슈 확인 |
+| rapha30/yt-youtube-transcript | Go CLI/라이브러리, Android/iOS InnerTube와 watch-page scraping fallback | Go 실행 환경 필요, 비공식 endpoint 및 페이지 스크래핑 명시 |
+| yt-dlp | Python CLI의 수동/자동 자막 다운로드 및 파일 변환 | 사용자가 CLI를 실행해야 하며 GitHub Pages 앱 내 자동 취득 기능과는 다름 |
+
+### 커뮤니티 사례와 실사용 문제
+- Reddit의 Obsidian Web Clipper 작성자는 사용자가 YouTube transcript pane을 직접 열어야 하고, clipper는 페이지에 현재 존재하는 데이터만 읽는다고 답했다.
+- 같은 게시물의 후속 댓글에는 YouTube 레이아웃 변경 후 동작이 깨졌다는 보고가 있다.
+- 다른 Reddit plugin 사례는 외부 Nootube 서비스에 의존하고, captions가 없으면 Whisper로 전환한다고 설명한다. 이는 무서버·0원 조건을 충족하는 독립 구현이 아니다.
+- Defuddle GitHub issue #310은 iOS Safari의 m.youtube.com 경로에서 caption fetch CORS preflight가 실패하여 transcript가 비는 사례를 기록한다.
+
+### 정책·약관 검토
+- YouTube API Developer Policies는 문서화되지 않은 API 사용과 YouTube/Google 앱 스크래핑 및 스크랩된 데이터 취득을 금지하는 문구를 포함한다.
+- YouTube Terms of Service도 자동화된 접근(robots.txt를 따르는 공개 검색엔진 또는 사전 서면 허가 예외 제외)에 제한을 둔다.
+- 공개 GitHub 코드와 MIT 라이선스는 YouTube 서비스 접근 방식의 허가나 정책 준수를 의미하지 않는다.
+- 본 기록은 정책/약관 위험을 식별한 것이며 개별 사용 사례의 법률 자문이나 법적 판단이 아니다.
+
+### 현재 판정
+- **코드 참고 가치 있음:** 자막 cue의 공통 데이터 구조(text/start/duration), 수동/자동 자막 트랙 선택, 언어 우선순위, 파서 분리, 오류 유형, 테스트 설계.
+- **영상책에 그대로 통합하지 않음:** InnerTube, timedtext scrape, YouTube page scraping, proxy/지역 라우팅, 비공식 client impersonation.
+- **브라우저 DOM 추출은 보조 연구:** 사용자가 원본 YouTube 페이지에서 transcript pane을 열어야 하고, 영상책의 별도 도메인에서는 iframe DOM 접근이 안 된다. Android Chrome 확장/탭 연동은 이번 조사에서 검증하지 않았다.
+- **공식 공개 API 대안:** 이번 생태계 조사에서도 일반 시청자가 임의 공개 영상의 자막 본문을 정적 앱에 제공하는 공식 공개 API는 찾지 못했다.
+- 결론은 조사한 대표 프로젝트와 공식 문서에 한정되며 모든 가능한 경로가 없다고 증명한 것은 아니다.
+
+### 검증·비용
+- 10개 초과 검색 질의: 완료.
+- GitHub 실제 코드 파일 6개 이상/프로젝트 5개: 확인.
+- Reddit 사용자 사례: 2건 이상 확인.
+- 공식 정책·약관 교차 확인: 완료.
+- 실제 Android 기기·브라우저·GitHub Pages E2E: 미실행.
+- 앱 코드 변경: 없음.
+- 계정/API/OAuth/유료 API/프록시/결제: 사용·설정 안 함.
+- 비용: 0원.
+
+### 다음 단계
+- STT를 우선 경로로 삼지 않는다.
+- 다음 탐색은 브라우저 원본 YouTube 페이지 DOM에서 사용자가 이미 볼 수 있는 transcript를 어떤 공식·정책 준수 범위에서 활용할 수 있는지, Android에서 실제로 앱 간 연결이 가능한지에 초점을 둔다. 구현 전 사용자 조작 부담과 Android 호환성을 확인한다.
+- 비공식 API/스크래핑 코드는 벤치마크 참고에만 두고 영상책에 통합하지 않는다.
