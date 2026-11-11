@@ -35,11 +35,10 @@
   - 현재 영상책 `app.js`는 `new YT.Player("player", ...)`로 플레이어 인스턴스를 직접 생성하고, 같은 인스턴스에서 `loadVideoById`, `seekTo`, `getCurrentTime` 등을 호출한다.
   - Hyperaudio Lite의 기본 YouTube 어댑터도 지정된 iframe에 대해 별도의 `new YT.Player(...)`를 생성한다.
   - 따라서 현재 플레이어에 Hyperaudio Lite 기본 YouTube 어댑터를 그대로 덧붙이면 같은 영상 플레이어를 두 객체가 관리하거나 API 콜백/이벤트가 중복되는 충돌 가능성이 있다. 바로 통합하지 않는다.
-  - 가능한 다음 실험은 (A) 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube 플레이어를 단독 소유하게 해 검증하거나, (B) 현재 영상책 플레이어와 연결하는 사용자 정의 adapter를 검토하는 것이다. 어느 쪽이 적절한지는 최소 실험 후 결정한다.
 - 자동 자막 취득:
   - README, YouTube 데모, 확인한 핵심 코드에서 임의의 공개 YouTube 영상 자막을 자동으로 내려받는 기능은 확인하지 못했다.
   - 데모 transcript는 HTML에 미리 들어 있는 시간표시 텍스트이며, 플레이어에서 자동 추출한 자막이 아니다.
-- 판정: **시간 동기화 UI 벤치마킹으로 적합. 자동 자막 취득 기능은 제공하지 않음. 영상책 기존 플레이어에 즉시 통합하지 말고 독립 실험을 먼저 수행.**
+- 판정: **시간 동기화 UI 벤치마킹으로 적합. 자동 자막 취득 기능은 제공하지 않음. 기존 앱에 즉시 통합하지 않는다.**
 
 ## 2. Hyperaudio Lite Editor
 
@@ -121,44 +120,6 @@
   - 자동 자막을 임의의 영상에서 안정적으로 공급한다는 근거는 이번 확인에서 찾지 못함.
 - 판정: **UI 참고만. 핵심 의존성 채택 보류.**
 
-## 요약 비교
-
-| 프로젝트 | 확인된 강점 | 자동 자막 취득 | GitHub Pages 단독 적합성 | 영상책 활용 |
-|---|---|---|---|---|
-| Hyperaudio Lite | 단어 단위 timed transcript와 YouTube iframe 동기화 | 확인 안 됨 | 정적 프런트엔드 라이브러리로 검토 가능 | 독립 실험 후 동기화 UI 일부 참고 |
-| Hyperaudio Lite Editor | 로컬 STT/자막 교정/내보내기 | 로컬 미디어 대상 기능, YouTube iframe 자동 추출은 미확인 | 일부 브라우저 기능은 가능성 있으나 실험 필요 | 교정 UI/로컬 STT 참고 |
-| Invidious | 대체 프런트엔드/API | 이번 조사에서 확인 안 됨 | 부적합(서버/인스턴스) | 구조만 참고 |
-| Piped | 대체 프런트엔드/API | 이번 조사에서 확인 안 됨 | 부적합(백엔드/인스턴스) | 구조만 참고 |
-| ViewTube | 모바일 UI/검색/영상 탐색 | 이번 조사에서 확인 안 됨 | 부적합(서버/API 구조) | UI만 참고 |
-| Materialious | 모바일 플레이어/탐색 UI | 이번 조사에서 확인 안 됨 | 부적합(백엔드 배포 경로) | UI만 참고 |
-
-## 영상책에 대한 결론
-
-1. **Hyperaudio Lite를 시간 동기화 UI의 1순위 벤치마킹 대상으로 유지**한다.
-2. **바로 현재 앱에 붙이지 않는다.** 현재 앱과 Hyperaudio Lite 모두 YouTube IFrame API 플레이어를 생성/관리하므로 이중 플레이어 관리 충돌 위험을 먼저 해결해야 한다.
-3. 다음 최소 실험은 별도 테스트 페이지에서 Hyperaudio Lite 단독 YouTube iframe + 미리 준비된 소량의 timed transcript로 클릭 seek/활성 단어/자동 스크롤을 확인하는 것이다. 이 실험은 자막 자동 취득 테스트가 아니다.
-4. Hyperaudio Lite Editor는 별도 실험으로 둔다. Android 기기에서 한국어 Whisper/Parakeet 모델의 실행, 메모리/성능, 라이선스를 확인하기 전에는 통합하지 않는다.
-5. Invidious, Piped, ViewTube, Materialious는 제품 전체를 복제하거나 서버를 연결하지 않는다. 필요한 UI/구조만 참고한다.
-6. 임의의 공개 YouTube 영상에서 자막을 자동으로 얻는 무료·무제한·서버 없는 확실한 방법은 여전히 확인되지 않았다.
-7. 비공식 서비스도 자동 자막 취득 경로로 확정하지 않는다. 공식 문서, 운영 구조, 라이선스, 정책, 장애 대응을 확인하고 별도 실험을 통과한 뒤에만 채택한다.
-
-## 확인한 공식 출처
-
-- https://github.com/hyperaudio/hyperaudio-lite
-- https://github.com/hyperaudio/hyperaudio-lite/blob/main/README.md
-- https://github.com/hyperaudio/hyperaudio-lite/blob/main/demos/youtube.html
-- https://github.com/hyperaudio/hyperaudio-lite/blob/main/js/hyperaudio-lite.js
-- https://github.com/hyperaudio/hyperaudio-lite/blob/main/package.json
-- https://github.com/hyperaudio/hyperaudio-lite/blob/main/LICENSE
-- https://github.com/hyperaudio/hyperaudio-lite-editor
-- https://github.com/iv-org/invidious
-- https://github.com/TeamPiped/Piped
-- https://github.com/ViewTube/viewtube
-- https://github.com/Materialious/Materialious
-
-이 문서는 저장소 README/공식 문서와 일부 실제 소스 파일을 확인한 결과이며, Android 실기기에서 Hyperaudio Lite를 테스트했다는 뜻은 아니다.
-
-
 ## 7. YouTube 공식 자막 접근 경로 — 2026-11-11 재확인
 
 ### YouTube Data API Captions
@@ -166,8 +127,8 @@
 - `captions.download`: OAuth 2.0 인증이 필요하고, 호출하는 사용자가 해당 동영상을 수정할 권한을 가져야 한다.
 - 따라서 다른 사람이 올린 임의의 공개 영상을 영상책에서 자동으로 가져오는 일반 사용자용 공개 API로 쓸 수 없다.
 - 공식 문서:
-  - https://developers.google.com/youtube/data/reference/rest/v3/captions/list
-  - https://developers.google.com/youtube/data/reference/rest/v3/captions/download
+  - https://developers.google.com/youtube/v3/docs/captions/list
+  - https://developers.google.com/youtube/v3/docs/captions/download
   - https://developers.google.com/youtube/v3/guides/implementation/captions
 
 ### YouTube IFrame Player API
@@ -177,8 +138,64 @@
 - 그러므로 플레이어에 CC가 표시되는 것과 영상책이 자막 텍스트를 받아 별도 패널에 표시할 수 있는 것은 별개의 기능이다.
 - 공식 문서: https://developers.google.com/youtube/iframe_api_reference
 
-### 영상책에 대한 판정
-- GitHub Pages 정적 앱 + 공식 YouTube API만으로 임의 공개 영상의 자막 텍스트를 자동 취득하는 경로는 확인되지 않았다.
-- 비공식 내부 인터페이스/스크래핑/공개 프록시를 즉시 붙이지 않는다. 가용성, 정책, 개인정보, 안정성 및 무료 사용 한도를 검증하지 않은 상태에서 핵심 기능으로 채택할 수 없다.
-- 다음 조사는 사용자의 핵심 제약(정적 Pages, Android, 비용/쿼터 최소화)을 기준으로 어떤 조건을 완화해야 실제 자동 자막이 가능한지 비교하는 것이다.
-- 이번 조사는 코드 구현이나 Android 실기기 검증이 아니다.
+## 8. API 키 없이 자막을 가져온다고 설명하는 프로젝트 — 2026-11-11 소스 확인
+
+### Transcript Studio for YouTube
+- 저장소: https://github.com/krishnakanthb13/yt-transcript-studio
+- 확인 파일: README.md, LICENSE
+- README는 Chrome/Edge Manifest V3 확장 프로그램으로서 YouTube 페이지에서 자막 트랙을 찾아 자막을 가져오고, 언어 선택/검색/클릭 seek/활성 줄 강조/내보내기를 제공한다고 설명한다.
+- README가 설명하는 데이터 흐름은 브라우저 확장 권한으로 YouTube 탭에 스크립트를 실행하고, 페이지의 플레이어 데이터에서 트랙을 찾은 뒤 YouTube의 비공개 InnerTube 요청을 사용해 자막 데이터를 가져오는 구조다.
+- README는 2025년 중반 이후 WEB 자막 URL에 PoToken 검증이 적용되어 빈 응답을 받는 문제가 있어 WEB 경로를 사용하지 않고 ANDROID/IOS/MWEB 등의 비-WEB 클라이언트 경로를 선택한다고 명시한다.
+- 무료/로컬 실행을 표방하지만 README 자체도 YouTube가 요청을 제한할 수 있다고 안내한다. 무제한이나 장기 안정성을 보장하는 근거는 아니다.
+- 라이선스 파일은 GNU GPL v3. 영상책 코드에 코드 일부를 복사하거나 통합하려면 GPL 의무와 배포 방식을 별도로 검토해야 한다.
+- 중요한 제한: 이 프로젝트는 Chrome/Edge 확장 프로그램이며 YouTube 탭에 대한 확장 권한을 사용한다. GitHub Pages에서 실행되는 일반 웹페이지에 같은 권한이 생기는 것은 아니다.
+- 영상책 판정: 자막 표시/편집 UI와 브라우저 확장 프로그램의 권한 경계에 대한 구조 참고만 한다. README가 설명하는 비공개 내부 엔드포인트/클라이언트 선택 경로를 영상책에서 재현하거나 제한을 우회하는 구현은 채택하지 않는다.
+
+### yttext
+- 저장소: https://github.com/kkensuke/yttext
+- 확인 파일: README.md, docs/architecture.md, docs/deployment.md
+- README는 API 키 없이 YouTube의 수동/자동 자막을 추출하고 Markdown/TXT/JSON/SRT/VTT로 내보내는 CLI 및 브라우저 앱이라고 설명한다.
+- 실제 구조는 정적 단일 HTML이 아니다. Python CLI/웹 앱이며 브라우저 앱은 로컬 또는 호스팅된 FastAPI 서버와 통신한다.
+- 아키텍처 문서는 브라우저 → FastAPI → YouTube 흐름을 설명하며, 추출을 서버 측에서 수행한다고 명시한다.
+- 배포 문서는 hosted mode에서 TLS, 허용 Host/Origin, 단일 애플리케이션 worker, 요청 제한과 남용 방지, 메모리 모니터링, 의존성 업데이트가 필요하다고 안내한다.
+- README는 HTTP 429가 발생할 수 있고 YouTube가 일시적으로 요청을 제한할 수 있다고 설명한다.
+- Gemini 요약은 별도 선택 기능이며 사용자 API 키가 필요하다. 자막 추출 자체와 요약 API는 구분한다.
+- 판정: 정적 GitHub Pages만으로 구현하는 방식이 아니라 별도 서버를 운영하는 방식의 참고 사례다. 개인이 직접 로컬로 실행하면 외부 호스팅 비용은 피할 수 있지만, 영상책 웹페이지 단독으로 서버 역할을 할 수는 없다. 공개 호스팅하면 운영자 비용/용량/요청 제한/남용 대응이 생긴다. YouTube 추출 방식의 정책 적합성은 별도로 검토해야 하므로 영상책의 자동 자막 경로로 채택하지 않는다.
+
+## 요약 비교
+
+| 방식/프로젝트 | 자막 취득 구조 | API/사용량 제한 | GitHub Pages 단독 | 영상책 판정 |
+|---|---|---|---|---|
+| 공식 YouTube Captions API | OAuth + 영상 수정 권한 | 공식 API 쿼터/권한 | 불가(임의 공개 영상) | 소유 영상 보조 |
+| IFrame Player API | 임베드 재생/표시 제어 | 공식 API 호출 방식과 다름 | 재생은 가능, 자막 전문은 미제공 | 플레이어 제어 |
+| Transcript Studio | 브라우저 확장 권한 + 비공개 내부 요청 | YouTube 요청 제한 가능 | 불가(확장 권한 필요) | UI/권한 구조만 참고 |
+| yttext | Python/FastAPI 서버에서 자막 취득 | YouTube 429/서버 용량·운영 제한 | 불가(서버 필요) | 서버형 아키텍처 참고 |
+| Hyperaudio Lite | 사전에 제공된 timed transcript 동기화 | 자막 취득 쿼터 없음 | 정적 프런트엔드 라이브러리로 검토 가능 | 자막 UI 참고 |
+| 로컬 STT 편집기 | 사용자 제공 로컬 오디오를 기기에서 전사 | 외부 API 없이 가능할 수 있음 | 브라우저 기능 일부 가능 | 로컬 미디어 후속 후보 |
+
+## 영상책에 대한 결론
+
+1. **시간 동기화 UI**는 Hyperaudio Lite를 참고하되, 현재 플레이어와의 이중 인스턴스 충돌을 피하도록 설계한다.
+2. **자동 자막 취득**은 UI 라이브러리와 별개의 문제다. 공식 YouTube API만으로 임의 공개 영상의 자막 전문을 얻는 방법은 확인되지 않았다.
+3. API 키 없이 자막을 얻는다고 소개하는 오픈소스도 실제 구조를 보면 브라우저 확장 권한과 비공개 내부 요청을 사용하거나, 별도 서버에서 추출한다. 무료라는 표현이 무제한·안정적·정적 Pages 호환을 의미하지 않는다.
+4. Transcript Studio의 내부 요청 흐름을 영상책에 복제하지 않는다. yttext의 서버 구조는 정적 Pages만으로 해결되지 않는다는 비교 자료로만 활용한다.
+5. **모든 공개 영상 자동 자막 + 무제한 무료 + 서버 없음 + GitHub Pages만 사용**을 동시에 만족하는 안정적·정책 검증 경로는 확인되지 않았다.
+6. 다음 설계 결정에서는 사용자 제약 중 어느 하나를 완화할 수 있는지 먼저 정한다. 승인 전에는 자동 자막 취득 코드를 추가하지 않는다.
+
+## 확인한 저장소/공식 출처
+
+- https://github.com/hyperaudio/hyperaudio-lite
+- https://github.com/hyperaudio/hyperaudio-lite-editor
+- https://github.com/iv-org/invidious
+- https://github.com/TeamPiped/Piped
+- https://github.com/ViewTube/viewtube
+- https://github.com/Materialious/Materialious
+- https://developers.google.com/youtube/v3/docs/captions/list
+- https://developers.google.com/youtube/v3/docs/captions/download
+- https://developers.google.com/youtube/iframe_api_reference
+- https://github.com/krishnakanthb13/yt-transcript-studio
+- https://github.com/kkensuke/yttext
+- https://github.com/kkensuke/yttext/blob/main/docs/architecture.md
+- https://github.com/kkensuke/yttext/blob/main/docs/deployment.md
+
+이 문서는 저장소 README와 일부 실제 소스/설계 문서를 확인한 결과이며, Android 실기기에서 위 후보들을 실행해 검증했다는 뜻은 아니다.
