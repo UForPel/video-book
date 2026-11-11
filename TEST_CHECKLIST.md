@@ -32,13 +32,13 @@
 
 ## C. Hyperaudio Lite 독립 실험 (VB-02)
 
-- [ ] 기존 영상책 `index.html`, `app.js`, `style.css`는 실험 중 변경하지 않음
-- [ ] 테스트 파일을 별도 폴더/페이지에 격리
-- [ ] 공식 저장소의 현재 배포 버전 및 필요한 파일 목록 확인
-- [ ] MIT LICENSE와 저작권 고지 보존
-- [ ] transcript는 HTML 단어 요소로 구성
-- [ ] 각 단어의 `data-m`은 시작 시각(밀리초), `data-d`는 길이(밀리초)
-- [ ] YouTube iframe에 고유 id, `data-player-type="youtube"`, `enablejsapi=1` 설정
+- [x] 기존 영상책 `index.html`, `app.js`, `style.css`는 변경하지 않고 별도 실험 경로로 격리
+- [x] `experiments/hyperaudio-lite/index.html` 별도 테스트 페이지 생성
+- [x] 공식 저장소에서 Hyperaudio Lite 2.6.4 코어 JS, CSS, LICENSE 확인
+- [x] MIT LICENSE 파일과 원본 저작권 헤더 보존
+- [x] transcript는 HTML 단어 요소로 구성
+- [x] 각 단어의 `data-m`은 시작 시각(밀리초), `data-d`는 길이(밀리초)
+- [x] YouTube iframe에 고유 id, `data-player-type="youtube"`, `enablejsapi=1` 설정
 - [ ] IFrame API 스크립트가 중복 로드되지 않는지 확인
 - [ ] 전역 `onYouTubeIframeAPIReady` 콜백을 덮어쓰거나 유실하지 않는지 확인
 - [ ] 한 단어 클릭 시 정확한 시점으로 이동
