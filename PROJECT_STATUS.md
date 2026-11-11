@@ -24,7 +24,7 @@
 | YouTube 자막 자동 취득 | [!] | 공식 Captions API는 임의 공개 영상의 범용 취득 수단이 아님 | 정책/기술 대안 조사 |
 | Hyperaudio Lite 소스 검토 | [x] | README, YouTube 데모 HTML, JS 플레이어 어댑터, package.json, MIT LICENSE 확인 | 독립 최소 실험 |
 | Hyperaudio Lite 기존 앱 통합 | [!] | 양쪽에서 YouTube IFrame API 플레이어를 생성/관리하므로 이중 관리 충돌 위험 | 별도 데모 또는 사용자 정의 어댑터 검증 |
-| Hyperaudio Lite Android 실기기 테스트 | [ ] | 아직 테스트 안 함 | 최소 데모 완성 후 테스트 |
+| Hyperaudio Lite 독립 테스트 페이지 | [?] | 별도 페이지와 2.6.4 코어/CSS/라이선스 반영, 코드 재확인 완료 | 배포 후 브라우저에서 동작 확인 |\n| Hyperaudio Lite Android 실기기 테스트 | [ ] | 아직 테스트 안 함 | 배포된 독립 데모 테스트 |
 | Hyperaudio Lite Editor/로컬 STT | [?] | 로컬 미디어 전사·교정 기능 설명 확인 | 라이선스/한국어/Android 성능 확인 |
 | 자막 자동 교정 | [ ] | 미구현 | 자동 자막 확보 후 설계 |
 | 앱 내 유튜브 검색 | [ ] | 미구현 | 검색 API 쿼터/대안 조사 후 진행 |
@@ -74,10 +74,10 @@
 목표: 현재 앱의 코드를 바꾸지 않고, 별도 테스트 페이지에서 Hyperaudio Lite가 YouTube iframe + 미리 준비한 소량의 timed transcript를 동기화하는지 검증합니다.
 
 완료 조건:
-- [ ] Hyperaudio Lite의 필요한 JS/CSS 파일만 별도 경로에 복사
-- [ ] MIT 저작권/라이선스 고지 보존
-- [ ] 테스트 전용 HTML에 YouTube iframe과 data-player-type 설정
-- [ ] 단어별 data-m/data-d 형식의 테스트 transcript 준비
+- [x] Hyperaudio Lite 2.6.4 코어 JS와 transcript CSS를 별도 경로에 복사
+- [x] MIT 저작권/라이선스 고지 보존
+- [x] 테스트 전용 HTML에 YouTube iframe과 data-player-type 설정
+- [x] 단어별 data-m/data-d 형식의 한국어 테스트 transcript 준비
 - [ ] 클릭 seek, 재생 중 활성 단어, 자동 스크롤 동작 확인
 - [ ] YouTube IFrame API 로딩 순서/콜백 충돌 여부 확인
 - [ ] Android Chrome 실기기에서 열기 및 동작 확인
