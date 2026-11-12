@@ -188,3 +188,15 @@ AI는 기술적으로 가능한 방법을 찾는 것만으로 작업을 완료�
 - YouTube Terms of Service와 YouTube API Services Developer Policies는 적용 범위가 다르므로 구분해서 설명한다. 개발자 정책의 scraping 조항은 API Clients에 관한 문맥을 명시하고, 일반 이용약관의 automated means 조항은 별도로 확인한다.
 - 차단·보호를 회피하기 위한 프록시 회전, 토큰 우회, CAPTCHA 우회, 세션/쿠키 모방을 실행 절차로 제공하거나 구현하지 않는다.
 - 사용자에게 실질적인 적합성을 판단할 때는 Android에서 Chrome 확장 미지원, Firefox Android의 확장 호환성 제한, 정적 GitHub Pages와 확장 간 데이터 전달 문제를 반드시 고려한다.
+
+
+## 13. Android 브라우저 확장 연계 — 배포·정책·실기기 검증 전 채택 금지 (2026-11-12)
+- Firefox for Android가 확장을 지원한다는 사실만으로 임의의 확장이 호환된다고 가정하지 않는다. Mozilla는 Android와 호환되지 않는 확장이 있을 수 있다고 명시한다.
+- WebExtensions의 runtime.sendMessage, tabs.sendMessage, tabs.query, storage.local은 확장 내부에서 탭 간 데이터를 전달하는 설계 후보일 뿐, Android Firefox에서 해당 조합이 동작한다고 실기기 검증한 것은 아니다.
+- Firefox 정식/베타 버전용 확장은 Mozilla 서명이 필요하다. 자체 배포 XPI도 서명 절차가 필요하며, Firefox Android에서는 파일에서 설치하는 사용자 절차가 요구된다. AMO 등록은 개발자 계정·제출·검증 절차가 필요하다. 이 계정/배포 절차를 사용자에게 당연히 수행할 수 있다고 가정하지 않는다.
+- 영상책은 YouTube IFrame Player API를 사용한다. YouTube Developer Policies는 IFrame Player API를 YouTube API Services에 포함하고, API Services를 사용하는 웹사이트/앱을 API Client로 정의한다. 따라서 API Client 대상 스크래핑 금지 조항이 영상책에도 적용될 가능성을 반드시 검토한다. 일반 YouTube Terms의 자동화 접근 조항도 별도로 검토한다.
+- 사용자가 확장 버튼을 직접 누르거나 transcript 패널을 먼저 열었다는 사실만으로 자동 DOM 추출이 약관/정책상 허용된다고 단정하지 않는다.
+- 정책상 허용 근거나 YouTube의 필요한 서면 승인이 확인되지 않으면 DOM scraping을 영상책 핵심 기능으로 구현·배포하지 않는다. 이 규칙은 기술적 가능성을 부정하는 것이 아니라 제품 채택을 보류하는 기준이다.
+- 계정 생성, 개발자 등록, 약관 동의, 서명/배포 절차가 필요한 경우 연령·이용 조건과 전화번호 등 추가 요구 여부를 확인하지 않은 채 사용자를 가입 단계로 안내하지 않는다.
+- 확장 → 영상책 전달은 사용자 수동 복사·붙여넣기를 요구하지 않는 구조만 검토한다. 확장 권한은 YouTube와 영상책 도메인에 필요한 최소 범위로 제한하고, 자막 데이터는 외부 서버로 보내지 않는 것을 기본값으로 한다. 로컬 저장 시 삭제/보관 기간과 비암호화 저장 위험을 검토한다.
+- 실제 Android Firefox 설치, 실제 YouTube transcript DOM 추출, 탭 간 자동 전달, 영상책 cue 동기화가 모두 검증되기 전에는 E2E 성공으로 기록하지 않는다.
