@@ -233,3 +233,17 @@
 - [ ] 자동 검색 → transcript DOM → 교정 → 앱 표시/재생 동기화 E2E
 
 이번 회차는 자료 조사와 문서 기록만 수행했다. 코드 변경, 실기기 테스트, API/서버/프록시/계정 설정은 없고 비용은 0원이다.
+
+
+## VB-25 — Firefox Android 확장 연계·정책 검토 (2026-11-12)
+- [x] Firefox for Android 확장 설치 지원 및 호환성 주의 확인
+- [x] Firefox 확장 서명·AMO 등록·자체 배포 XPI 설치 조건 확인
+- [x] WebExtensions 메시지 전달 및 로컬 저장 API의 설계 가능성 확인
+- [x] YouTube Terms의 자동화 접근 제한 문구 재확인
+- [x] 영상책의 IFrame Player API 사용과 YouTube API Client 정의/스크래핑 정책의 관련성 확인
+- [x] 사용자 복사·붙여넣기 없는 확장→영상책 데이터 전달 설계안 작성
+- [ ] YouTube의 명확한 서면 허가 또는 적용 가능한 공식 정책 허용 근거 확인
+- [ ] Firefox Android에서 영상책 확장 설치·API 호환성·실제 YouTube DOM 읽기·탭 간 전달 실기기 테스트 (정책 허용 근거 확보 후에만 진행)
+- [ ] 앱 내부 검색 → 자동 자막 → 교정 → 표시/시간 동기화 E2E
+
+판정: 전달 구조는 설계상 가능성이 있지만 Android 실기기 검증은 미실행이다. YouTube 약관/Developer Policies 관련 위험으로 실제 scraping 구현과 배포는 보류한다. 이번 회차 코드 변경·계정 생성·API/서버/프록시/결제는 없고 비용은 0원.
