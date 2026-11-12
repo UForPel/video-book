@@ -785,3 +785,66 @@ D. 서버/헤드리스 브라우저에서 페이지를 렌더링해 추출
 2. 원본 YouTube 페이지의 DOM에서 읽은 transcript를 영상책 페이지로 자동 전달할 수 있는 WebExtension 구조를 설계 수준에서 비교한다. 사용자에게 수동 복사/붙여넣기를 요구하지 않는다.
 3. 이 흐름이 약관상 허용되는지 확인 가능한 근거가 없으면, 정책 검토 미해결로 표시하고 실제 제품 기능으로 배포하지 않는다.
 4. 사용자 시나리오(일반 시청자, Android, 본인 계정, 앱 내부 검색/선택, 자동 추출, 교정, 시간 동기화)를 기준으로 검증한다.
+
+
+## VB-25 — Firefox Android 확장 연계·배포·정책 재검토 (2026-11-12)
+
+### 작업 시작 상태
+- 시작 전 최신 커밋: e0a7d85120b6258e0da566c7daac3ec5c8befd3d — research: assess YouTube transcript scraping methods (2026-11-11).
+- 작업 규칙 및 6개 프로젝트 문서 재조회: 완료.
+- 이번 목표: Android Firefox에서 확장 설치 가능성, 확장→영상책 자동 전달 설계, YouTube 약관/개발자 정책 적용 범위를 조사하고 제품 채택 여부 판정.
+
+### 공식 자료 조사 및 결과 (2026-11-12)
+1. Mozilla Firefox for Android 도움말
+   - Firefox Android의 Add-ons Manager 또는 AMO Android 페이지에서 확장을 설치할 수 있다.
+   - 일부 확장은 Android와 호환되지 않을 수 있다.
+   - 판정: Android 확장 설치 기능 **확인됨**, 임의의 영상책 확장 호환성 **미확인**.
+2. Mozilla Extension Workshop 배포 안내
+   - Firefox 정식/베타용 확장은 Mozilla 서명이 필요하다.
+   - AMO 공개 등록 또는 자체 배포 모두 제출/서명 절차가 있다.
+   - Firefox Android에서 자체 배포 XPI는 웹 다운로드 후 즉시 설치되는 데스크톱 방식이 아니며, 기기에 저장한 파일을 통해 설치해야 한다.
+   - AMO 등록에는 개발자 계정 및 제출/검증 절차가 필요하다.
+   - 판정: 설치/배포에 추가 단계가 있음 **확인됨**. 영상책 전용 확장의 사용자 친화적 배포 경로 **미확인**.
+3. Mozilla WebExtensions API
+   - runtime.sendMessage는 확장 내부 메시지 전달, tabs.sendMessage는 특정 탭의 콘텐츠 스크립트에 메시지 전달, tabs.query는 탭 조회, storage.local은 기기 로컬 확장 저장소를 제공한다.
+   - 이 API 조합으로 YouTube 탭 → 확장 background → Video Book 탭 content script → 앱 페이지 이벤트의 데이터 전달 구조를 설계할 수 있다.
+   - storage.local은 로컬 저장소이며 암호화 저장소로 간주하면 안 된다.
+   - 판정: 일반 WebExtensions 구조 **확인됨**, Firefox Android의 해당 API 조합/확장 수명주기/탭 간 자동 전달 **미확인**.
+4. YouTube Terms of Service
+   - 자동화 수단(robots.txt에 따른 공개 검색엔진 또는 YouTube의 사전 서면 허가 등 예외 외)을 통한 서비스 접근 제한 문구를 확인했다.
+   - 판정: 자동화 접근 제한 문구 **확인됨**. 사용자가 버튼을 누른 DOM 추출이 예외에 해당하는지 **미확인**.
+5. YouTube API Services Developer Policies
+   - 문서는 YouTube API Services를 사용하는 서비스/제품/앱의 정책임을 명시한다.
+   - API Client는 YouTube API Services를 사용하는 웹사이트 또는 소프트웨어로 정의된다.
+   - IFrame Player API는 Developer Policies가 예시로 명시한 YouTube API Services다. 영상책은 현재 IFrame Player API를 사용하므로 API Client 정책의 관련성을 배제할 수 없다.
+   - API Client의 YouTube Applications 직접/간접 스크래핑 및 스크랩 데이터 취득 금지 조항을 확인했다.
+   - 판정: 영상책에 대한 정책 관련성 **높음/적용 범위 검토 필요**. 개별 DOM 확장 방식에 대한 법률 판단은 **미확인**.
+### 데이터 전달 설계 후보 (코드 구현 아님)
+- YouTube 탭의 확장 content script가 화면에 이미 렌더링된 transcript panel DOM을 읽는다.
+- content script는 runtime.sendMessage로 확장 background에 video ID, timestamp, text cue를 보낸다.
+- background는 영상책 탭을 tabs.query로 찾고, 해당 탭의 확장 content script에 tabs.sendMessage로 전달한다. 영상책 탭이 없을 경우 storage.local에 임시 보관한 뒤 영상책 탭이 열릴 때 전달하는 대안도 설계 가능하다.
+- 영상책 content script가 앱 페이지에 데이터를 전달하면 앱은 video ID를 확인하고 기존 cue parser/sync model에 맞춰 표시할 수 있다.
+- 이 설계는 사용자의 복사·붙여넣기 없이 전달할 수 있는 구조를 설명한 것이며, Android에서 실제 동작하는 코드나 검증된 사용자 흐름이 아니다.
+- 권한은 YouTube와 영상책 도메인에 필요한 범위로 최소화하고, 자막 텍스트는 외부 서버로 보내지 않는 것이 기본 설계 원칙이다. 로컬 저장은 암호화되지 않을 수 있으므로 최소 보관·삭제가 필요하다.
+### 실제 사용자 시나리오 판정
+- 목표 사용자: 일반 YouTube 시청자.
+- 기기/권한: Android 스마트폰, 일반 시청자 계정, Firefox for Android 확장 설치 권한.
+- 기대 흐름: YouTube 영상에서 대본 패널을 연 상태로 확장 동작 → 복사·붙여넣기 없이 영상책으로 cue 전달 → 영상책이 video ID와 시간 정보를 연결.
+- 적합성:
+  - Android Chrome: 확장 미지원이므로 부적합.
+  - Firefox Android: 확장 설치는 가능하지만 개별 확장 호환성과 설치 경로가 미검증.
+  - 사용자 행동: XPI 자체 배포 시 파일 설치 추가 부담. AMO 등록 시 개발자 등록/심사 부담은 제작자 쪽에 발생.
+  - 정책: 영상책의 IFrame Player API 사용으로 API Client 정책 관련성이 높고, 자동화 스크래핑 금지와 충돌 가능성이 있어 허용 근거 확인 전 채택 불가.
+### 최종 판정
+- **기술 구조:** 설계상 가능성 있음.
+- **Android 사용자 환경:** 미검증.
+- **정책/약관:** 채택 보류. 약관상 자동화 접근 제한과 API Client scraping prohibition이 핵심 blocker.
+- **코드 통합:** 하지 않음.
+- **실기기 Android Firefox 설치/추출/전달 테스트:** 미실행.
+- **YouTube 서면 승인/법률 자문:** 미실행.
+- **API key/OAuth/서버/프록시/계정 생성/유료 서비스:** 사용하지 않음.
+- **비용:** 0원.
+### 다음 작업
+1. YouTube의 공식적인 서면 허가/정책 해석을 얻을 수 있는 공개 절차가 있는지 확인하되, 허가를 얻었다고 가정하지 않는다.
+2. 허용 근거가 확보되지 않으면 스크래핑 구현은 계속 보류하고, 정책 준수 가능한 다른 자동 취득 경로가 있는지 조사한다.
+3. 사용자의 핵심 목표는 변경하지 않는다. 수동 복사/붙여넣기나 제작자 자막 파일로 대체하지 않는다.
