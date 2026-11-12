@@ -103,3 +103,12 @@ YouTube 공식 대본 페이지 링크는 보조 링크일 뿐, 영상책 내부
 - 상세 유형별 조사 및 출처: [RESEARCH_BENCHMARKS.md §28](./RESEARCH_BENCHMARKS.md#28-스크래핑-유형별-기술-정책-모바일-적합성-조사-2026-11-11).
 - Chrome Android는 확장을 지원하지 않으며, Firefox Android는 확장을 지원하지만 모든 확장이 호환되는 것은 아니다. 따라서 데스크톱용 확장 코드를 Android 일반 시청자에게 바로 적용할 수 없다.
 - 아직 영상책에 스크래핑 코드를 통합하거나 Android 실기기에서 시험하지 않았다.
+
+
+## Android Firefox 확장 연계 검토 (VB-25, 2026-11-12)
+- Firefox for Android는 확장을 설치할 수 있지만, 모든 확장이 Android와 호환되는 것은 아니다.
+- WebExtensions의 메시지/로컬 저장 API로 YouTube 탭에서 영상책 탭으로 데이터를 전달하는 설계는 가능성이 있으나, Android 실기기에서의 호환 및 자동 전달은 미검증이다.
+- 자체 배포 확장은 Mozilla 서명이 필요하고 Android에서는 XPI 파일 설치 절차가 추가된다. AMO 공개 등록도 개발자 계정 및 검토 절차가 필요하다.
+- 영상책은 YouTube IFrame Player API를 사용하므로 YouTube API Services Developer Policies의 API Client 스크래핑 금지 조항이 적용될 가능성이 높다. 일반 Terms의 자동화 접근 제한도 별도로 존재한다. 사용자 클릭만으로 허용된다고 판단하지 않는다.
+- 따라서 DOM scraping 확장 연계는 기술 후보로만 남기고, 정책상 허용 근거가 확인될 때까지 구현·배포를 보류한다.
+- 상세 조사와 출처: [RESEARCH_BENCHMARKS.md §29](./RESEARCH_BENCHMARKS.md#29-firefox-android-확장-연계-배포-및-youtube-정책-재검토-2026-11-12).
