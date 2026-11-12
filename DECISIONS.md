@@ -469,3 +469,20 @@
   6. 약관상 허용 근거가 불명확하면 실제 제품 배포 전 미해결 위험으로 표시한다.
 - 행동강령: AGENT_WORK_RULES.md §12.
 - 상세 조사: PROJECT_STATUS.md VB-24, RESEARCH_BENCHMARKS.md §28.
+
+
+## Decision 043 — Firefox Android 확장 연계는 기술 후보로 유지하되 정책 허용 근거 전 채택 보류 (2026-11-12)
+- 상태: 조사 기반 보류 결정.
+- 근거:
+  - Firefox Android는 확장을 설치할 수 있지만 모든 확장이 Android와 호환되는 것은 아니다.
+  - Firefox 정식/베타용 확장은 Mozilla 서명이 필요하며, 자체 배포 XPI는 Android에서 파일을 통한 추가 설치 과정이 필요하다. AMO 등록에는 개발자 계정과 제출/검증이 필요하다.
+  - WebExtensions의 runtime.sendMessage, tabs.sendMessage, tabs.query, storage.local을 조합하면 원본 YouTube 탭에서 영상책 탭으로 cue 데이터를 전달하는 구조를 설계할 수 있다. Android Firefox에서 실제 동작은 미검증이다.
+  - YouTube Terms는 자동화 수단을 통한 서비스 접근을 제한한다.
+  - YouTube API Developer Policies는 API Client의 YouTube Applications 스크래핑 및 스크랩 데이터 취득을 금지한다. API Client 정의는 YouTube API Services를 사용하는 웹사이트/앱이며, 문서는 IFrame Player API를 해당 서비스의 예시로 명시한다. 영상책은 IFrame Player API를 사용하므로 정책 관련성을 무시할 수 없다.
+- 결정:
+  1. DOM scraping은 기술적으로 가능한 후보라는 점은 유지한다.
+  2. 사용자 클릭 또는 화면에 표시된 transcript라는 사실만으로 약관상 허용된다고 단정하지 않는다.
+  3. 영상책은 IFrame Player API 사용으로 API Client 정책이 관련될 가능성이 높으므로, YouTube의 명확한 서면 승인 또는 적용 가능한 공식 허용 근거가 확인되기 전 scraping 코드를 통합·배포하지 않는다.
+  4. 확장→앱 전달 구조는 설계 참고로만 보관한다. Android 실기기 설치·API 호환·E2E는 미실행 상태다.
+  5. 사용자의 복사·붙여넣기, 제작자 자막 파일, 외부 서버/유료 API로 핵심 요구를 대체하지 않는다.
+- 상세 기록: PROJECT_STATUS.md VB-25, PROJECT_CONTEXT.md §20, RESEARCH_BENCHMARKS.md §29.
