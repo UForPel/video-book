@@ -221,3 +221,28 @@
 - 2026년 Obsidian Clipper 이슈에서 YouTube DOM selector 변경과 timedtext 0-byte/지연 사례가 함께 보고됐다.
 - Android에서 Chrome은 확장 미지원, Firefox Android는 확장 지원하나 모든 확장 호환을 보장하지 않는다.
 - 상세 내용: [RESEARCH_BENCHMARKS.md §28](./RESEARCH_BENCHMARKS.md#28-스크래핑-유형별-기술-정책-모바일-적합성-조사-2026-11-11).
+
+
+## 20. Firefox Android 확장 연계 검토 — VB-25 (2026-11-12)
+### 기술적 가능성
+- Mozilla 공식 도움말에 따르면 Firefox for Android에서 AMO 또는 브라우저 확장 관리자에서 확장을 설치할 수 있다. 다만 일부 확장은 Android와 호환되지 않을 수 있다.
+- WebExtensions API는 확장 백그라운드와 콘텐츠 스크립트 간 메시지 전달(runtime.sendMessage, tabs.sendMessage), 탭 검색(tabs.query), 확장 로컬 저장(storage.local)을 제공한다.
+- 설계 후보: YouTube 탭의 콘텐츠 스크립트가 사용자가 이미 열어 둔 transcript panel의 렌더링 DOM을 읽고 video ID, timestamp, text cue를 확장 background에 전달 → background가 데이터를 임시 로컬 저장 또는 영상책 탭의 content script로 전달 → 영상책 페이지가 video ID와 cue를 연결해 표시한다. 사용자의 복사·붙여넣기는 필요하지 않은 설계다.
+- 이 흐름은 WebExtensions API의 일반 기능을 조합한 설계 수준의 가능성이다. Firefox Android에서 content script, tabs messaging, storage, 실제 YouTube DOM selector가 함께 작동하는지는 실기기에서 검증하지 않았다.
+### 설치·배포 제약
+- Firefox Android는 확장을 지원하지만 모든 확장이 호환되는 것은 아니다.
+- Firefox 정식/베타 버전은 Mozilla 서명이 된 확장이 필요하다. 자체 배포 확장도 서명을 받아야 하며, Android의 자체 배포 방식은 XPI 파일을 기기에 저장하고 파일에서 설치하는 추가 단계가 필요하다.
+- AMO 공개 등록은 개발자 계정, 제출, 자동 검증 및 필요 시 수동 검토를 요구한다. 사용자에게 개발자 계정 생성/등록을 진행시키지 않았다.
+- 따라서 설치 가능한 브라우저가 있다는 사실은 영상책 전용 확장의 배포·설치·사용성 검증을 대체하지 않는다.
+### YouTube 정책 검토 — 채택 보류 사유
+- 일반 YouTube Terms에는 robots.txt에 따른 공개 검색엔진 또는 YouTube의 사전 서면 허가 등 예외를 제외하고 자동화 수단으로 서비스에 접근하는 제한이 있다.
+- YouTube API Services Developer Policies는 API Client가 YouTube Applications를 직접/간접 스크래핑하거나 스크랩된 데이터를 취득하는 것을 금지한다.
+- 정책 정의상 API Client는 YouTube API Services를 사용하는 웹사이트/소프트웨어다. Developer Policies는 YouTube IFrame Player API를 YouTube API Services의 한 예로 명시한다. 영상책은 IFrame Player API를 사용하므로, 이 정책 조항이 영상책에 적용될 가능성을 무시할 수 없다.
+- 사용자 클릭으로 DOM 추출을 시작하거나, 추출 대상이 이미 화면에 보이는 transcript라는 사실만으로 약관/정책상 허용된다고 단정하지 않는다.
+- 법률 자문이나 개별 구현의 최종 법률 판단은 아니다. YouTube의 명확한 서면 승인 또는 적용 가능한 공식 허용 근거가 확인되지 않아 핵심 기능 채택은 보류한다.
+### 현재 판정
+- WebExtensions 기반 탭 간 전달: **설계상 가능성 있음 / Android 실기기 미검증**
+- Firefox Android 확장 설치: **공식 지원 확인 / 개별 확장 호환 미검증**
+- 일반 사용자용 자동 DOM 추출: **기술 후보 / 약관·정책상 채택 보류**
+- 영상책 통합·배포: **미실행**
+- 핵심 목표인 앱 내부 검색 → 자동 자막 취득 → 교정 → 표시/시간 동기화는 여전히 미해결이다.
