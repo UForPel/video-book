@@ -1045,3 +1045,95 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 - Android 실기기·확장 설치·앱 간 전달 E2E: 미실행.
 - 법률 자문/YouTube의 서면 허가 확인: 미실행.
 - 비용: 0원. 코드/계정/API/서버/프록시/결제 변경 없음.
+
+
+## 29. Firefox Android 확장 연계·배포 및 YouTube 정책 재검토 (2026-11-12)
+
+### 조사 질문
+일반 시청자가 Android Firefox에서 YouTube transcript panel의 DOM을 읽는 확장을 설치하고, 수동 복사·붙여넣기 없이 정적 GitHub Pages 영상책으로 cue를 전달할 수 있는가? 설치·배포·정책상 장애는 무엇인가?
+
+### Mozilla 공식 설치·배포 자료
+1. Firefox for Android Add-ons 도움말
+   - https://support.mozilla.org/en-US/kb/find-and-install-add-ons-firefox-android
+   - Firefox Android의 Add-ons Manager 또는 AMO Android 페이지에서 확장을 설치할 수 있다.
+   - Mozilla는 일부 add-on이 Android와 호환되지 않을 수 있다고 명시한다.
+2. Add-on submission
+   - https://extensionworkshop.com/documentation/publish/submitting-an-add-on/
+   - 개발자는 AMO developer account를 만들고 확장 패키지를 제출해 AMO 공개 등록 또는 자체 배포를 선택한다.
+3. Self-distribution
+   - https://extensionworkshop.com/documentation/publish/self-distribution/
+   - Firefox Android에서 데스크톱과 같은 웹 다운로드 후 즉시 설치 흐름은 작동하지 않는다. Android에서는 XPI 파일을 내려받고 파일에서 설치해야 한다.
+4. Signing and distribution
+   - https://extensionworkshop.com/documentation/publish/signing-and-distribution-overview/
+   - Firefox 정식/베타 버전에 설치할 확장은 Mozilla 서명이 필요하다. 자체 배포 확장도 서명 절차가 필요하며, 모든 제출물은 정책/배포 약관의 적용을 받는다.
+5. 설치 판정
+   - Android Firefox 확장 설치 기능: **확인됨**.
+   - 모든 확장의 Android 호환: **반증됨** (Mozilla가 일부 비호환 가능성을 명시).
+   - 영상책 전용 확장 Android 호환: **미확인**.
+   - 자체 배포 XPI 설치의 간편성: **제약 확인됨** (파일 다운로드 및 파일에서 설치 필요).
+   - AMO 공개 배포: 개발자 계정/제출/검증 과정 **확인됨**. 계정 생성이나 게시를 이번 회차에서 수행하지 않음.
+
+### WebExtensions의 탭 간 전달 설계
+공식 문서:
+- runtime.sendMessage: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/sendMessage
+- tabs.sendMessage: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/sendMessage
+- tabs.query: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/tabs/query
+- storage.local: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/storage/local
+- Content scripts: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts
+- storage.local은 설치된 기기 내 extension storage이며, 암호화 저장소로 간주하면 안 된다.
+- 일반적인 확장 구조로는 YouTube 탭 content script → runtime.sendMessage → extension background → tabs.query로 Video Book 탭 탐색 → tabs.sendMessage로 Video Book content script에 전달하는 구성이 가능하다.
+- Video Book 탭이 열려 있지 않은 경우에만 storage.local을 짧게 임시 보관하는 대안을 생각할 수 있으나, 사용자 동작/삭제/저장 수명주기는 별도 설계가 필요하다.
+- 앱과 확장 간 통신은 extension content script가 페이지 DOM 이벤트 등으로 앱에 전달하는 별도 경계가 필요하다. Firefox의 externally_connectable 웹페이지 직접 메시지 방식은 MDN 문서상 Firefox에서 지원되지 않으므로 이를 설계에 사용하지 않는다.
+- 이 설계는 WebExtensions API 조합에 대한 개념 설명이며 Firefox Android에서의 실기기 호환을 증명하지 않는다.
+
+### YouTube 약관과 Developer Policies
+1. YouTube Terms of Service
+   - https://www.youtube.com/t/terms
+   - 자동화된 수단(예: robots, botnets, scrapers)으로 서비스에 접근하는 것을 제한하는 문구가 있다. 공개 검색엔진의 robots.txt 준수 또는 YouTube의 사전 서면 허가 등 명시된 예외를 둔다.
+   - 이 조항을 고려하면 사용자가 확장 버튼을 직접 눌렀거나 transcript panel을 직접 열었다는 사실만으로 자동 DOM 추출이 허용된다고 결론 내릴 수 없다.
+2. YouTube API Services Developer Policies
+   - https://developers.google.com/youtube/terms/developer-policies
+   - 문서 서두는 YouTube API Services를 사용하는 서비스/제품/앱에 적용되는 정책이라고 설명한다.
+   - §IV 정의에서 API Client는 YouTube API Services를 사용하는 웹사이트 또는 소프트웨어 애플리케이션으로 정의한다.
+   - 정책은 YouTube IFrame Player API를 YouTube API Services의 예로 명시한다.
+   - §III.E.6은 API Client가 YouTube Applications를 직접 또는 간접 스크래핑하거나 스크랩된 YouTube 데이터/콘텐츠를 얻는 것을 금지한다.
+   - 영상책은 현재 IFrame Player API를 사용한다. 따라서 영상책이 API Client 정의에 해당할 가능성이 높고, DOM scraping도 Developer Policies의 직접/간접 스크래핑 금지 조항과 관련될 수 있다.
+   - 이 정책은 단순히 “비공식 API를 직접 호출하지 않으면 관계없다”고 볼 수 없다. 반대로 개별 DOM 확장 방식의 최종 법률 판단을 이 문서만으로 확정하지도 않는다.
+3. 범위 구분
+   - 일반 YouTube Terms의 자동화 접근 제한과 YouTube API Services Developer Policies의 API Client 대상 스크래핑 금지를 구분한다.
+   - 이 조항들은 약관/정책 검토의 강한 위험 신호이며, 법률 자문이나 위법성 확정 판정은 아니다.
+   - YouTube의 서면 허가 또는 적용 가능한 공식 허용 근거는 이번 조사에서 확보하지 못했다.
+
+### 영상책 사용자 시나리오와 적합성
+목표 사용자는 Android 스마트폰과 일반 시청자 계정만 가진 사용자다.
+- 기술 흐름 후보: YouTube에서 transcript panel을 열고 확장 동작 → DOM cue 추출 → extension background를 통해 Video Book 탭에 전달 → video ID로 cue 연결 → 교정/표시/재생 동기화.
+- 수동 복사·붙여넣기는 요구하지 않는 설계가 가능하다.
+- Android Chrome에서는 확장 미지원이므로 이 경로를 사용할 수 없다.
+- Firefox Android에서는 확장 설치가 가능하지만, 영상책 전용 확장의 Android API 호환·YouTube DOM 추출·탭 간 전달은 미실행이다.
+- 자체 배포는 파일 설치 추가 단계가 있고, AMO 공개 등록은 개발자 측 계정/검토 절차가 있다.
+- 정책상 자동화 스크래핑 위험은 해소되지 않았다.
+
+### 종합 판정
+| 항목 | 결과 | 상태 |
+|---|---|---|
+| Firefox Android 확장 설치 기능 | 공식 도움말로 확인 | 확인됨 |
+| 임의 확장 Android 호환 | 일부 비호환 가능 | 보장되지 않음 |
+| WebExtensions 탭 간 메시징/로컬 저장 | 공식 API 문서로 확인 | 설계 가능 |
+| Video Book 전용 확장의 Android E2E | 기기 테스트 없음 | 미확인 |
+| 사용자 복사·붙여넣기 없는 데이터 전달 | 설계상 가능 | 부분 확인 |
+| YouTube Terms 자동화 접근 허용 | 예외/서면 허가 근거 미확보 | 미확인 |
+| API Client scraping prohibition 관련성 | IFrame Player API 사용 및 정의로 강하게 관련 | 위험 높음/법률 판단 미확정 |
+| 영상책 핵심 기능 채택 | 정책 허용 근거가 없어 보류 | 보류 |
+
+### 조회 범위·미실행 항목
+- 공식 자료: Mozilla Android add-on 도움말, Extension Workshop 제출/자체 배포/서명 문서, MDN WebExtensions messaging/tabs/storage/content scripts, YouTube Terms, YouTube API Services Developer Policies.
+- 서로 다른 검색 관점: Firefox Android 설치, 확장 호환성, 서명/배포, WebExtensions messaging, tabs API, storage API, host permissions, YouTube Terms, API Client 정의, IFrame Player API, scraping 조항 등 10개 이상.
+- Android 실기기에서 Firefox 설치/확장 실행: **미실행**.
+- 실제 YouTube 영상 transcript DOM 읽기: **미실행**.
+- 실제 Video Book 탭 자동 전달/동기화: **미실행**.
+- Mozilla AMO 계정 생성/확장 제출/서명: **미실행**.
+- YouTube 서면 허가/법률 자문: **미실행**.
+- 코드 변경/API/서버/프록시/계정/결제: 없음. 비용 0원.
+
+### 결론
+Firefox Android 확장과 WebExtensions 메시징은 기술적으로 검토할 수 있는 구조다. 그러나 실제 Android 호환성은 미확인이고, 영상책이 IFrame Player API를 사용하는 만큼 API Client scraping prohibition의 관련성을 무시할 수 없다. 따라서 정책상 허용 근거를 확보하지 못한 현재 상태에서는 DOM scraping 확장을 구현하거나 배포하지 않는다. 핵심 목표(일반 시청자용 자동 자막 취득)는 미해결로 유지한다.
