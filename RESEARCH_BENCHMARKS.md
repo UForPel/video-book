@@ -1230,3 +1230,29 @@ YouTube Data API 계정/프로젝트/약관 수락 없이 영상책 페이지 �
 - 미실행: API 프로젝트/키/OAuth/계약 수락, YouTube 검색 페이지 scraping, Android 실기기, 실제 앱 검색 E2E.
 - 비용: 0원.
 - 다음 단계: 동일한 공식 API와 스크래핑 후보를 반복 조사하지 않는다. 현재 제약을 유지하는 새로운 공식 경로가 실제로 확인될 때만 다시 작업한다.
+
+
+## 32. 영상책 내부 검색·결과 목록·내부 재생 요구사항 명확화 (2026-11-13)
+
+### 사용자 요구 확인
+영상책은 영상 링크 입력 도구가 아니라, 앱 내부에서 YouTube 영상을 검색하고 선택해 읽고 보는 앱이다. 사용자는 검색 결과 목록도 영상책 화면 안에서 볼 수 있어야 하며, 외부 검색 페이지를 거쳐 URL을 붙여넣는 흐름을 명확히 거부했다.
+
+### 필수 end-to-end 흐름
+1. 검색어 입력: 영상책 화면 내부
+2. 검색 요청: 제품이 승인된 검색 데이터 공급 경로 사용
+3. 결과 표시: 영상책 내부 목록(실제 결과의 제목/썸네일/채널 등)
+4. 선택: 목록 카드/행을 탭
+5. 재생: 외부 페이지 이동 없이 기존 영상책 내부 YouTube IFrame Player에 선택된 video ID 전달
+
+### 기술적 연결
+- Data API `search.list` 결과는 video ID와 snippet 메타데이터를 제공하므로, API 접근이 적법하고 계정/자격 증명 조건이 해결되면 결과를 내부 목록으로 렌더링하고 선택한 ID를 IFrame Player에 전달하는 구조를 설계할 수 있다.
+- IFrame Player API의 `listType=search`는 더 이상 지원되지 않는다. 검색 결과는 별도 검색 데이터 경로가 공급해야 한다.
+- 결과 목록의 UI만 먼저 만들거나 하드코딩 샘플을 보여주는 것은 실제 검색 구현이 아니다.
+- 외부 YouTube 검색 결과를 복사·붙여넣게 하거나 YouTube 검색 페이지로 보내는 것은 사용자의 요구사항과 불일치한다.
+
+### 이번 회차 검증 및 미실행
+- 공식 IFrame API 및 Data API 검색 문서를 재조회했다: https://developers.google.com/youtube/iframe_api_reference ; https://developers.google.com/youtube/data/reference/rest/v3/search/list ; https://developers.google.com/youtube/data/getting-started
+- 공식 문서는 Data API search.list를 IFrame 검색 대안으로 안내하고, Data API 시작 절차에 Google 계정, Cloud 프로젝트, API key 발급/앱 등록이 포함됨을 확인했다.
+- 실제 Data API 호출, 계정 생성, Cloud 프로젝트, API key, OAuth, 검색 결과 UI, Android E2E는 미실행.
+- 비용: 0원.
+- 결과: 제품 UX 요구사항은 명확해졌으나 검색 데이터 공급 경로는 미해결이다.
