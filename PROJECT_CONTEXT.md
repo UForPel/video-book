@@ -246,3 +246,38 @@
 - 일반 사용자용 자동 DOM 추출: **기술 후보 / 약관·정책상 채택 보류**
 - 영상책 통합·배포: **미실행**
 - 핵심 목표인 앱 내부 검색 → 자동 자막 취득 → 교정 → 표시/시간 동기화는 여전히 미해결이다.
+
+
+## 21. YouTube 공식 문의·사전 서면 허가 경로 — VB-26 (2026-11-13)
+### 확인된 공식 문구
+- YouTube Terms of Service의 Permissions and Restrictions는 자동화 수단(robots, botnets, scrapers 등) 접근을 제한하며, YouTube의 사전 서면 허가를 예외로 명시한다.
+- YouTube API Services Developer Policies III.E.6은 API Client가 YouTube/Google Applications를 직접 또는 간접 스크래핑하거나 스크랩된 데이터를 얻는 것을 금지하고, 공개 검색엔진에 대해서만 robots.txt 또는 YouTube의 사전 서면 승인 예외를 문구상 명시한다.
+- 영상책은 YouTube IFrame Player API를 사용한다. 정책은 IFrame Player API를 API Services 예시로 명시하며 API Client를 API Services를 사용하는 웹사이트/앱으로 정의한다. 따라서 영상책이 API Client로 간주될 가능성이 높다.
+- Terms의 사전 서면 허가가 API Developer Policies III.E.6의 API Client 금지에도 충분한 예외가 되는지 공식 답변을 확인하지 못했다. 일반 Terms 허가와 Developer Policies의 적용은 별도로 질문해야 한다.
+### 실제 공식 문의 경로와 양식 확인
+1. API Compliance Audit 안내
+   - 공식 개발자 가이드는 서비스가 허용되는지 불확실한 경우 API Compliance Audit 신청을 안내한다.
+   - 정책 문서의 UI 변경 등 사전 승인 문구에 연결된 양식도 실제로 열어 확인했다.
+2. 양식의 실제 내용
+   - 양식 제목: YouTube Data API Services — Audit and Quota Extension Form.
+   - 요청 유형 선택은 추가 할당량 요청을 위한 규정 준수 감사 또는 YouTube가 요청한 재감사다.
+   - 필수/요구 항목에 개인 법적 이름, 조직명, 주소/연락처, 기본 웹사이트, API Client URL, 개인정보처리방침 URL, API 프로젝트 번호, 사용 사례, 검토용 앱 접근/데모 정보 등이 포함된다.
+   - 일반적인 사전 스크래핑 허가만 요청하는 독립 선택지는 확인하지 못했다.
+   - 따라서 이 양식은 정책 적합성 검토를 위한 공식 절차이기는 하지만, 무프로젝트 상태의 개인이 스크래핑 예외만 신청할 수 있는 전용 양식이라고 확인되지 않았다.
+3. Legal Support
+   - YouTube 공식 고객센터는 legal@support.youtube.com을 Legal Support 연락처로 게시한다.
+   - 해당 페이지는 법률 지원 연락처를 제공하지만, 자동화 접근 사전 허가 신청을 이 이메일로 접수한다고 명시하지 않는다.
+   - 따라서 참고 가능한 일반 법률 연락처로만 분류하며, 승인 접수처라고 안내하지 않는다.
+4. API 약관의 연령 조건
+   - YouTube API Services Terms §3.2는 YouTube와 구속력 있는 계약을 체결할 법적 연령에 도달하지 않은 사람은 계약을 수락하거나 API Services를 사용해서는 안 된다고 명시한다.
+   - 사용자에게 API 약관 동의, API 프로젝트/자격 증명 생성, 감사 양식 제출을 안내하지 않는다. 타인 명의 계정이나 대리 제출도 대안으로 제안하지 않는다.
+### 현재 결론
+- 일반 Terms에 사전 서면 허가 예외가 존재한다는 점: 확인됨.
+- 스크래핑에 대한 일반 사용자용 전용 허가 신청 절차: 미확인.
+- API Compliance Audit 양식의 실제 필드와 요청 유형: 확인됨.
+- 감사 양식이 스크래핑 금지 예외를 부여하는 절차인지: 미확인.
+- Legal Support 이메일이 사전 허가 접수처인지: 미확인.
+- Developer Policies가 API Client scraping을 금지한다는 점: 확인됨.
+- Terms 서면 허가만으로 Developer Policies도 면제되는지: 미확인.
+- 허가 신청/서면 답변/승인: 미실행/미확보.
+- 정책 허용 근거가 확인되기 전에는 스크래핑 구현·배포를 보류한다.
