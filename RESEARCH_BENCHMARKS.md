@@ -1137,3 +1137,61 @@ YouTube URL 기반 자막 자동 확보 목표를 유지하면서 독립 제공�
 
 ### 결론
 Firefox Android 확장과 WebExtensions 메시징은 기술적으로 검토할 수 있는 구조다. 그러나 실제 Android 호환성은 미확인이고, 영상책이 IFrame Player API를 사용하는 만큼 API Client scraping prohibition의 관련성을 무시할 수 없다. 따라서 정책상 허용 근거를 확보하지 못한 현재 상태에서는 DOM scraping 확장을 구현하거나 배포하지 않는다. 핵심 목표(일반 시청자용 자동 자막 취득)는 미해결로 유지한다.
+
+
+## 30. YouTube 공식 문의 및 사전 서면 허가 경로 검증 (2026-11-13)
+
+### 조사 질문
+YouTube Terms가 자동화 접근에 대해 사전 서면 허가를 예외로 두는데, 일반 개인이 YouTube DOM scraping 허가 또는 영상책의 정책 적합성 해석을 요청할 공식 경로가 있는가? API Compliance Audit 및 Legal Support가 해당 요청을 실제로 접수하는가?
+
+### 공식 원문
+1. YouTube Terms of Service (한국어)
+   - https://www.youtube.com/t/terms?hl=ko
+   - Permissions and Restrictions §3: 서비스에 automated means (robots, botnets, scrapers 등)로 접근하는 것을 제한한다. 예외는 public search engines가 robots.txt에 따르는 경우 또는 YouTube의 prior written permission이 있는 경우다.
+   - §1은 서비스/콘텐츠를 사용하려면 서비스의 명시적 허용 또는 YouTube 및 필요한 권리자의 사전 서면 허가가 있어야 한다는 별도 제한도 둔다.
+2. YouTube API Services Developer Policies (한국어)
+   - https://developers.google.com/youtube/terms/developer-policies?hl=ko
+   - III.E.6: API Client는 YouTube Applications/Google Applications를 직접 또는 간접 scraping하거나 scraped YouTube data/content를 취득해서는 안 된다. public search engines는 robots.txt 준수 또는 YouTube의 prior written permission이 있는 경우에만 scrape 가능하다고 기재한다.
+   - IV 정의: API Client는 YouTube API Services를 사용하는 웹사이트 또는 소프트웨어 애플리케이션이다.
+   - III.D.2: YouTube IFrame Player API는 사용자 인증이 필요 없는 YouTube API Services의 예로 명시된다.
+   - 영상책은 IFrame Player API를 사용하므로 API Client 정책의 관련성을 무시할 수 없다.
+3. Complying with YouTube's Developer Policies
+   - https://developers.google.com/youtube/terms/developer-policies-guide
+   - 정책 적용 여부가 불확실하면 API Compliance Audit 신청을 안내한다. 이 안내는 API Services를 사용하는 서비스에 대한 규정 준수 검토 경로다.
+4. 실제 연결 양식
+   - https://support.google.com/youtube/contact/yt_api_form?hl=ko
+   - 정책의 일부 prior written approval 문구에서 연결되는 양식을 클릭해 실제 내용을 확인했다.
+   - 제목: YouTube Data API Services — Audit and Quota Extension Form.
+   - 요청 유형: 추가 quota 요청을 위한 compliance audit, YouTube가 요청한 재감사를 위한 audit.
+   - 항목: 개인의 법적 이름, 조직/주소/연락처, 웹사이트, API Client 이름/기본 URL, 개인정보처리방침 URL, API 프로젝트 번호, 사용 사례, 검토용 데모/서비스 접근 정보 등.
+   - 이 양식은 실제 API Client에 대한 audit/usage review임을 확인했다. 단순한 scraping permission 전용 요청 유형은 폼에서 찾지 못했다.
+   - 정책 페이지가 일부 사전 승인 요청을 이 양식에 연결하지만, 폼의 실제 선택 항목은 quota audit/re-audit 중심이다. 이 안내 문구와 실제 양식 범위 사이의 불명확성을 기록한다. 폼이 scraping permission을 승인하는지 추정하지 않는다.
+5. YouTube Legal Support
+   - https://support.google.com/youtube/answer/6154232?hl=ko
+   - YouTube 공식 Help page는 legal@support.youtube.com을 Legal Support 이메일로 안내한다.
+   - 페이지는 법률 지원 연락처를 제시할 뿐, 자동화 접근 사전 허가 신청이나 API Developer Policies interpretation request를 이 주소로 보내라고 명시하지 않는다.
+   - 따라서 공식 법률 연락처로는 확인되지만, 이 요청의 허가 접수처인지는 미확인이다.
+6. YouTube API Services Terms of Service
+   - https://developers.google.com/youtube/terms/api-services-terms-of-service
+   - §3.2는 YouTube와 법적 구속력이 있는 계약을 체결할 연령에 도달하지 않은 사람은 계약을 수락하거나 API Services를 사용하지 못하도록 한다.
+   - 이 프로젝트에서는 사용자에게 API Terms 수락, API project/credentials 생성, compliance form 제출을 안내하지 않는다. 타인 계정/명의를 이용하는 대안도 제안하지 않는다.
+
+### 핵심 정책 해석의 한계
+- YouTube Terms의 일반 automated means 예외 문구와 API Developer Policies III.E.6의 API Client scraping 금지는 문서상 별도 조항이다.
+- Developer Policies III.E.6은 API Client 전체에 대해 직접/간접 scraping을 금지하고, 공개 검색엔진만 별도 예외로 언급한다.
+- Terms에 따라 일반적인 prior written permission을 받으면 API Client scraping prohibition도 면제되는지, 또는 별도 정책 승인/면제가 가능한지 공식 답변을 확보하지 못했다.
+- 따라서 YouTube의 서면 허가만 받으면 무조건 API 정책까지 허용이라고 말하지 않는다.
+- 반대로 현재 자료만으로 법률상 모든 DOM extraction이 반드시 불법이라고 결론 내리지도 않는다.
+
+### 회차 품질 회고
+- 잘한 점: 정책 페이지에서 실제 연결 양식을 열어 필수 항목과 요청 유형까지 확인했고, Legal Support 페이지의 실제 안내 범위를 확인했다. Terms와 Developer Policies를 구분했다.
+- 불충분했던 점: 이전 VB-25 기록은 정책 승인 링크가 존재한다는 점을 확인했으나, 양식의 실제 선택 항목을 검증하지 않았다.
+- 바로잡은 점: API Compliance Audit은 일반적인 scraping-only 허가 양식이라고 볼 수 없으며, Legal Support 이메일도 자동화 접근 승인 접수처라고 확인되지 않았음을 명시했다.
+- 참고한 1차 자료: 위 여섯 개 YouTube 공식 Terms/Developer/Help/form pages. 검색은 공식 도메인 중심으로 10개 질의/관점(일반 Terms permission, developer policy scraping, API audit, form request type, prior written approval, legal support, API contract age, IFrame API, API Client definition, permission scope)으로 수행.
+- 성공: 공식 정책 문구, API audit 가이드, 실제 form fields, legal support contact, API age clause 확인.
+- 실패/미확인: 개인의 scraping-only permission을 접수하는 독립된 공식 절차, Terms permission과 Developer Policies의 교차 면제 여부.
+- 미실행: 이메일 발송, 양식 제출, API project/account creation, 약관 동의, legal counsel, YouTube 서면 허가, code/Android E2E test.
+- 비용: 0원.
+
+### 결론
+일반 Terms에는 사전 서면 허가 예외가 있지만, 일반 사용자가 이를 요청할 독립된 공개 양식은 확인되지 않았다. 정책 페이지의 연결 양식은 실제로 API Compliance Audit/Quota Extension Form이며, scraping-only request type은 확인되지 않았다. Legal Support 이메일도 해당 허가의 접수처인지 미확인이다. API Developer Policies의 API Client scraping ban과 Terms permission의 관계에 대한 공식 답변도 없다. 따라서 scraping은 계속 보류한다.
