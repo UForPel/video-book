@@ -505,3 +505,22 @@
   - API 프로젝트 생성, 계약 수락, 타인 명의 제출을 사용자에게 권하지 않는다.
   - 핵심 목표는 유지하되 허가 확보 전까지 자막 자동 취득 기능은 미해결로 둔다.
 - 회차 회고 및 상세 근거: PROJECT_STATUS.md VB-26, PROJECT_CONTEXT.md §21, RESEARCH_BENCHMARKS.md §30.
+
+
+## Decision 045 — YouTube 내부 검색은 Data API의 계약·등록 요건 때문에 현재 조건에서 보류 (2026-11-13)
+- 상태: 공식 검색 기능은 존재하지만 현재 사용자/프로젝트 제약에서는 채택 보류.
+- 확인:
+  1. IFrame Player API `cuePlaylist/loadPlaylist`의 `listType=search`는 2020-11-15부터 지원 중단되었다. 현재 문서상 지원 목록은 `playlist`, `user_uploads`다.
+  2. 공식 대안은 YouTube Data API `search.list`이며 공개 영상 검색 결과를 반환한다.
+  3. Data API 시작 안내는 Google 계정, Google Cloud 프로젝트, API 자격 증명 및 API 등록을 요구한다.
+  4. `search.list` 기본 할당량은 하루 100회이며 호출당 1 unit이다.
+  5. YouTube API Services Terms §3.2는 법적 계약 연령에 도달하지 않은 사람의 약관 수락과 API 사용을 금지한다.
+- 결정:
+  - 사용자에게 Google Cloud 계정/프로젝트/API 키 생성 또는 약관 수락을 안내하지 않는다.
+  - API 키를 공개 저장소에 삽입하지 않는다.
+  - 제3자 계정이나 명의를 빌리는 방식은 사용하지 않는다.
+  - IFrame API 검색 기능이 살아 있는 것처럼 코드를 작성하지 않는다.
+  - 비공식 검색 페이지 스크래핑을 구현하지 않는다.
+  - 현재 0원·Android·정적 Pages·연령/계정 제약을 유지하면 앱 내부 검색은 미구현 상태로 둔다.
+- 제품 영향: 검색이 막힌 상태에서 자막 자동 취득/교정도 이어지는 사용자 흐름으로 연결할 수 없다. 현재 앱은 영상 URL 재생과 SRT/VTT 실험판이다.
+- 근거: YouTube IFrame API reference, Data API search.list, Data API getting started, API Services Terms §3.2.
