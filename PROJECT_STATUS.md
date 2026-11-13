@@ -13,7 +13,8 @@
 | 영역 | 상태 | 현재 확인된 사실 | 다음 확인/작업 |
 |---|---|---|---|
 | GitHub 저장소/문서 | [x] | 전용 저장소와 요구사항/결정/조사 문서 존재 | 변경 때 문서 갱신 |
-| GitHub Pages 및 기본 화면 | [x] | Android에서 기존 사이트 열림 확인. Pages는 정적 파일 호스팅 | 변경 후 회귀 확인 |
+| GitHub Pages 및 기본 화면 | [x] | Android에서 기존 사이트 열림 확인. 최신 Pages 빌드·배포 Actions도 성공 | 변경 후 회귀 확인 |
+| GitHub Actions 자동 검사 | [x] | 2026-11-13 최신 main 커밋에서 자막 테스트, `node --check app.js` 모두 성공 | 앱 기능 변경 시 CI 회귀 확인 |
 | GitHub Actions 실시간 백엔드 가능성 | [x] | 이벤트/수동/예약 실행형 작업이며 요청을 상시 수신하는 웹 서버가 아님 | 빌드·검사·배포 용도로만 활용 |
 | YouTube 영상 재생/시점 이동 | [x] | Android 실기기에서 재생과 예시 시점 이동 성공 보고 | 핵심 기능 변경 시 회귀 확인 |
 | 로컬 SRT/VTT 파서 | [x] | 파서를 독립 모듈로 분리하고 Node.js 자동 테스트 8개 통과. 실제 한국어 파일 실기기 검증은 미확인 | Android에서 한국어 SRT/VTT 인코딩 및 표시 확인 |
@@ -1002,3 +1003,35 @@ D. 서버/헤드리스 브라우저에서 페이지를 렌더링해 추출
 - 근거: 저장소의 `app.js`, `index.html`, `subtitle-parser.js`, `tests/subtitle-parser.test.js`, `package.json`, `.github/workflows/test.yml`.
 - 비용/계정: 0원. 외부 API, 패키지 의존성, 계정 생성, 결제 없음.
 - 다음 작업: GitHub Actions 실행 결과를 확인하고, 사용자가 Android에서 실제 한국어 SRT/VTT 파일을 불러와 재생 동기화를 확인한다.
+
+
+## VB-30 — 원격 CI 및 Pages 배포 결과 확인 (2026-11-13)
+
+### 목표
+VB-29에서 미확인으로 남긴 GitHub Actions 원격 실행 결과를 실제 저장소의 최신 main 커밋에서 확인하고 기준 문서를 정정한다.
+
+### 확인한 기준 커밋
+- 커밋: `0d7ce91916447c12e75b2581daf14fcb1cf72175`
+- 메시지: `docs: correct parser verification record`
+
+### 실제 GitHub Actions 결과
+- Test workflow run #12: **success**
+  - `npm test`: success
+  - `node --check app.js`: success
+  - 실행: https://github.com/UForPel/video-book/actions/runs/43401058449
+- GitHub Pages build and deployment run #231: **success**
+  - Jekyll build: success
+  - Upload artifact: success
+  - Deploy to GitHub Pages: success
+  - 실행: https://github.com/UForPel/video-book/actions/runs/43401058617
+
+### 성공 / 미실행 구분
+- 성공: GitHub 원격 자막 파서 테스트 워크플로, 앱 JS 구문 검사, Pages 빌드 및 배포 작업.
+- 미실행: 실제 Android 브라우저 E2E, YouTube 검색, 범용 자막 자동 취득, 자동 맞춤법 교정.
+- 이 CI 성공은 현재 구현된 파서 및 정적 사이트 빌드 검증이며, 제품 핵심 기능의 완성을 뜻하지 않는다.
+
+### 다음 작업
+- 현재 제약을 유지하는 공식 내부 검색 공급 경로가 새로 확인되지 않는 한 검색 UI를 가짜로 추가하지 않는다. 새 경로가 확인될 때까지 핵심 검색/자막 취득은 미해결로 표시하고, 이미 구현된 앱의 실제 브라우저 회귀 검증을 별도로 진행한다.
+
+### 비용 및 보안
+- 비용 0원. 새 계정, API 키, 서버, 외부 API, 유료 서비스 추가 없음.
