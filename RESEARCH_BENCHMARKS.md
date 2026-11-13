@@ -1272,7 +1272,7 @@ YouTube Data API 계정/프로젝트/약관 수락 없이 영상책 페이지 �
 - 별도 번들러/컴파일러가 없는 정적 사이트이므로 compile 단계는 없다.
 - 원격 저장소에서 다시 가져온 `app.js`에 `node --check`를 실행해 통과했다.
 - `index.html`은 Python 표준 라이브러리 `html.parser` 파싱 검사에 통과했다.
-- GitHub Actions 실제 실행 결과, GitHub Pages 배포 상태, Android 실기기 및 YouTube IFrame E2E는 미확인/미실행이다.
+- 이후 VB-30(2026-11-13)에서 최신 main 커밋의 실제 GitHub Actions 결과를 확인했다: Test run #12 성공(npm test, node --check app.js), Pages build/deployment run #231 성공(Jekyll build 및 deploy). Android 실기기 및 YouTube IFrame E2E는 여전히 미실행이다.
 - 이 테스트는 파서 로직의 회귀 검사이며, 자막 자동 취득·교정·검색 기능의 작동을 증명하지 않는다.
 
 ### 회차 회고
