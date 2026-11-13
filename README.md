@@ -112,3 +112,12 @@ YouTube 공식 대본 페이지 링크는 보조 링크일 뿐, 영상책 내부
 - 영상책은 YouTube IFrame Player API를 사용하므로 YouTube API Services Developer Policies의 API Client 스크래핑 금지 조항이 적용될 가능성이 높다. 일반 Terms의 자동화 접근 제한도 별도로 존재한다. 사용자 클릭만으로 허용된다고 판단하지 않는다.
 - 따라서 DOM scraping 확장 연계는 기술 후보로만 남기고, 정책상 허용 근거가 확인될 때까지 구현·배포를 보류한다.
 - 상세 조사와 출처: [RESEARCH_BENCHMARKS.md §29](./RESEARCH_BENCHMARKS.md#29-firefox-android-확장-연계-배포-및-youtube-정책-재검토-2026-11-12).
+
+
+## 공식 문의·허가 경로 조사 (VB-26, 2026-11-13)
+- YouTube Terms는 자동화 접근(scrapers 포함)에 대해 사전 서면 허가 예외를 언급하지만, 일반 사용자가 스크래핑 허가를 요청하는 전용 신청 절차는 확인하지 못했다.
+- YouTube API Developer Policies의 스크래핑 조항은 API Client의 직접/간접 스크래핑을 금지하고, 예외로 공개 검색엔진을 명시한다. 일반 Terms의 허가 문구가 API Developer Policies까지 면제하는지는 확인되지 않았다.
+- 정책 문서가 연결하는 양식은 실제로 YouTube Data API의 규정 준수 감사/할당량 확장 양식이다. 요청 유형은 추가 할당량 감사 또는 요청받은 재감사이고, API 프로젝트 번호, 서비스 URL, 개인정보처리방침 등을 요구한다. 일반 스크래핑 허가만 요청하는 전용 선택지는 확인되지 않았다.
+- legal@support.youtube.com은 YouTube 공식 도움말에 법률 지원 연락처로 게시되어 있으나, 일반적인 스크래핑 사전 허가 신청을 접수한다고 안내되어 있지 않다.
+- YouTube API Services 약관은 계약을 체결할 법적 연령에 도달하지 않은 사람이 약관을 수락하거나 API 서비스를 사용하지 못하도록 한다. 이 프로젝트에서는 사용자에게 API 약관 수락, API 프로젝트 생성, 감사 양식 제출을 안내하지 않는다.
+- 따라서 현재는 공식 허가를 신청·획득하지 못했으며, 스크래핑 구현은 계속 보류한다. 상세 근거: [RESEARCH_BENCHMARKS.md §30](./RESEARCH_BENCHMARKS.md#30-youtube-공식-문의-및-사전-서면-허가-경로-검증-2026-11-13).
