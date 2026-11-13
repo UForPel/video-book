@@ -300,3 +300,12 @@
 5. URL 직접 입력은 테스트/보조 경로로 남길 수 있지만 내부 검색 기능을 대신할 수 없다.
 6. 결과 목록은 실제 데이터에 기반해야 하며 샘플/목업 결과를 실검색인 것처럼 보여주면 안 된다.
 7. 검색 API 경로가 현재 사용자 조건에서 막혀 있다는 사실은 요구사항을 낮추는 이유가 아니다. 요구사항은 유지하고 구현 상태를 미해결로 표시한다.
+
+
+## 24. 자막 파서 모듈과 자동 테스트 (VB-29, 2026-11-13)
+- SRT/VTT 파싱과 시간 표시 함수를 `subtitle-parser.js`로 분리해 앱 UI와 독립적으로 테스트할 수 있게 했다.
+- `app.js`는 ES module로 파서 함수를 import하며, `index.html`도 module script로 로드한다.
+- `package.json`은 의존성 없이 Node.js 내장 테스트 러너(`node --test`)만 사용한다.
+- `tests/subtitle-parser.test.js`에는 SRT/VTT, BOM/CRLF, HTML 태그·문자 엔티티, 정렬, 겹치는 cue, 잘못된 시간, 표시 형식 등 8개 테스트가 있다.
+- GitHub Actions는 push/pull request에서 테스트와 `node --check app.js`를 실행하도록 구성했다.
+- 이 변경은 파서의 자동 회귀 검사 기반을 만든 것이며, 범용 YouTube 자막 취득·맞춤법 교정·내부 검색 기능을 구현한 것은 아니다.
