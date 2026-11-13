@@ -1256,3 +1256,25 @@ YouTube Data API 계정/프로젝트/약관 수락 없이 영상책 페이지 �
 - 실제 Data API 호출, 계정 생성, Cloud 프로젝트, API key, OAuth, 검색 결과 UI, Android E2E는 미실행.
 - 비용: 0원.
 - 결과: 제품 UX 요구사항은 명확해졌으나 검색 데이터 공급 경로는 미해결이다.
+
+
+## 33. 자막 파서 자동 검증 구성 (VB-29, 2026-11-13)
+
+### 확인한 구현
+- 기존 `app.js` 안에 있던 타임스탬프 해석, SRT/VTT 블록 파싱, 시간 표시 함수를 `subtitle-parser.js`로 분리했다.
+- 자막 텍스트는 기존처럼 DOM의 `textContent`로 표시하며 HTML로 삽입하지 않는다.
+- 파서는 일반적인 SRT 콤마 밀리초, WebVTT 헤더/큐 설정, BOM, CRLF, 태그 제거, 기본/숫자 문자 엔티티, 정렬, 겹치는 cue, 잘못된 시간 입력을 테스트한다.
+- Node.js 내장 `node:test`만 사용하며 외부 패키지/서비스 의존성은 추가하지 않았다.
+- GitHub Actions 워크플로는 push와 pull request에서 `npm test`, `node --check app.js`를 실행하도록 작성했다.
+
+### 테스트 결과와 한계
+- Node.js v22.16.0 / npm 10.9.2에서 `npm test`: 8 passed, 0 failed.
+- 별도 번들러/컴파일러가 없는 정적 사이트이므로 compile 단계는 없다.
+- 로컬 테스트 디렉터리에 앱 본체 `app.js`와 `index.html`이 없어 앱 구문 검사 및 HTML 파싱은 미실행이다.
+- GitHub Actions 실제 실행 결과, GitHub Pages 배포 상태, Android 실기기 및 YouTube IFrame E2E는 미확인/미실행이다.
+- 이 테스트는 파서 로직의 회귀 검사이며, 자막 자동 취득·교정·검색 기능의 작동을 증명하지 않는다.
+
+### 회차 회고
+- 성공: 파서 독립 모듈, 8개 단위 테스트, CI 워크플로 추가.
+- 부족: 로컬에 전체 앱 파일을 가져오지 않아 앱 전체 검증을 완료하지 못했다.
+- 비용: 0원, 외부 의존성 없음.
