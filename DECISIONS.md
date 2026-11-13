@@ -546,3 +546,15 @@
   - 외부 링크/붙여넣기를 핵심 대체안으로 제안하지 않는다.
   - 검색 공급 경로가 확보되기 전 가짜 UI를 구현하지 않는다.
 - 회차 기록: PROJECT_STATUS.md VB-28, RESEARCH_BENCHMARKS.md §32.
+
+
+## Decision 047 — 자막 파서는 독립 모듈과 내장 테스트로 검증
+- 상태: 구현.
+- 결정:
+  - SRT/VTT 파싱 및 시간 표시 로직을 `subtitle-parser.js`로 분리한다.
+  - UI는 ES module import로 해당 로직을 사용한다.
+  - 외부 npm 패키지 없이 Node.js 내장 `node:test`를 사용한다.
+  - push/pull request 시 GitHub Actions가 단위 테스트와 `app.js` 구문 검사를 실행한다.
+- 이유: 정적 웹앱의 단순성을 유지하면서 파서 회귀를 자동으로 발견하기 위함.
+- 한계: 단위 테스트는 YouTube 자막 취득, 실영상 재생, 브라우저 호환성, Android E2E를 보장하지 않는다.
+- 기록: PROJECT_STATUS.md VB-29, PROJECT_CONTEXT.md §24.
