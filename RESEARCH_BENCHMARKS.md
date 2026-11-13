@@ -1195,3 +1195,38 @@ YouTube Terms가 자동화 접근에 대해 사전 서면 허가를 예외로 �
 
 ### 결론
 일반 Terms에는 사전 서면 허가 예외가 있지만, 일반 사용자가 이를 요청할 독립된 공개 양식은 확인되지 않았다. 정책 페이지의 연결 양식은 실제로 API Compliance Audit/Quota Extension Form이며, scraping-only request type은 확인되지 않았다. Legal Support 이메일도 해당 허가의 접수처인지 미확인이다. API Developer Policies의 API Client scraping ban과 Terms permission의 관계에 대한 공식 답변도 없다. 따라서 scraping은 계속 보류한다.
+
+
+## 31. YouTube 검색 공식 경로와 현재 사용자 제약 재검증 (2026-11-13)
+
+### 질문
+YouTube Data API 계정/프로젝트/약관 수락 없이 영상책 페이지 안에서 공개 영상을 검색할 수 있는 공식 IFrame Player API 기능이 남아 있는가?
+
+### 공식 문서 확인
+1. IFrame Player API Reference: https://developers.google.com/youtube/iframe_api_reference
+   - `cuePlaylist` 및 `loadPlaylist` 객체 문법은 playlist 또는 user uploads feed를 지원한다.
+   - `listType=search`는 deprecated이며 2020-11-15부터 더 이상 지원되지 않는다. 이후 해당 요청은 4xx 오류를 반환할 수 있다고 문서화되어 있다.
+   - 공식 대안으로 YouTube Data API `search.list`를 안내한다.
+2. YouTube Data API `search.list`: https://developers.google.com/youtube/data/reference/rest/v3/search/list
+   - 공개 영상/채널/재생목록 검색 결과를 반환한다.
+   - 기본 검색 할당량: 하루 100회, 호출당 1 unit.
+3. YouTube Data API 시작 안내: https://developers.google.com/youtube/data/getting-started
+   - Google 계정으로 Cloud Console에 접근해 API key를 요청하고 앱을 등록하며, 프로젝트를 만들고 YouTube Data API를 활성화하고 자격 증명을 발급하도록 안내한다.
+4. YouTube API Services Terms: https://developers.google.com/youtube/terms/api-services-terms-of-service
+   - §3.2: 법적 구속력이 있는 계약을 체결할 연령에 도달하지 않은 사람은 계약을 수락하거나 API Services에 접근/사용할 수 없다.
+
+### 판정
+- IFrame Player API만으로 검색: **반증됨** (검색 list 기능 지원 중단).
+- 공식 Data API를 통한 검색: **기술적으로 확인됨**.
+- 현재 사용자가 직접 API 계정/프로젝트/약관 절차를 수행하는 경로: **부적합** (연령/계약 조건 및 프로젝트 제약).
+- 0원 여부: API 자체의 기본 할당량은 무료 quota로 안내되지만, 무료 quota라고 해서 등록·약관·계정 요건이 없어지는 것은 아니다.
+- 정적 GitHub Pages에서 API 키를 안전하게 비밀로 보관: **불가**. 공개 클라이언트에 키를 넣는 것은 별도 보안/정책 검토 없이 채택하지 않는다.
+- 검색 페이지 스크래핑: **비채택**. 공식 API 대체로 가장하지 않으며, 기존 스크래핑 보류 결정 유지.
+
+### 회차 회고와 미실행
+- 잘한 점: IFrame API의 deprecated 문구와 Data API의 실제 등록 절차, 검색 quota, API 계약 연령 조항을 공식 1차 자료에서 각각 확인했다.
+- 부족한 점: 실제 제품 기능은 이번에도 늘지 않았다. 이 결과를 기능 구현 성공으로 표현하지 않는다.
+- 코드/배포 변경: 없음.
+- 미실행: API 프로젝트/키/OAuth/계약 수락, YouTube 검색 페이지 scraping, Android 실기기, 실제 앱 검색 E2E.
+- 비용: 0원.
+- 다음 단계: 동일한 공식 API와 스크래핑 후보를 반복 조사하지 않는다. 현재 제약을 유지하는 새로운 공식 경로가 실제로 확인될 때만 다시 작업한다.
