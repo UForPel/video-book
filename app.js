@@ -1,3 +1,5 @@
+import { parseSubtitle, formatTime } from "./subtitle-parser.js";
+
 const statusEl = document.getElementById("status");
 const inputEl = document.getElementById("video-url");
 const loadButton = document.getElementById("load-video");
@@ -142,51 +144,6 @@ async function loadRegisteredSubtitle(videoId) {
     transcriptHint.textContent = "등록된 자막을 자동으로 불러오지 못했습니다. SRT/VTT 파일을 직접 선택할 수 있습니다.";
     statusEl.textContent = "등록 자막을 읽지 못했습니다. 자막 파일을 직접 선택해주세요.";
   }
-}
-
-function parseTimestamp(value) {
-  // SRT: 00:00:01,250 / VTT: 00:01.250 or 00:00:01.250
-  const time = value.trim().split(/\s+/)[0].replace(",", ".");
-  const parts = time.split(":");
-  if (parts.length !== 2 && parts.length !== 3) return null;
-  const secondsPart = parts.pop();
-  const secondsMatch = secondsPart.match(/^(\d{1,2})(?:\.(\d{1,3}))?$/);
-  if (!secondsMatch || Number(secondsMatch[1]) > 59) return null;
-  const minutesPart = parts.pop();
-  if (!/^\d{1,2}$/.test(minutesPart) || Number(minutesPart) > 59) return null;
-  const hoursPart = parts.length ? parts.pop() : "0";
-  if (!/^\d+$/.test(hoursPart)) return null;
-  const fraction = secondsMatch[2] ? Number((secondsMatch[2] + "00").slice(0, 3)) / 1000 : 0;
-  return Number(hoursPart) * 3600 + Number(minutesPart) * 60 + Number(secondsMatch[1]) + fraction;
-}
-
-function parseSubtitle(text) {
-  const blocks = text.replace(/^\uFEFF/, "").replace(/\r/g, "").split(/\n\s*\n/);
-  const parsed = [];
-  for (const block of blocks) {
-    const lines = block.split("\n").map(line => line.trim()).filter(Boolean);
-    const timeIndex = lines.findIndex(line => line.includes("-->"));
-    if (timeIndex < 0) continue;
-    const times = lines[timeIndex].split("-->");
-    const start = parseTimestamp(times[0]);
-    const end = parseTimestamp(times[1].trim().split(/\s+/)[0]);
-    const content = lines.slice(timeIndex + 1).join(" ")
-      .replace(/<[^>]*>/g, "")
-      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").trim();
-    if (start !== null && end !== null && end > start && content) parsed.push({ start, end, text: content });
-  }
-  return parsed.sort((a, b) => a.start - b.start);
-}
-
-
-function formatTime(seconds) {
-  const total = Math.max(0, Math.floor(seconds));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = total % 60;
-  return h ? [h, m, s].map(v => String(v).padStart(2, "0")).join(":")
-    : [m, s].map(v => String(v).padStart(2, "0")).join(":");
 }
 
 function renderTranscript() {
