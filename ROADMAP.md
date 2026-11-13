@@ -291,7 +291,7 @@
 - [x] 파싱/시간 표시 로직을 독립 ES module로 분리
 - [x] Node.js 내장 테스트 러너 설정 및 8개 자동 테스트 추가
 - [x] GitHub Actions push/pull request 검사 워크플로 추가
-- [~] GitHub Actions 실제 실행 결과 확인
+- [x] GitHub Actions 실제 실행 결과 확인 (VB-30: Test run #12 success)
 - [ ] Android 실기기에서 실제 한국어 SRT/VTT 파일과 영상 동기화 재검증
 
 이 작업은 기존 자막 파일 파서의 유지보수성과 회귀 검증을 개선한다. YouTube 일반 시청자용 자동 자막 취득이나 내부 검색을 해결한 것은 아니다.
