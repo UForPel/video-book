@@ -486,3 +486,22 @@
   4. 확장→앱 전달 구조는 설계 참고로만 보관한다. Android 실기기 설치·API 호환·E2E는 미실행 상태다.
   5. 사용자의 복사·붙여넣기, 제작자 자막 파일, 외부 서버/유료 API로 핵심 요구를 대체하지 않는다.
 - 상세 기록: PROJECT_STATUS.md VB-25, PROJECT_CONTEXT.md §20, RESEARCH_BENCHMARKS.md §29.
+
+
+## Decision 044 — 공식 허가 경로가 확인되기 전 YouTube DOM scraping 보류 유지 (2026-11-13)
+- 상태: 공식 문서/실제 신청 양식 확인에 따른 보류.
+- 확인:
+  1. YouTube Terms는 자동화 수단 접근 제한과 YouTube의 사전 서면 허가 예외를 명시한다.
+  2. YouTube API Developer Policies III.E.6은 API Client의 직접/간접 YouTube Applications 스크래핑 및 스크랩 데이터 취득을 금지한다. 해당 조항은 공개 검색엔진 예외를 별도로 언급하지만 일반 API Client 전체에 대한 승인 예외를 명시하지 않는다.
+  3. 영상책은 IFrame Player API를 사용하므로 API Client 정의와 정책의 관련성이 높다.
+  4. Terms의 사전 서면 허가가 Developer Policies의 API Client scraping prohibition까지 면제하는지 공식 답변은 없다.
+  5. 정책 문서의 사전 승인 링크는 실제로 YouTube Data API Services Audit and Quota Extension Form으로 연결된다. 폼의 요청 유형은 추가 할당량 감사와 요청받은 재감사이며, API 프로젝트 번호 및 API Client URL/개인정보처리방침 등을 요구한다. 일반적인 scraping-only 허가 신청 유형은 확인되지 않았다.
+  6. YouTube Legal Support 이메일은 공식 연락처로 확인되지만, 자동화 접근 허가 요청을 접수하는 곳이라고 명시되어 있지 않다.
+  7. API Services Terms §3.2는 계약 체결 법적 연령에 도달하지 않은 자의 계약 수락 및 API 사용을 금지한다. 사용자에게 계약/프로젝트/양식 제출을 안내하지 않는다.
+- 결정:
+  - 공식 허가 절차나 정책 예외가 확인되지 않은 상태에서는 scraping 코드와 확장 배포를 진행하지 않는다.
+  - 일반 Terms의 서면 허가 문구만으로 API Developer Policies도 면제된다고 추정하지 않는다.
+  - Compliance Audit과 Legal Support를 scraping permission channel이라고 부르지 않는다.
+  - API 프로젝트 생성, 계약 수락, 타인 명의 제출을 사용자에게 권하지 않는다.
+  - 핵심 목표는 유지하되 허가 확보 전까지 자막 자동 취득 기능은 미해결로 둔다.
+- 회차 회고 및 상세 근거: PROJECT_STATUS.md VB-26, PROJECT_CONTEXT.md §21, RESEARCH_BENCHMARKS.md §30.
