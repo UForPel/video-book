@@ -848,3 +848,72 @@ D. 서버/헤드리스 브라우저에서 페이지를 렌더링해 추출
 1. YouTube의 공식적인 서면 허가/정책 해석을 얻을 수 있는 공개 절차가 있는지 확인하되, 허가를 얻었다고 가정하지 않는다.
 2. 허용 근거가 확보되지 않으면 스크래핑 구현은 계속 보류하고, 정책 준수 가능한 다른 자동 취득 경로가 있는지 조사한다.
 3. 사용자의 핵심 목표는 변경하지 않는다. 수동 복사/붙여넣기나 제작자 자막 파일로 대체하지 않는다.
+
+
+## VB-26 — YouTube 공식 문의·사전 서면 허가 경로 검증 (2026-11-13)
+
+### 작업 시작 확인
+- 시작 전 최신 커밋: ccea4a5ea60cc56c0461cb97f77668eb7b8abb98 — docs: assess Firefox Android transcript bridge and policy.
+- 작업 규칙과 6개 프로젝트 문서 및 연구 벤치마크 재조회: 완료.
+- 작업 목표: YouTube가 명시한 자동화 접근 사전 서면 허가 및 API 정책 문의 절차를 찾아 실제 양식/필수 조건까지 확인. 미성년 사용자에게 계약 수락이나 계정 생성이 필요한 단계를 안내하지 않음.
+
+### 조사한 공식 자료
+- YouTube Terms of Service (한국어): https://www.youtube.com/t/terms?hl=ko
+- YouTube API Services Developer Policies (한국어): https://developers.google.com/youtube/terms/developer-policies?hl=ko
+- Complying with YouTube's Developer Policies: https://developers.google.com/youtube/terms/developer-policies-guide
+- YouTube API Compliance Audit and Quota Extension Form: https://support.google.com/youtube/contact/yt_api_form?hl=ko
+- YouTube Legal Support: https://support.google.com/youtube/answer/6154232?hl=ko
+- YouTube API Services Terms of Service: https://developers.google.com/youtube/terms/api-services-terms-of-service
+
+### 확인한 사실
+1. 일반 Terms
+   - automated means(scrapers 포함) 접근을 제한하고 YouTube의 사전 서면 허가를 예외로 명시한다.
+   - 해당 문구는 일반 Terms의 자동화 접근 조항이다. 일반 이용자용 사전 허가 신청 절차는 같은 페이지에서 확인되지 않았다.
+2. Developer Policies
+   - III.E.6은 API Client가 YouTube/Google Applications를 직접/간접 스크래핑하거나 스크랩된 YouTube 데이터/콘텐츠를 취득하는 것을 금지한다.
+   - 공개 검색엔진은 robots.txt 준수 또는 YouTube 사전 서면 승인 시에만 스크래핑할 수 있다는 문구가 있으나, 일반 API Client 전체에 대한 별도 허가 예외는 해당 조항에 명시되어 있지 않다.
+   - API Client 정의는 YouTube API Services를 사용하는 웹사이트/앱이다. 문서는 IFrame Player API를 YouTube API Services 예시로 든다. 영상책은 IFrame Player API를 사용한다.
+   - Terms의 사전 서면 허가가 Developer Policies의 API Client 스크래핑 금지도 면제하는지 확인되지 않았다. 두 문서의 관계를 하나의 허가 문구로 단정하지 않는다.
+3. 공식 API Compliance Audit
+   - 개발자 가이드는 정책상 서비스 허용 여부가 불확실한 경우 API Compliance Audit을 신청하라고 한다.
+   - 정책 문서에서 UI 변경 사전 승인 등에 연결된 form link를 직접 열어 실제 폼 내용을 확인했다.
+   - 폼 제목은 YouTube Data API Services — Audit and Quota Extension Form이다.
+   - 요청 유형은 (a) 추가 할당량을 요청하기 위한 규정 준수 감사, (b) YouTube가 재감사를 요청한 경우 현재 할당량 유지를 위한 감사다.
+   - 폼은 개인 법적 이름, 조직/주소/연락처, 웹사이트, API Client 이름 및 URL, 개인정보처리방침 URL, API 프로젝트 번호, 사용 사례, 검토용 서비스/데모 접근 정보 등을 요구한다.
+   - 따라서 공식 API Client의 정책 적합성 감사 경로임은 확인되나, 프로젝트가 없는 개인의 사전 스크래핑 허가만을 위한 별도 신청으로 확인되지는 않는다.
+   - 안내 문구의 prior written approval 링크와 실제 양식의 request type이 완전히 일치하는지 의문이 남으므로 자료 충돌/범위 불명확으로 기록한다. 폼이 scraping permission을 승인하는지 추정하지 않는다.
+4. Legal Support
+   - YouTube 공식 Help page는 legal@support.youtube.com을 Legal Support 이메일로 안내한다.
+   - 해당 페이지는 법률 지원 연락처를 제공할 뿐, 자동화 접근 사전 허가나 API 정책 해석 요청을 이 주소로 제출하라고 명시하지 않는다.
+   - 허가 신청처라고 추정하지 않는다.
+5. 연령 및 계약 제한
+   - YouTube API Services Terms §3.2는 YouTube와 구속력 있는 계약을 체결할 법적 연령에 도달하지 않은 자는 약관을 수락하거나 API Services를 사용할 수 없다고 명시한다.
+   - 사용자에게 해당 계약 수락, Google Cloud/API 프로젝트 생성, API 자격 증명 생성, 감사 양식 제출을 안내하지 않는다. 성인/타인 계정으로 우회하는 방법도 제안하지 않는다.
+
+### 회차 품질 회고
+- 잘한 점:
+  - 정책 페이지의 링크만 보고 신청 경로를 추정하지 않고 실제 연결된 양식을 열어 요청 유형과 필수 필드를 확인했다.
+  - 일반 Terms, API Developer Policies, API Compliance Audit, Legal Support 연락처를 각각 다른 절차로 분리했다.
+  - IFrame Player API를 사용하는 앱의 API Client 해당 가능성을 다시 검토했다.
+  - 연령 제한 조항을 공식 API 약관에서 확인하고 사용자에게 가입/계약 단계를 지시하지 않았다.
+- 불충분했던 점 및 보완:
+  - 직전 VB-25에서는 정책 승인 링크가 존재한다는 수준에서 기록했으나, 양식의 실제 선택 항목과 필수 자료를 열어 확인하지 않았다. 이번에 실제 폼을 열어 스크래핑 전용 신청 유형이 보이지 않는다는 점을 보완했다.
+  - 일반 Terms의 서면 허가 예외와 API Developer Policies의 API Client 스크래핑 금지를 하나로 합쳐 해석할 위험이 있었다. 두 조항의 적용 관계가 공식 답변으로 확인되지 않았음을 명시했다.
+  - Legal Support 이메일을 허가 접수처로 오인할 수 있어, 공식 페이지가 확인해 주는 것은 연락처 정보뿐이라는 한계를 기록했다.
+- 이번에 바로잡은 점: API Compliance Audit은 일반적인 scraping-only 허가 양식이라고 볼 수 없으며, Legal Support 이메일도 자동화 접근 승인 접수처라고 확인되지 않았음을 명시했다.
+- 실패: 허가 접수처/승인 절차를 명확히 확인하지 못함.
+- 미실행: 이메일 발송, API 감사 신청, 서면 허가 요청, 법률 자문, API 프로젝트/계정 생성, 코드 수정, Android 실기기 테스트, 스크래핑 실행.
+- 비용: 0원. 새 계정, API, 서버, 유료 서비스, 외부 전송 사용 없음.
+
+### 최종 상태
+- Terms 사전 서면 허가 예외: 확인됨.
+- 일반 사용자용 스크래핑 허가 전용 신청 절차: 미확인.
+- API Compliance Audit의 실제 필드/요청 유형: 확인됨.
+- 이 감사가 스크래핑 허가를 부여하는지: 미확인.
+- Legal Support가 해당 요청을 접수하는지: 미확인.
+- API Developer Policies의 API Client 스크래핑 금지: 확인됨.
+- Terms 허가가 Developer Policies까지 면제되는지: 미확인.
+- 허가/공식 서면 답변: 미확보.
+- 구현/배포: 보류.
+### 다음 작업
+- API 계약이나 프로젝트 생성을 요구하지 않는 공식 문의 창구가 추가로 확인되지 않는 한, 허가를 받았다고 가정하지 않는다. 스크래핑은 계속 보류하고, 정책상 허용된 viewer transcript 접근 방법이 별도로 존재하는지 공식 자료에서 확인한다.
