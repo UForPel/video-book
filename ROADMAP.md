@@ -247,3 +247,17 @@
 - [ ] 앱 내부 검색 → 자동 자막 → 교정 → 표시/시간 동기화 E2E
 
 판정: 전달 구조는 설계상 가능성이 있지만 Android 실기기 검증은 미실행이다. YouTube 약관/Developer Policies 관련 위험으로 실제 scraping 구현과 배포는 보류한다. 이번 회차 코드 변경·계정 생성·API/서버/프록시/결제는 없고 비용은 0원.
+
+
+## VB-26 — YouTube 공식 문의·사전 서면 허가 경로 확인 (2026-11-13)
+- [x] YouTube Terms의 automated means 및 prior written permission 문구 재확인
+- [x] Developer Policies III.E.6의 API Client scraping 금지 문구 재확인
+- [x] API Compliance Audit 가이드의 안내 목적 확인
+- [x] 정책 문서에서 연결되는 실제 양식의 제목, 요청 유형, 필수 항목 확인
+- [x] YouTube Legal Support 이메일의 공식 안내 범위 확인
+- [x] API Services Terms의 법적 계약 연령 제한 확인
+- [ ] API Client scraping prohibition과 Terms prior written permission 사이의 관계에 대한 YouTube 공식 서면 답변 확보
+- [ ] API 프로젝트/약관 수락을 요구하지 않는 일반 사전 허가 신청 경로 확인
+- [ ] 정책상 허용 근거 확보 후 Android viewer transcript E2E 테스트
+
+판정: 공식 API Compliance Audit은 존재하지만, 양식은 API Client/프로젝트에 대한 quota audit 또는 재감사 중심이며, 스크래핑 허가만 요청하는 일반 사용자용 경로로 확인되지 않았다. Legal Support 이메일도 허가 접수처인지 미확인. API Services 약관의 계약 연령 요건 때문에 사용자에게 계정/프로젝트/약관 수락을 안내하지 않는다. 구현은 보류한다.
