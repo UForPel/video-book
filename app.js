@@ -1,4 +1,5 @@
 import { parseSubtitle, formatTime } from "./subtitle-parser.js";
+import { readVideoLibrary, saveVideo, removeVideo } from "./video-library.js";
 
 const statusEl = document.getElementById("status");
 const inputEl = document.getElementById("video-url");
@@ -8,6 +9,9 @@ const subtitleFile = document.getElementById("subtitle-file");
 const transcriptEl = document.getElementById("transcript");
 const transcriptHint = document.getElementById("transcript-hint");
 const youtubeTranscriptLink = document.getElementById("youtube-transcript-link");
+const videoTitleEl = document.getElementById("video-title");
+const saveVideoButton = document.getElementById("save-video");
+const videoLibraryEl = document.getElementById("video-library");
 
 let player = null;
 let apiReady = false;
@@ -16,6 +20,7 @@ let cues = [];
 let activeCueIndex = -1;
 let captionRegistryPromise = null;
 let captionLoadToken = 0;
+let currentVideoId = null;
 
 function getVideoId(value) {
   const raw = value.trim();
@@ -44,6 +49,8 @@ function loadVideo() {
   const id = getVideoId(inputEl.value);
   if (!id) { youtubeTranscriptLink.hidden = true; statusEl.textContent = "올바른 유튜브 주소 또는 11자리 영상 ID를 입력해주세요."; return; }
   pendingVideoId = id;
+  currentVideoId = id;
+  saveVideoButton.disabled = false;
   youtubeTranscriptLink.href = "https://www.youtube.com/watch?v=" + encodeURIComponent(id);
   youtubeTranscriptLink.hidden = false;
   loadRegisteredSubtitle(id);
@@ -59,6 +66,8 @@ function createPlayer(videoId) {
     events: {
       onReady: () => {
         placeholder.hidden = true;
+        const playerTitle = player && typeof player.getVideoData === "function" ? player.getVideoData().title : "";
+        if (playerTitle && !videoTitleEl.value.trim()) videoTitleEl.value = playerTitle.slice(0, 120);
         statusEl.textContent = cues.length
           ? "영상이 준비됐습니다. 등록된 자막을 함께 읽을 수 있습니다."
           : "영상이 준비됐습니다. 자막이 없다면 SRT/VTT 파일을 선택해주세요.";
@@ -251,6 +260,79 @@ function updateActiveCue() {
     if (active) line.scrollIntoView({ block: "nearest", behavior: "smooth" });
   });
 }
+
+
+function renderVideoLibrary(items = readVideoLibrary()) {
+  videoLibraryEl.replaceChildren();
+  if (!items.length) {
+    const empty = document.createElement("p");
+    empty.className = "library-empty";
+    empty.textContent = "아직 담은 영상이 없습니다. 영상을 불러온 뒤 ‘영상책에 담기’를 눌러보세요.";
+    videoLibraryEl.appendChild(empty);
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  items.forEach(entry => {
+    const card = document.createElement("article");
+    card.className = "saved-video-card";
+    const open = document.createElement("button");
+    open.type = "button";
+    open.className = "saved-video-open";
+    open.addEventListener("click", () => {
+      inputEl.value = entry.videoId;
+      videoTitleEl.value = entry.title;
+      loadVideo();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    const thumbnail = document.createElement("img");
+    thumbnail.className = "saved-video-thumb";
+    thumbnail.src = "https://i.ytimg.com/vi/" + encodeURIComponent(entry.videoId) + "/mqdefault.jpg";
+    thumbnail.alt = "";
+    thumbnail.loading = "lazy";
+    const details = document.createElement("span");
+    details.className = "saved-video-details";
+    const title = document.createElement("strong");
+    title.textContent = entry.title;
+    const id = document.createElement("span");
+    id.textContent = entry.videoId;
+    details.append(title, id);
+    open.append(thumbnail, details);
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "remove-saved-video";
+    remove.textContent = "삭제";
+    remove.setAttribute("aria-label", entry.title + " 영상 삭제");
+    remove.addEventListener("click", () => {
+      try {
+        renderVideoLibrary(removeVideo(localStorage, entry.videoId));
+        statusEl.textContent = "내 영상책에서 영상을 삭제했습니다.";
+      } catch (_) {
+        statusEl.textContent = "저장 공간에 접근할 수 없어 삭제하지 못했습니다.";
+      }
+    });
+    card.append(open, remove);
+    fragment.appendChild(card);
+  });
+  videoLibraryEl.appendChild(fragment);
+}
+
+saveVideoButton.addEventListener("click", () => {
+  if (!currentVideoId) {
+    statusEl.textContent = "먼저 영상을 불러와주세요.";
+    return;
+  }
+  const playerTitle = player && typeof player.getVideoData === "function" ? player.getVideoData().title : "";
+  const title = (videoTitleEl.value.trim() || playerTitle || ("YouTube 영상 " + currentVideoId)).slice(0, 120);
+  try {
+    renderVideoLibrary(saveVideo(localStorage, { videoId: currentVideoId, title }));
+    videoTitleEl.value = title;
+    statusEl.textContent = "‘" + title + "’ 영상을 내 영상책에 저장했습니다.";
+  } catch (_) {
+    statusEl.textContent = "브라우저 저장 공간에 접근할 수 없습니다. 브라우저의 사이트 저장 설정을 확인해주세요.";
+  }
+});
+
+renderVideoLibrary();
 
 loadButton.addEventListener("click", loadVideo);
 inputEl.addEventListener("keydown", event => { if (event.key === "Enter") loadVideo(); });

@@ -43,3 +43,19 @@ h2 { margin: 0; font-size: 20px; letter-spacing: -.04em; }
 .cue-text { overflow-wrap: anywhere; }
 footer { padding: 22px 0; color: #99958b; text-align: center; font-size: 11px; }
 @media (max-width: 420px) { .app { width: min(100% - 22px, 760px); } .load-panel, .transcript-panel { padding: 14px; } .load-row button { padding: 0 13px; } }
+.library-panel { margin: 14px 0; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); }
+.save-video-row { display: flex; gap: 8px; margin-top: 14px; }
+.save-video-row input { min-width: 0; flex: 1; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: white; font-size: 13px; }
+.save-video-row button { padding: 0 13px; border: 0; border-radius: 10px; background: var(--accent); color: white; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.save-video-row button:disabled { opacity: .45; }
+.library-panel .helper { margin-bottom: 8px; }
+.video-library { border-top: 1px solid var(--line); }
+.library-empty { margin: 12px 0 2px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.saved-video-card { display: flex; align-items: center; gap: 9px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.saved-video-open { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 0; border: 0; background: transparent; color: var(--ink); text-align: left; }
+.saved-video-thumb { width: 88px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 7px; background: #e8e5dd; }
+.saved-video-details { display: grid; gap: 4px; min-width: 0; }
+.saved-video-details strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.saved-video-details span { color: var(--muted); font-size: 10px; }
+.remove-saved-video { padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: white; color: var(--muted); font-size: 11px; }
+@media (max-width: 420px) { .library-panel { padding: 14px; } .save-video-row { flex-wrap: wrap; } .save-video-row input { flex-basis: 100%; } .save-video-row button { min-height: 38px; margin-left: auto; } }

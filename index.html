@@ -27,6 +27,18 @@
       </div>
       <p id="status" class="status" role="status">영상 주소를 입력하고 불러오기를 눌러주세요.</p>
     </section>
+    <section class="library-panel" aria-labelledby="library-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">MY VIDEO BOOK</p><h2 id="library-title">내 영상책</h2></div>
+        <span class="coming-soon">이 기기에 저장</span>
+      </div>
+      <div class="save-video-row">
+        <input id="video-title" type="text" maxlength="120" placeholder="영상 제목 (선택)" aria-label="저장할 영상 제목">
+        <button id="save-video" type="button" disabled>영상책에 담기</button>
+      </div>
+      <p class="helper">저장한 영상 목록은 현재 브라우저의 이 기기에만 보관됩니다. 영상 파일이나 자막은 저장하지 않습니다.</p>
+      <div id="video-library" class="video-library" aria-live="polite"></div>
+    </section>
     <section class="viewer" aria-label="영상 플레이어">
       <div id="player-placeholder" class="player-placeholder">
         <span class="play-symbol">▶</span><span>영상이 여기에 표시됩니다</span>
