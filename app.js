@@ -12,6 +12,12 @@ const youtubeTranscriptLink = document.getElementById("youtube-transcript-link")
 const videoTitleEl = document.getElementById("video-title");
 const saveVideoButton = document.getElementById("save-video");
 const videoLibraryEl = document.getElementById("video-library");
+const librarySearchEl = document.getElementById("library-search");
+
+function getLocalStorage() {
+  try { return window.localStorage; }
+  catch (_) { return null; }
+}
 
 let player = null;
 let apiReady = false;
@@ -262,7 +268,7 @@ function updateActiveCue() {
 }
 
 
-function renderVideoLibrary(items = readVideoLibrary()) {
+function renderVideoLibrary(items = readVideoLibrary(), query = librarySearchEl.value) {
   videoLibraryEl.replaceChildren();
   if (!items.length) {
     const empty = document.createElement("p");
@@ -271,8 +277,19 @@ function renderVideoLibrary(items = readVideoLibrary()) {
     videoLibraryEl.appendChild(empty);
     return;
   }
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const visibleItems = normalizedQuery
+    ? items.filter(entry => (entry.title + " " + entry.videoId).toLocaleLowerCase().includes(normalizedQuery))
+    : items;
+  if (!visibleItems.length) {
+    const empty = document.createElement("p");
+    empty.className = "library-empty";
+    empty.textContent = "검색어와 일치하는 영상이 없습니다.";
+    videoLibraryEl.appendChild(empty);
+    return;
+  }
   const fragment = document.createDocumentFragment();
-  items.forEach(entry => {
+  visibleItems.forEach(entry => {
     const card = document.createElement("article");
     card.className = "saved-video-card";
     const open = document.createElement("button");
@@ -304,7 +321,7 @@ function renderVideoLibrary(items = readVideoLibrary()) {
     remove.setAttribute("aria-label", entry.title + " 영상 삭제");
     remove.addEventListener("click", () => {
       try {
-        renderVideoLibrary(removeVideo(localStorage, entry.videoId));
+        renderVideoLibrary(removeVideo(getLocalStorage(), entry.videoId));
         statusEl.textContent = "내 영상책에서 영상을 삭제했습니다.";
       } catch (_) {
         statusEl.textContent = "저장 공간에 접근할 수 없어 삭제하지 못했습니다.";
@@ -324,7 +341,7 @@ saveVideoButton.addEventListener("click", () => {
   const playerTitle = player && typeof player.getVideoData === "function" ? player.getVideoData().title : "";
   const title = (videoTitleEl.value.trim() || playerTitle || ("YouTube 영상 " + currentVideoId)).slice(0, 120);
   try {
-    renderVideoLibrary(saveVideo(localStorage, { videoId: currentVideoId, title }));
+    renderVideoLibrary(saveVideo(getLocalStorage(), { videoId: currentVideoId, title }));
     videoTitleEl.value = title;
     statusEl.textContent = "‘" + title + "’ 영상을 내 영상책에 저장했습니다.";
   } catch (_) {
@@ -333,6 +350,7 @@ saveVideoButton.addEventListener("click", () => {
 });
 
 renderVideoLibrary();
+librarySearchEl.addEventListener("input", () => renderVideoLibrary(readVideoLibrary(), librarySearchEl.value));
 
 loadButton.addEventListener("click", loadVideo);
 inputEl.addEventListener("keydown", event => { if (event.key === "Enter") loadVideo(); });

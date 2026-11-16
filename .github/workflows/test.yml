@@ -17,3 +17,5 @@ jobs:
           node-version: 22
       - run: npm test
       - run: node --check app.js
+      - run: node --check subtitle-parser.js
+      - run: node --check video-library.js

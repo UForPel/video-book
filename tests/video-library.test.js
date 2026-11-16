@@ -48,3 +48,21 @@ test("handles unavailable or invalid local storage data safely", () => {
   assert.deepEqual(readVideoLibrary({ getItem() { throw new Error("blocked"); } }), []);
   assert.deepEqual(readVideoLibrary(createStorage("not-json")), []);
 });
+
+test("limits the library to the newest 100 unique videos", () => {
+  const storage = createStorage();
+  for (let i = 0; i < 105; i++) {
+    const id = i.toString(36).padStart(11, "a").slice(-11);
+    saveVideo(storage, { videoId: id, title: "영상 " + i }, i + 1);
+  }
+  const items = readVideoLibrary(storage);
+  assert.equal(items.length, 100);
+  assert.equal(items[0].title, "영상 104");
+  assert.equal(items.at(-1).title, "영상 5");
+});
+
+test("returns an empty library when storage is unavailable and rejects writes", () => {
+  assert.deepEqual(readVideoLibrary(null), []);
+  assert.throws(() => saveVideo(null, { videoId: "abcdefghijk", title: "영상" }), /저장 공간/);
+  assert.throws(() => removeVideo(null, "abcdefghijk"), /저장 공간/);
+});
