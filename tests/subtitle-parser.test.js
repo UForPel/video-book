@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { formatTime, parseSubtitle, parseTimestamp } from "../subtitle-parser.js";
+import { formatTime, parseSubtitle, parseTimestamp, searchSubtitle } from "../subtitle-parser.js";
 
 test("parses SRT timestamps with comma milliseconds", () => {
   assert.deepEqual(parseSubtitle("1\n00:00:01,250 --> 00:00:02,500\n안녕하세요."), [
@@ -52,4 +52,16 @@ test("formats times with and without hours", () => {
   assert.equal(formatTime(65.9), "01:05");
   assert.equal(formatTime(3661), "01:01:01");
   assert.equal(formatTime(-3), "00:00");
+});
+
+
+test("searches subtitle text without changing original cue indexes", () => {
+  const cues = [
+    { start: 0, end: 1, text: "Hello world" },
+    { start: 1, end: 2, text: "안녕하세요" },
+    { start: 2, end: 3, text: "HELLO again" }
+  ];
+  assert.deepEqual(searchSubtitle(cues, " hello ").map(match => match.index), [0, 2]);
+  assert.deepEqual(searchSubtitle(cues, "안녕").map(match => match.index), [1]);
+  assert.deepEqual(searchSubtitle(cues, "").map(match => match.index), [0, 1, 2]);
 });

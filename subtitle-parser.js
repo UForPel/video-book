@@ -60,3 +60,14 @@ export function formatTime(seconds) {
     ? [hours, minutes, remainder].map(value => String(value).padStart(2, "0")).join(":")
     : [minutes, remainder].map(value => String(value).padStart(2, "0")).join(":");
 }
+
+/** Return matching subtitle cues with their original cue indexes. */
+export function searchSubtitle(cues, query) {
+  if (!Array.isArray(cues)) return [];
+  const term = typeof query === "string" ? query.trim().toLocaleLowerCase() : "";
+  return cues.reduce((matches, cue, index) => {
+    const text = cue && typeof cue.text === "string" ? cue.text : "";
+    if (!term || text.toLocaleLowerCase().includes(term)) matches.push({ cue, index });
+    return matches;
+  }, []);
+}

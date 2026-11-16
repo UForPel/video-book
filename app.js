@@ -1,4 +1,4 @@
-import { parseSubtitle, formatTime } from "./subtitle-parser.js";
+import { parseSubtitle, formatTime, searchSubtitle } from "./subtitle-parser.js";
 import { readVideoLibrary, saveVideo, removeVideo } from "./video-library.js";
 
 const statusEl = document.getElementById("status");
@@ -7,6 +7,7 @@ const loadButton = document.getElementById("load-video");
 const placeholder = document.getElementById("player-placeholder");
 const subtitleFile = document.getElementById("subtitle-file");
 const transcriptEl = document.getElementById("transcript");
+const transcriptSearchEl = document.getElementById("transcript-search");
 const transcriptHint = document.getElementById("transcript-hint");
 const youtubeTranscriptLink = document.getElementById("youtube-transcript-link");
 const videoTitleEl = document.getElementById("video-title");
@@ -163,15 +164,26 @@ async function loadRegisteredSubtitle(videoId) {
 
 function renderTranscript() {
   transcriptEl.replaceChildren();
+  transcriptSearchEl.disabled = !cues.length;
   if (!cues.length) {
     transcriptHint.textContent = "SRT 또는 VTT 자막 파일을 선택하면 시간대별로 표시됩니다.";
     return;
   }
+  const matches = searchSubtitle(cues, transcriptSearchEl.value);
   const fragment = document.createDocumentFragment();
-  cues.forEach((cue, index) => {
+  if (!matches.length) {
+    const empty = document.createElement("p");
+    empty.className = "transcript-empty";
+    empty.textContent = "검색어와 일치하는 자막이 없습니다.";
+    transcriptEl.appendChild(empty);
+    transcriptHint.textContent = "검색 결과 0개 · 다른 단어로 찾아보세요.";
+    return;
+  }
+  matches.forEach(({ cue, index }) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "time-line";
+    button.dataset.cueIndex = String(index);
     const timestamp = document.createElement("span");
     timestamp.className = "timestamp";
     timestamp.textContent = formatTime(cue.start);
@@ -191,7 +203,9 @@ function renderTranscript() {
     fragment.appendChild(button);
   });
   transcriptEl.appendChild(fragment);
-  transcriptHint.textContent = cues.length + "개 자막을 불러왔습니다. 문장을 누르면 영상이 해당 시점으로 이동합니다.";
+  transcriptHint.textContent = transcriptSearchEl.value.trim()
+    ? "검색 결과 " + matches.length + "개 / 전체 " + cues.length + "개 자막 · 문장을 누르면 해당 장면으로 이동합니다."
+    : cues.length + "개 자막을 불러왔습니다. 문장을 누르면 영상이 해당 시점으로 이동합니다.";
 }
 
 subtitleFile.addEventListener("change", async () => {
@@ -260,8 +274,8 @@ function updateActiveCue() {
   }
   if (found === activeCueIndex) return;
   activeCueIndex = found;
-  transcriptEl.querySelectorAll(".time-line").forEach((line, index) => {
-    const active = index === found;
+  transcriptEl.querySelectorAll(".time-line").forEach(line => {
+    const active = Number(line.dataset.cueIndex) === found;
     line.classList.toggle("active", active);
     if (active) line.scrollIntoView({ block: "nearest", behavior: "smooth" });
   });
@@ -351,6 +365,7 @@ saveVideoButton.addEventListener("click", () => {
 
 renderVideoLibrary();
 librarySearchEl.addEventListener("input", () => renderVideoLibrary(readVideoLibrary(), librarySearchEl.value));
+transcriptSearchEl.addEventListener("input", renderTranscript);
 
 loadButton.addEventListener("click", loadVideo);
 inputEl.addEventListener("keydown", event => { if (event.key === "Enter") loadVideo(); });

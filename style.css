@@ -62,3 +62,9 @@ footer { padding: 22px 0; color: #99958b; text-align: center; font-size: 11px; }
 
 .library-search { width: 100%; margin: 4px 0 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; font: inherit; font-size: 12px; }
 .library-search:focus { outline: 2px solid #b8c9be; outline-offset: 1px; }
+
+.transcript-search-label { display: block; margin: 14px 0 7px; font-size: 12px; font-weight: 700; }
+.transcript-search { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: #fff; font: inherit; font-size: 13px; }
+.transcript-search:focus { outline: 2px solid #b8c9be; outline-offset: 1px; }
+.transcript-search:disabled { background: #f1efe9; color: var(--muted); }
+.transcript-empty { margin: 14px 0; padding: 14px; border-radius: 9px; background: #f7f5f0; color: var(--muted); font-size: 12px; text-align: center; }
