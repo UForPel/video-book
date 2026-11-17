@@ -1068,3 +1068,58 @@ VB-29에서 미확인으로 남긴 GitHub Actions 원격 실행 결과를 실제
 - 근거: 저장소의 PROJECT_CONTEXT.md, README.md, ROADMAP.md, DECISIONS.md, AGENT_WORK_RULES.md 및 실제 GitHub Actions 결과.
 - 비용/계정: 0원. 새 계정, API 키, 서버, 결제 없음.
 - 다음 작업: 검색과 일반 시청자 자막 취득을 분리해, 현재 제약을 지키면서 실제로 작동하고 정책상 허용되는 경로가 있는지 확인한다. 경로가 없다면 그 사실을 명확히 보고하고 사용자 승인 없이 제약을 바꾸지 않는다.
+
+
+## VB-32 — 프로젝트 종료 및 다음 프로젝트 인수인계 (2026-11-18)
+
+### 작업 전 저장소 확인
+- 저장소: UForPel/video-book, 기본 브랜치 main.
+- 기준 HEAD: 5e35367519c217cc38005f670f50478a6b503345 (docs: realign roadmap with core video book goals, 2026-11-16).
+- 저장소 최신 문서와 기존 작업 규칙을 재조회했다.
+- 최신 Test workflow run #21: success — https://github.com/UForPel/video-book/actions/runs/43876800911.
+- Pages workflow 직전 run #231: success — https://github.com/UForPel/video-book/actions/runs/43876799632.
+- 이 작업에서는 종료 보고서와 인수인계 문서를 작성하며, 앱 코드/기능은 변경하지 않는다.
+
+### 사용자의 최종 결정
+2026-11-18 사용자는 영상책 개발을 종료하고, 지금까지의 요구사항·조사·실패 원인·결정·테스트·미구현 기능을 GitHub에 자세히 정리해 향후 다른 프로젝트를 시작할 수 있도록 요청했다.
+
+같은 날 별도 브라우저형 GitHub Pages 포털 아이디어(설치 없이 YouTube 전체 사이트를 내부 표시하고 Brave 수준 광고 차단을 적용하는 방향)도 검토했다. 사용자는 내부 플레이어 방식(검색/즐겨찾기/시청을 웹앱에 모음)을 선택했으나, 정적 웹앱의 브라우저 권한 한계와 검색 데이터 공급 문제를 확인한 후 해당 아이디어도 진행하지 않기로 했다. 별도 web-portal 저장소나 코드/배포는 만들지 않았다.
+
+### 종료 이유 요약
+1. IFrame Player API의 listType=search는 2020-11-15부터 지원 중단되었다.
+2. 공식 Data API search.list는 존재하지만 기본 100회/일 검색 쿼터가 있으며, 추가 결과 페이지도 별도 요청을 소비한다. 무제한 검색이 아니다.
+3. Data API 등록·자격 증명 및 API Services Terms §3.2의 법적 계약 연령 요건은 현재 사용자 제약과 충돌한다. 사용자에게 약관 수락·API 프로젝트/키 발급·연령 우회를 안내하지 않았다.
+4. GitHub Pages는 정적 호스팅이며 API 비밀키를 안전하게 보관하는 백엔드가 아니다. 서버를 추가해도 YouTube API quota·계약·정책은 사라지지 않는다.
+5. Captions API는 일반 시청자가 임의 공개 영상 자막 본문을 가져오는 범용 API가 아니다. IFrame API도 transcript cue 본문을 반환하지 않는다.
+6. 비공식 DOM scraping/InnerTube/timedtext/확장/헤드리스 경로는 기술 사례가 있으나 정책상 허용 근거, Android 안정성, 운영 지속성을 확보하지 못했다.
+7. 사용자가 거부한 외부 검색·URL 붙여넣기·수동 대본 복사·제작자 자막 파일 확보는 핵심 UX 대체안이 될 수 없다.
+8. 핵심 데이터 경로가 해결되지 않은 상태에서 보조 기능만 추가하는 것은 사용자에게 원하는 제품 진전을 제공하지 못했다.
+
+### 기존 구현과 미구현 구분
+- 구현/보존: GitHub Pages 정적 사이트, YouTube IFrame 재생, URL/ID 입력, SRT/VTT 파서·로컬 파일 표시 및 시간 동기화 실험, 빈 자막 registry 골격, 로컬 영상 보관함, 보관함 검색, 자막 텍스트 검색, Node 내장 파서 테스트 8개, GitHub Actions.
+- 미구현: 영상책 내부 실제 YouTube 검색/결과 목록, 일반 시청자용 임의 공개 영상 자막 자동 취득, 자동 한국어 맞춤법·띄어쓰기 교정의 완결 흐름, 전체 Android E2E.
+- 기존 보조 기능은 삭제하지 않으며 핵심 제품 완성으로 재분류하지 않는다.
+
+### 테스트/배포 상태와 한계
+- 기준 커밋 5e35367519c217cc38005f670f50478a6b503345의 GitHub Actions Test run #21은 success.
+- Pages workflow run #231은 success로 기록되어 있다.
+- 성공은 기존 파서 테스트/JS 구문 검사 및 정적 사이트 빌드·배포에 한정된다. 핵심 YouTube 검색·자동 자막·교정 E2E 성공이 아니다.
+- 과거 Android 영상 재생/시점 이동은 사용자 보고가 있었으나, 이번 종료 정리에서 새 실기기 테스트는 미실행이다.
+- 한국어 SRT/VTT 실제 파일 실기기 E2E는 미확인이다.
+
+### 변경 사항
+- 신규: PROJECT_CLOSURE_REPORT.md — 전체 종료 보고서.
+- 신규: NEXT_PROJECT_HANDOFF.md — 다음 프로젝트 착수 체크리스트와 재발 방지 기준.
+- 갱신: README.md, PROJECT_CONTEXT.md, PROJECT_STATUS.md, ROADMAP.md, DECISIONS.md.
+- 앱 소스, 테스트 코드, 워크플로, Pages 설정은 변경하지 않는다.
+- 저장소/Pages는 삭제하거나 비활성화하지 않고 보존한다.
+
+### 검증 / 미실행
+- 성공: 작업 전 최신 main HEAD와 필수 문서를 확인, 종료 원인과 구현/미구현/테스트 상태를 분리해 문서화.
+- 이번 문서 작업에서 미실행: 앱 코드 테스트 재실행, Android 실기기 테스트, YouTube API 호출, 자막 자동 취득 E2E, 새 Pages 배포 확인.
+- 새 비용·계정·API 키·서버·유료 서비스 추가 없음.
+
+### 다음 작업
+- 영상책 신규 개발은 종료 상태로 유지한다.
+- 다음 프로젝트는 NEXT_PROJECT_HANDOFF.md의 사전 타당성 검토를 먼저 통과시킨 뒤 별도 저장소에서 시작한다.
+- 기존 조사 후보는 새로운 공식 근거가 생기지 않는 한 반복하지 않는다.

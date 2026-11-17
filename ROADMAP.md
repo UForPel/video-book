@@ -1,5 +1,16 @@
 # 영상책 개발 로드맵
 
+**상태: 개발 종료(보존) — 2026-11-18**
+
+신규 기능 개발과 동일 후보 반복 조사는 중단한다. 기존 코드는 삭제하지 않고 역사적 구현·테스트 자산으로 보존한다. 재개는 종료 보고서의 재개 조건을 모두 새롭게 충족할 때만 검토한다.
+
+- 종료 보고서: [PROJECT_CLOSURE_REPORT.md](./PROJECT_CLOSURE_REPORT.md)
+- 다음 프로젝트 인수인계: [NEXT_PROJECT_HANDOFF.md](./NEXT_PROJECT_HANDOFF.md)
+- 현재 상태: [PROJECT_STATUS.md](./PROJECT_STATUS.md)
+- 결정 기록: [DECISIONS.md](./DECISIONS.md)
+
+---
+
 상세 상태는 [PROJECT_STATUS.md](./PROJECT_STATUS.md), 기술 결정은 [DECISIONS.md](./DECISIONS.md), 벤치마킹 자료는 [RESEARCH_BENCHMARKS.md](./RESEARCH_BENCHMARKS.md)를 기준으로 관리합니다.
 
 ## 최우선 선결 과제 — 내부 검색과 자동 스크립트 확보
