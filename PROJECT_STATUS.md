@@ -993,7 +993,7 @@ D. 서버/헤드리스 브라우저에서 페이지를 렌더링해 추출
 - 정적 사이트는 별도 번들/컴파일 단계가 없어 별도 compile 명령은 없다.
 - 원격 저장소에서 다시 가져온 앱 파일을 로컬 검사 디렉터리에 구성한 뒤 `node --check app.js`: 통과.
 - Python 표준 라이브러리 `html.parser`로 `index.html` 파싱: 통과.
-- VB-29 작성 시점에는 실제 원격 실행 결과를 조회하지 못했다. 이후 VB-30에서 해당 커밋의 Test run #12와 Pages deployment run #231이 모두 성공했음을 확인했다.
+- VB-29 작성 시점에는 실제 원격 실행 결과를 조회하지 못했다. 이후 VB-30에서 해당 커밋의 Test run #12와 Pages deployment run #240이 모두 성공했음을 확인했다.
 - 실제 브라우저, GitHub Pages 배포, Android 실기기 테스트는 미실행.
 
 ### 품질 회고
@@ -1019,7 +1019,7 @@ VB-29에서 미확인으로 남긴 GitHub Actions 원격 실행 결과를 실제
   - `npm test`: success
   - `node --check app.js`: success
   - 실행: https://github.com/UForPel/video-book/actions/runs/43401058449
-- GitHub Pages build and deployment run #231: **success**
+- GitHub Pages build and deployment run #240: **success**
   - Jekyll build: success
   - Upload artifact: success
   - Deploy to GitHub Pages: success
@@ -1077,7 +1077,7 @@ VB-29에서 미확인으로 남긴 GitHub Actions 원격 실행 결과를 실제
 - 기준 HEAD: 5e35367519c217cc38005f670f50478a6b503345 (docs: realign roadmap with core video book goals, 2026-11-16).
 - 저장소 최신 문서와 기존 작업 규칙을 재조회했다.
 - 최신 Test workflow run #21: success — https://github.com/UForPel/video-book/actions/runs/43876800911.
-- Pages workflow 직전 run #231: success — https://github.com/UForPel/video-book/actions/runs/43876799632.
+- Pages workflow 직전 run #240: success — https://github.com/UForPel/video-book/actions/runs/43876799632.
 - 이 작업에서는 종료 보고서와 인수인계 문서를 작성하며, 앱 코드/기능은 변경하지 않는다.
 
 ### 사용자의 최종 결정
@@ -1102,7 +1102,7 @@ VB-29에서 미확인으로 남긴 GitHub Actions 원격 실행 결과를 실제
 
 ### 테스트/배포 상태와 한계
 - 기준 커밋 5e35367519c217cc38005f670f50478a6b503345의 GitHub Actions Test run #21은 success.
-- Pages workflow run #231은 success로 기록되어 있다.
+- Pages workflow run #240은 success로 기록되어 있다.
 - 성공은 기존 파서 테스트/JS 구문 검사 및 정적 사이트 빌드·배포에 한정된다. 핵심 YouTube 검색·자동 자막·교정 E2E 성공이 아니다.
 - 과거 Android 영상 재생/시점 이동은 사용자 보고가 있었으나, 이번 종료 정리에서 새 실기기 테스트는 미실행이다.
 - 한국어 SRT/VTT 실제 파일 실기기 E2E는 미확인이다.

@@ -175,7 +175,7 @@
 
 기준 커밋 5e35367519c217cc38005f670f50478a6b503345 (2026-11-16, docs: realign roadmap with core video book goals)에 대해 확인한 GitHub Actions:
 - Test run #21: **success** — https://github.com/UForPel/video-book/actions/runs/43876800911
-- GitHub Pages build/deployment run #231: **success** — https://github.com/UForPel/video-book/actions/runs/43876799632
+- GitHub Pages build/deployment run #240: **success** — https://github.com/UForPel/video-book/actions/runs/43876799632
 
 Test run 성공은 저장소에 구현된 자동 테스트와 JavaScript 구문 검사 통과를 의미한다. Pages 배포 성공은 정적 사이트가 빌드·게시되었다는 의미다. 둘 다 YouTube 내부 검색, 일반 시청자 자막 자동 취득, 자동 교정이 동작한다는 증거가 아니다.
 
